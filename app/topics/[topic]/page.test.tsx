@@ -16,6 +16,9 @@ describe("TopicPage", () => {
     expect(
       screen.getByRole("link", { name: "Study due questions" }),
     ).toHaveAttribute("href", "/topics/nodejs/study");
+    expect(
+      screen.getByRole("link", { name: "Take proficiency quiz" }),
+    ).toHaveAttribute("href", "/topics/nodejs/quiz");
 
     for (const [category, label] of Object.entries(
       QUESTION_CATEGORY_LABELS,

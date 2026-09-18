@@ -2,7 +2,7 @@
 
 ## Purpose
 
-InterviewForge is a personal web app for preparing for technical interviews. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it.
+InterviewForge is a personal web app for preparing for technical interviews. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. It also offers a short timed Node.js proficiency quiz that is separate from study.
 
 ## Core study loop
 
@@ -18,16 +18,30 @@ InterviewForge is a personal web app for preparing for technical interviews. It 
 10. View a session summary with rating counts for the questions studied.
 11. Optionally click **Study again** to rebuild the same kind of session (due review or category practice) from current progress.
 
+## Node.js proficiency quiz
+
+1. From the Node.js topic page, choose **Take proficiency quiz**.
+2. Read that the attempt has 10 questions and 8 minutes, then click **Start quiz**.
+3. Select one of four answers and click **Next**. The last question uses **Finish quiz**.
+4. If time reaches 00:00, the attempt ends with answers given so far. Unanswered questions count as incorrect.
+5. View the score, percentage, and per-category breakdown for that attempt.
+6. Optionally click **Try again** for a new in-memory attempt, or **Back to Node.js**.
+
+Quiz results are not saved and do not change study progress.
+
 ## Current target use case
 
-A single user studying a curated bank of **30 Node.js questions across 8 categories** in the browser, on their own device, without signing in. Progress survives page reloads via browser LocalStorage.
+A single user studying a curated bank of **30 Node.js questions across 8 categories** in the browser, on their own device, without signing in. Study progress survives page reloads via browser LocalStorage.
 
-Entry path: home page → **Study Node.js questions** → `/topics/nodejs`. The topic page links to due review at `/topics/nodejs/study` and to manual practice for each category.
+The same topic also offers a timed multiple-choice quiz from a separate bank of **20 Node.js quiz questions**. Each attempt samples 10 of those questions.
+
+Entry path: home page → **Study Node.js questions** → `/topics/nodejs`. The topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, and manual practice for each category.
 
 ## Product principles
 
 - **Incremental delivery** — ship the smallest slice that completes the current story.
 - **Active recall** — questions before answers; self-rating after reveal.
+- **Separate assessment** — quiz scoring is not mixed with recall ratings or review scheduling.
 - **Honest scope** — no features until a story requires them.
 - **Simple UX** — one question at a time, minimal navigation.
 
@@ -37,9 +51,10 @@ The product does **not** currently provide:
 
 - User accounts or authentication
 - Server-side or database persistence
+- Quiz history, quiz LocalStorage, or weak-category analysis
 - Adaptive spaced repetition algorithms beyond the current fixed schedule
 - Multiple topics beyond Node.js (only `nodejs` is wired in routing)
-- Quizzes, mock interviews, or coding challenge environments
+- Mock interviews or coding challenge environments
 - AI evaluation of answers
 - Analytics, gamification, or localization
 - Cross-device sync

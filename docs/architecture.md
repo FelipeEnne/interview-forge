@@ -16,33 +16,40 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 
 | Path | Role |
 | --- | --- |
-| `app/` | Routes and layouts. Home, topic overview, due study, and category study pages. |
-| `components/` | Interactive UI. `TopicStudySession` owns the study flow. |
-| `data/` | Static in-repo question banks (currently `nodejs-questions.ts`). |
-| `domain/` | Pure TypeScript logic: ratings, progress, due selection, ordering, LocalStorage I/O. |
+| `app/` | Routes and layouts. Home, topic overview, due study, category study, and quiz pages. |
+| `components/` | Interactive UI. `TopicStudySession` owns the study flow. `NodejsQuiz` owns the quiz flow. |
+| `data/` | Static in-repo banks: `nodejs-questions.ts` (study) and `nodejs-quiz-questions.ts` (quiz). |
+| `domain/` | Pure TypeScript logic: ratings, progress, due selection, ordering, LocalStorage I/O, quiz selection and scoring. |
 | `docs/` | Product and technical documentation. |
 
 ## Server vs client boundary
 
-- **Server Components (default):** route pages validate URL segments, select static topic data, and render either the topic overview or study shell.
+- **Server Components (default):** route pages validate URL segments, select static topic data, and render the topic overview, study shell, or quiz shell.
 - **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration.
+- **Client Component:** `NodejsQuiz` (`"use client"`) holds intro/active/result phases, samples questions after **Start quiz**, and runs the countdown from a deadline.
 
-LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`.
+LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`. Quiz pages pass the static quiz bank; the client samples an attempt only after an explicit start.
 
 ## Domain concepts
 
 | Concept | Responsibility |
 | --- | --- |
-| `InterviewQuestion` | Stable `id`, typed `category`, `question`, and `answer` text. |
-| `QuestionCategory` / `QUESTION_CATEGORY_LABELS` | Eight allowed Node.js category slugs and their UI labels. |
+| `InterviewQuestion` | Study/active-recall item: stable `id`, typed `category`, `question`, and `answer` text. |
+| `QuizQuestion` | Assessment item: stable `id`, typed `category`, `question`, four `options`, and `correctOption`. |
+| `QuestionCategory` / `QUESTION_CATEGORY_LABELS` | Eight allowed Node.js category slugs and their UI labels, shared by study and quiz. |
 | `RecallRating` | `"again" \| "hard" \| "good" \| "easy"`. |
 | `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question rating, count, and review timestamps (LocalStorage). |
 | `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
 | `getDueQuestions` (`domain/due-questions.ts`) | **Pure domain rule** — selects unreviewed, legacy, or scheduled questions whose `nextReviewAt` is at or before a supplied instant. |
 | `orderQuestionsForStudy` (`domain/question-order.ts`) | **Pure domain rule** — maps topic questions + progress snapshot → study order. |
+| `selectQuizQuestions` (`domain/quiz.ts`) | **Pure domain rule** — samples `count` unique questions using an injected `randomSource`. |
+| `calculateQuizResult` (`domain/quiz.ts`) | **Pure domain rule** — scores an attempt; unanswered items are incorrect; aggregates by category. |
 | Session mode | `due-review` lets scheduling select questions; `practice` includes every supplied question. |
 | Study session queue (`sessionQuestions`) | **Fixed ordered queue** for one pass; stored in React state after queue creation. |
 | `SessionRatings` | **Current-session only** — ratings for summary counts; cleared on **Study again**. |
+| Quiz attempt | **Current-attempt only** — selected questions, sparse answers, and deadline; not persisted. |
+
+Study questions and quiz questions are separate models. Quiz scoring does not read or write `QuestionProgress`.
 
 ## Session state vs persistent progress
 
@@ -63,11 +70,26 @@ LocalStorage is unavailable on the server; study pages pass questions and a sess
 
 **Boundary:** Persisted progress is read when creating a study queue (initial load, **Study again**, and voluntary **Study all questions**). `TopicStudySession` does not keep the full progress map in React state—only the selected and ordered question list. Ratings still read/write storage per question when the user rates.
 
+## Quiz attempt state
+
+**Attempt-only (React state in `NodejsQuiz`):**
+
+- Phase: intro, active, or result
+- Sampled attempt questions
+- Current question index
+- Sparse answers keyed by question id
+- Deadline (`Date.now() + 8 minutes`) and remaining seconds derived from it
+
+The countdown starts only on **Start quiz** or **Try again**. Remaining time is `ceil((deadline - Date.now()) / 1000)`, not a decrement-only counter. At zero, the component clears the interval and scores the current answers. **Try again** samples a new set and does not keep the previous result.
+
+Option order stays as authored. Tests inject `randomSource` into `selectQuizQuestions` so production can shuffle while domain tests stay deterministic.
+
 ## Topic and study routes
 
-- `/topics/nodejs` is the Node.js entry page. It links to due review and lists all categories from `QUESTION_CATEGORY_LABELS`.
+- `/topics/nodejs` is the Node.js entry page. It links to due review, the proficiency quiz, and all categories from `QUESTION_CATEGORY_LABELS`.
 - `/topics/nodejs/study` starts the normal due-review session.
 - `/topics/nodejs/categories/[category]` validates the category slug, filters the static bank on the server, and starts a manual practice session.
+- `/topics/nodejs/quiz` hosts the full quiz flow (intro, attempt, result) in one client component.
 - Unknown topic or category slugs return not found.
 
 Category filtering stays at the application boundary because it is a single, explicit use of `Array.filter`; no separate domain rule is needed.
@@ -89,7 +111,7 @@ Each rating uses a fixed elapsed-time interval: **Again** 10 minutes, **Hard** 1
 
 ## Due question selection
 
-A normal session includes a question when it has no progress, has legacy progress without `nextReviewAt`, or has `nextReviewAt <= currentTime`. The current instant is captured once per queue creation and passed to `getDueQuestions`; domain logic does not read the system clock.
+A normal session includes a question when it is unreviewed, has legacy progress without `nextReviewAt`, or has `nextReviewAt <= currentTime`. The current instant is captured once per queue creation and passed to `getDueQuestions`; domain logic does not read the system clock.
 
 Selection preserves topic order and is composed before ordering:
 
@@ -117,10 +139,10 @@ The server preserves question-bank order while filtering. The client then applie
 
 ## Testing strategy
 
-- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`).
-- **Data:** Sanity checks on `NODEJS_TOPIC` content, categories, count, unique ids, and preservation of original ids.
-- **Routes:** topic and category page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed UI.
-- **UI:** `TopicStudySession.test.tsx` exercises user-visible flows (category context, show answer, rate, summary, due and practice selection, prioritization, **Study again**, LocalStorage side effects) with Testing Library.
+- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`).
+- **Data:** Sanity checks on `NODEJS_TOPIC` and `NODEJS_QUIZ_QUESTIONS` content, categories, counts, unique ids, and option/correct-index validity.
+- **Routes:** topic, category, and quiz page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed study UI.
+- **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, **Try again**, and the countdown with fake timers.
 - No E2E or snapshot tests.
 
 Run: `npm test -- --run` (or `npm run test:run`).
@@ -129,9 +151,12 @@ Run: `npm test -- --run` (or `npm run test:run`).
 
 - Keep business rules in `domain/` so UI stays thin and testable without Next.js.
 - Pass the current instant into domain functions so scheduling tests never depend on the real clock.
+- Keep quiz selection testable by injecting `randomSource`; production uses `Math.random`.
+- Derive remaining quiz time from a deadline so tests can fake the clock without a real wait.
 - Static question data in TypeScript modules rather than a CMS or DB for now.
-- Keep all 30 Node.js questions and their category taxonomy in one readable data module; category display labels are the single source of truth for the category union.
-- Preserve question ids when content gains metadata because LocalStorage progress is keyed by question id. Category is not persisted.
+- Keep study questions and quiz questions in separate data modules because they are different shapes.
+- Keep all 30 Node.js study questions and their category taxonomy in one readable data module; category display labels are the single source of truth for the category union.
+- Preserve study question ids when content gains metadata because LocalStorage progress is keyed by question id. Category is not persisted.
 - Single topic route validates slug against `NODEJS_TOPIC`; unknown topics → `notFound()`.
 - Category slugs are validated against `QUESTION_CATEGORY_LABELS`; unknown categories → `notFound()`.
 - Strict LocalStorage validation to avoid corrupt partial state.
@@ -139,6 +164,7 @@ Run: `npm test -- --run` (or `npm run test:run`).
 - Separate **fixed session queue** from **mutable persisted progress** so in-session ratings never reshuffle the current pass.
 - Separate due filtering from question ordering so each domain rule remains independently testable.
 - Separate scheduled review from manual category practice through an explicit session mode.
+- Keep quiz results in memory for the current attempt only.
 
 ## Known technical debt
 

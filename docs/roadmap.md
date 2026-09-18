@@ -15,6 +15,7 @@ Stories are delivered incrementally. Details for completed work live under `docs
 | 7 | Study questions due for review |
 | 8 | Categorized Node.js question bank |
 | 9 | Study Node.js questions by category |
+| 10 | Node.js proficiency quiz |
 
 ## Next
 
@@ -22,9 +23,9 @@ Planned direction (not fully specified until each story is written):
 
 | Item | Notes |
 | --- | --- |
+| Weak-category analysis | Use quiz category breakdown as the conceptual base; do not persist until a dedicated story. |
 | Spaced repetition | Adaptive intervals beyond the fixed scheduling policy. |
 | Additional topics | More question banks and topic navigation. |
-| Quizzes | Structured assessment flows. |
 | Coding challenges | Practice with executable code; out of scope today. |
 
 Future items are placeholders only—implement when a dedicated story requires them.
