@@ -104,7 +104,6 @@ Run: `npm test -- --run` (or `npm run test:run`).
 
 ## Known technical debt
 
-- Duplicate `.js` files alongside some `.ts` sources in `domain/` (`question-order.js`, `recall-rating.js`, and related tests) — likely stray artifacts; TypeScript sources are authoritative for the app build.
 - Topic registry is hard-coded in the topic page (not a shared topic index).
 - No app-route-level tests; coverage is centered on `TopicStudySession` and domain modules.
 - `reviewCount` is persisted but not used in ordering or UI yet.

@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Stray tsc emit next to sources (tsconfig.json sets noEmit; domain is TypeScript-only)
+domain/**/*.js
