@@ -77,7 +77,7 @@ export function TopicStudySession({
             </ul>
             <button
               type="button"
-              className={styles.buttonPrimary}
+              className={`${styles.button} ${styles.buttonPrimary}`}
               onClick={handleStudyAgain}
             >
               Study again
@@ -92,7 +92,7 @@ export function TopicStudySession({
             <div className={styles.actions}>
               <button
                 type="button"
-                className={styles.buttonPrimary}
+                className={`${styles.button} ${styles.buttonPrimary}`}
                 onClick={handleShowAnswer}
                 disabled={isAnswerVisible}
               >

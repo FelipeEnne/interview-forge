@@ -92,7 +92,6 @@
 }
 
 .buttonPrimary {
-  composes: button;
   background: var(--foreground);
   color: var(--background);
   border-color: var(--foreground);
