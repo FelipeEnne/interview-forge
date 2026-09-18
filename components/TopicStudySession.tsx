@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { InterviewQuestion } from "@/data/nodejs-questions";
 import {
   readQuestionProgress,
   saveQuestionProgress,
 } from "@/domain/local-storage-progress";
+import { orderQuestionsForStudy } from "@/domain/question-order";
 import { recordQuestionProgress } from "@/domain/question-progress";
 import {
   countSessionRatings,
@@ -28,13 +29,25 @@ export function TopicStudySession({
   topicName,
   questions,
 }: TopicStudySessionProps) {
+  const [sessionQuestions, setSessionQuestions] = useState<
+    InterviewQuestion[] | null
+  >(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnswerVisible, setIsAnswerVisible] = useState(false);
   const [sessionRatings, setSessionRatings] = useState<SessionRatings>({});
   const [isSessionComplete, setIsSessionComplete] = useState(false);
 
-  const currentQuestion = questions[currentIndex];
-  const isLastQuestion = currentIndex >= questions.length - 1;
+  useEffect(() => {
+    // LocalStorage is client-only, so the session queue is initialized after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSessionQuestions(
+      orderQuestionsForStudy(questions, readQuestionProgress()),
+    );
+  }, [questions]);
+
+  const currentQuestion = sessionQuestions?.[currentIndex];
+  const isLastQuestion =
+    sessionQuestions !== null && currentIndex >= sessionQuestions.length - 1;
   const showRatings = isAnswerVisible && !isSessionComplete;
   const ratingCounts = countSessionRatings(sessionRatings);
 
@@ -43,6 +56,10 @@ export function TopicStudySession({
   }
 
   function handleRating(rating: RecallRating) {
+    if (!currentQuestion) {
+      return;
+    }
+
     const questionId = currentQuestion.id;
     const nextRatings = recordSessionRating(sessionRatings, questionId, rating);
     setSessionRatings(nextRatings);
@@ -64,6 +81,9 @@ export function TopicStudySession({
   }
 
   function handleStudyAgain() {
+    setSessionQuestions(
+      orderQuestionsForStudy(questions, readQuestionProgress()),
+    );
     setCurrentIndex(0);
     setIsAnswerVisible(false);
     setSessionRatings({});
@@ -74,7 +94,9 @@ export function TopicStudySession({
     <div className={styles.container}>
       <h1 className={styles.title}>{topicName}</h1>
       <article className={styles.card} aria-live="polite">
-        {isSessionComplete ? (
+        {sessionQuestions === null ? (
+          <p className={styles.question}>Preparing study session...</p>
+        ) : isSessionComplete ? (
           <div className={styles.summary}>
             <p className={styles.sessionComplete}>Session complete</p>
             <p className={styles.summaryTotal}>
@@ -95,7 +117,7 @@ export function TopicStudySession({
               Study again
             </button>
           </div>
-        ) : (
+        ) : currentQuestion ? (
           <>
             <p className={styles.question}>{currentQuestion.question}</p>
             {isAnswerVisible ? (
@@ -126,7 +148,7 @@ export function TopicStudySession({
               ) : null}
             </div>
           </>
-        )}
+        ) : null}
       </article>
     </div>
   );

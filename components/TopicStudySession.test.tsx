@@ -78,6 +78,22 @@ describe("TopicStudySession", () => {
     expect(screen.queryByText("First answer text.")).not.toBeInTheDocument();
   });
 
+  it("starts a new session with weaker questions prioritized", async () => {
+    localStorage.setItem(
+      QUESTION_PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        q1: { lastRating: "good", reviewCount: 1 },
+        q2: { lastRating: "again", reviewCount: 1 },
+      }),
+    );
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    expect(await screen.findByText("Second question text?")).toBeInTheDocument();
+  });
+
   it("does not show recall rating buttons before the answer is revealed", () => {
     render(
       <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
@@ -216,6 +232,20 @@ describe("TopicStudySession", () => {
     expect(screen.queryByText("Session complete")).not.toBeInTheDocument();
     expect(screen.getByText("First question text?")).toBeInTheDocument();
     expect(screen.queryByText("First answer text.")).not.toBeInTheDocument();
+  });
+
+  it("recalculates question priority when Study again is clicked", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    await completeSession(user, ["easy", "again", "good"]);
+    await user.click(screen.getByRole("button", { name: "Study again" }));
+
+    expect(screen.getByText("Second question text?")).toBeInTheDocument();
+    expect(screen.queryByText("Second answer text.")).not.toBeInTheDocument();
   });
 
   it("clears previous ratings when Study again is clicked", async () => {
