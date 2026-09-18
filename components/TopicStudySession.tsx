@@ -4,6 +4,11 @@ import { useState } from "react";
 
 import type { InterviewQuestion } from "@/data/nodejs-questions";
 import {
+  readQuestionProgress,
+  saveQuestionProgress,
+} from "@/domain/local-storage-progress";
+import { recordQuestionProgress } from "@/domain/question-progress";
+import {
   countSessionRatings,
   RECALL_RATING_LABELS,
   RECALL_RATING_OPTIONS,
@@ -41,6 +46,13 @@ export function TopicStudySession({
     const questionId = currentQuestion.id;
     const nextRatings = recordSessionRating(sessionRatings, questionId, rating);
     setSessionRatings(nextRatings);
+
+    const nextProgress = recordQuestionProgress(
+      readQuestionProgress(),
+      questionId,
+      rating,
+    );
+    saveQuestionProgress(nextProgress);
 
     if (isLastQuestion) {
       setIsSessionComplete(true);

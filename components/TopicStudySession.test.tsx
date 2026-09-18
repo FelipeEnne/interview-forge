@@ -1,8 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import type { InterviewQuestion } from "@/data/nodejs-questions";
+import {
+  QUESTION_PROGRESS_STORAGE_KEY,
+  readQuestionProgress,
+} from "@/domain/local-storage-progress";
 import type { RecallRating } from "@/domain/recall-rating";
 import { TopicStudySession } from "./TopicStudySession";
 
@@ -53,6 +57,10 @@ async function completeSession(
 }
 
 describe("TopicStudySession", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it("shows the topic name Node.js", () => {
     render(
       <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
@@ -252,5 +260,41 @@ describe("TopicStudySession", () => {
 
     expect(screen.getByText("Second question text?")).toBeInTheDocument();
     expect(screen.queryByText("Second answer text.")).not.toBeInTheDocument();
+  });
+
+  it("persists question progress to localStorage when a question is rated", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(readQuestionProgress()).toEqual({
+      q1: { lastRating: "good", reviewCount: 1 },
+    });
+    expect(localStorage.getItem(QUESTION_PROGRESS_STORAGE_KEY)).not.toBeNull();
+  });
+
+  it("preserves persisted progress when Study again is clicked", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    await completeSession(user, ["good", "good", "good"]);
+    await user.click(screen.getByRole("button", { name: "Study again" }));
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(readQuestionProgress()).toEqual({
+      q1: { lastRating: "good", reviewCount: 2 },
+      q2: { lastRating: "good", reviewCount: 1 },
+      q3: { lastRating: "good", reviewCount: 1 },
+    });
   });
 });
