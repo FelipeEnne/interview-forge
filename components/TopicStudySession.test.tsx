@@ -98,6 +98,212 @@ describe("TopicStudySession", () => {
     expect(await screen.findByText("Second question text?")).toBeInTheDocument();
   });
 
+  it("starts with only due questions ordered by recall priority", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
+    localStorage.setItem(
+      QUESTION_PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        q1: {
+          lastRating: "good",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-15T03:15:00.000Z",
+          nextReviewAt: "2026-09-18T03:15:00.000Z",
+        },
+        q2: {
+          lastRating: "again",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-18T03:00:00.000Z",
+          nextReviewAt: "2026-09-18T03:10:00.000Z",
+        },
+        q3: {
+          lastRating: "easy",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-17T03:15:00.000Z",
+          nextReviewAt: "2026-09-24T03:15:00.000Z",
+        },
+      }),
+    );
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    expect(await screen.findByText("Second question text?")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(screen.getByText("First question text?")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(screen.getByText("2 questions reviewed")).toBeInTheDocument();
+    expect(screen.queryByText("Third question text?")).not.toBeInTheDocument();
+  });
+
+  it("keeps the due queue fixed when time passes during a session", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
+    localStorage.setItem(
+      QUESTION_PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        q2: {
+          lastRating: "again",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-18T03:10:00.000Z",
+          nextReviewAt: "2026-09-18T03:20:00.000Z",
+        },
+        q3: {
+          lastRating: "easy",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-17T03:15:00.000Z",
+          nextReviewAt: "2026-09-24T03:15:00.000Z",
+        },
+      }),
+    );
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    expect(await screen.findByText("First question text?")).toBeInTheDocument();
+    vi.setSystemTime(new Date("2026-09-18T03:21:00.000Z"));
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(screen.getByText("1 question reviewed")).toBeInTheDocument();
+    expect(screen.queryByText("Second question text?")).not.toBeInTheDocument();
+  });
+
+  it("recalculates due questions with a new time on Study again", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
+    localStorage.setItem(
+      QUESTION_PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        q2: {
+          lastRating: "again",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-18T03:10:00.000Z",
+          nextReviewAt: "2026-09-18T03:20:00.000Z",
+        },
+        q3: {
+          lastRating: "easy",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-17T03:15:00.000Z",
+          nextReviewAt: "2026-09-24T03:15:00.000Z",
+        },
+      }),
+    );
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+    await screen.findByText("First question text?");
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    vi.setSystemTime(new Date("2026-09-18T03:20:00.000Z"));
+    await user.click(screen.getByRole("button", { name: "Study again" }));
+
+    expect(screen.getByText("Second question text?")).toBeInTheDocument();
+  });
+
+  it("shows an empty state when no questions are due", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
+    localStorage.setItem(
+      QUESTION_PROGRESS_STORAGE_KEY,
+      JSON.stringify(
+        Object.fromEntries(
+          sampleQuestions.map(({ id }) => [
+            id,
+            {
+              lastRating: "good",
+              reviewCount: 1,
+              lastReviewedAt: "2026-09-18T03:00:00.000Z",
+              nextReviewAt: "2026-09-21T03:00:00.000Z",
+            },
+          ]),
+        ),
+      ),
+    );
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    expect(await screen.findByText("You're all caught up")).toBeInTheDocument();
+    expect(
+      screen.getByText("No questions are due for review right now."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Study all questions" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Show answer" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("studies all questions in priority order for one voluntary session", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
+    localStorage.setItem(
+      QUESTION_PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        q1: {
+          lastRating: "good",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-18T03:00:00.000Z",
+          nextReviewAt: "2026-09-21T03:00:00.000Z",
+        },
+        q2: {
+          lastRating: "again",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-18T03:00:00.000Z",
+          nextReviewAt: "2026-09-18T03:25:00.000Z",
+        },
+        q3: {
+          lastRating: "easy",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-18T03:00:00.000Z",
+          nextReviewAt: "2026-09-25T03:00:00.000Z",
+        },
+      }),
+    );
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+    await screen.findByText("You're all caught up");
+    await user.click(
+      screen.getByRole("button", { name: "Study all questions" }),
+    );
+
+    expect(screen.getByText("Second question text?")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+    expect(screen.getByText("First question text?")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+    expect(screen.getByText("Third question text?")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(screen.getByText("3 questions reviewed")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Study again" }));
+
+    expect(screen.getByText("You're all caught up")).toBeInTheDocument();
+  });
+
   it("does not show recall rating buttons before the answer is revealed", () => {
     render(
       <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
@@ -163,7 +369,7 @@ describe("TopicStudySession", () => {
     await user.click(screen.getByRole("button", { name: "Show answer" }));
     await user.click(screen.getByRole("button", { name: "Good" }));
 
-    expect(screen.getByText("1 questions reviewed")).toBeInTheDocument();
+    expect(screen.getByText("1 question reviewed")).toBeInTheDocument();
     expect(screen.getByText("Good: 1")).toBeInTheDocument();
     expect(screen.getByText("Again: 0")).toBeInTheDocument();
   });
@@ -224,6 +430,8 @@ describe("TopicStudySession", () => {
   });
 
   it("starts a new session when Study again is clicked", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     const user = userEvent.setup();
 
     render(
@@ -231,6 +439,7 @@ describe("TopicStudySession", () => {
     );
 
     await completeSession(user, ["good", "good", "good"]);
+    vi.setSystemTime(new Date("2026-09-21T03:15:00.000Z"));
     await user.click(screen.getByRole("button", { name: "Study again" }));
 
     expect(screen.queryByText("Session complete")).not.toBeInTheDocument();
@@ -239,6 +448,8 @@ describe("TopicStudySession", () => {
   });
 
   it("recalculates question priority when Study again is clicked", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     const user = userEvent.setup();
 
     render(
@@ -246,6 +457,7 @@ describe("TopicStudySession", () => {
     );
 
     await completeSession(user, ["easy", "again", "good"]);
+    vi.setSystemTime(new Date("2026-09-18T03:25:00.000Z"));
     await user.click(screen.getByRole("button", { name: "Study again" }));
 
     expect(screen.getByText("Second question text?")).toBeInTheDocument();
@@ -253,6 +465,8 @@ describe("TopicStudySession", () => {
   });
 
   it("clears previous ratings when Study again is clicked", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     const user = userEvent.setup();
 
     render(
@@ -260,6 +474,7 @@ describe("TopicStudySession", () => {
     );
 
     await completeSession(user, ["again", "hard", "easy"]);
+    vi.setSystemTime(new Date("2026-09-25T03:15:00.000Z"));
     await user.click(screen.getByRole("button", { name: "Study again" }));
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
@@ -277,23 +492,6 @@ describe("TopicStudySession", () => {
     expect(screen.getByText("Again: 0")).toBeInTheDocument();
     expect(screen.getByText("Hard: 0")).toBeInTheDocument();
     expect(screen.getByText("Easy: 0")).toBeInTheDocument();
-  });
-
-  it("allows rating questions again after Study again", async () => {
-    const user = userEvent.setup();
-
-    render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
-    );
-
-    await completeSession(user, ["good", "good", "good"]);
-    await user.click(screen.getByRole("button", { name: "Study again" }));
-
-    await user.click(screen.getByRole("button", { name: "Show answer" }));
-    await user.click(screen.getByRole("button", { name: "Good" }));
-
-    expect(screen.getByText("Second question text?")).toBeInTheDocument();
-    expect(screen.queryByText("Second answer text.")).not.toBeInTheDocument();
   });
 
   it("persists question progress to localStorage when a question is rated", async () => {
@@ -320,6 +518,8 @@ describe("TopicStudySession", () => {
   });
 
   it("preserves persisted progress when Study again is clicked", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     const user = userEvent.setup();
 
     render(
@@ -327,6 +527,7 @@ describe("TopicStudySession", () => {
     );
 
     await completeSession(user, ["good", "good", "good"]);
+    vi.setSystemTime(new Date("2026-09-21T03:15:00.000Z"));
     await user.click(screen.getByRole("button", { name: "Study again" }));
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));

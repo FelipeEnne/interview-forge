@@ -7,6 +7,7 @@ import {
   readQuestionProgress,
   saveQuestionProgress,
 } from "@/domain/local-storage-progress";
+import { getDueQuestions } from "@/domain/due-questions";
 import { orderQuestionsForStudy } from "@/domain/question-order";
 import { recordQuestionProgress } from "@/domain/question-progress";
 import {
@@ -39,10 +40,11 @@ export function TopicStudySession({
 
   useEffect(() => {
     // LocalStorage is client-only, so the session queue is initialized after hydration.
+    const progress = readQuestionProgress();
+    const dueQuestions = getDueQuestions(questions, progress, new Date());
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSessionQuestions(
-      orderQuestionsForStudy(questions, readQuestionProgress()),
-    );
+    setSessionQuestions(orderQuestionsForStudy(dueQuestions, progress));
   }, [questions]);
 
   const currentQuestion = sessionQuestions?.[currentIndex];
@@ -81,14 +83,25 @@ export function TopicStudySession({
     setIsAnswerVisible(false);
   }
 
-  function handleStudyAgain() {
-    setSessionQuestions(
-      orderQuestionsForStudy(questions, readQuestionProgress()),
-    );
+  function startSession(nextQuestions: InterviewQuestion[]) {
+    setSessionQuestions(nextQuestions);
     setCurrentIndex(0);
     setIsAnswerVisible(false);
     setSessionRatings({});
     setIsSessionComplete(false);
+  }
+
+  function handleStudyAgain() {
+    const progress = readQuestionProgress();
+    const dueQuestions = getDueQuestions(questions, progress, new Date());
+
+    startSession(orderQuestionsForStudy(dueQuestions, progress));
+  }
+
+  function handleStudyAllQuestions() {
+    const progress = readQuestionProgress();
+
+    startSession(orderQuestionsForStudy(questions, progress));
   }
 
   return (
@@ -101,7 +114,8 @@ export function TopicStudySession({
           <div className={styles.summary}>
             <p className={styles.sessionComplete}>Session complete</p>
             <p className={styles.summaryTotal}>
-              {ratingCounts.total} questions reviewed
+              {ratingCounts.total}{" "}
+              {ratingCounts.total === 1 ? "question" : "questions"} reviewed
             </p>
             <ul className={styles.summaryCounts}>
               {RECALL_RATING_OPTIONS.map((rating) => (
@@ -116,6 +130,20 @@ export function TopicStudySession({
               onClick={handleStudyAgain}
             >
               Study again
+            </button>
+          </div>
+        ) : sessionQuestions.length === 0 ? (
+          <div className={styles.summary}>
+            <p className={styles.sessionComplete}>You&apos;re all caught up</p>
+            <p className={styles.summaryTotal}>
+              No questions are due for review right now.
+            </p>
+            <button
+              type="button"
+              className={`${styles.button} ${styles.buttonPrimary}`}
+              onClick={handleStudyAllQuestions}
+            >
+              Study all questions
             </button>
           </div>
         ) : currentQuestion ? (

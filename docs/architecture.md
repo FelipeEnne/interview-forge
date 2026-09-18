@@ -19,7 +19,7 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 | `app/` | Routes and layouts. Home (`/`) and dynamic topic page (`/topics/[topic]`). |
 | `components/` | Interactive UI. `TopicStudySession` owns the study flow. |
 | `data/` | Static in-repo question banks (currently `nodejs-questions.ts`). |
-| `domain/` | Pure TypeScript logic: ratings, progress, ordering, LocalStorage I/O. |
+| `domain/` | Pure TypeScript logic: ratings, progress, due selection, ordering, LocalStorage I/O. |
 | `docs/` | Product and technical documentation. |
 
 ## Server vs client boundary
@@ -37,6 +37,7 @@ LocalStorage is unavailable on the server; the topic page passes questions as pr
 | `RecallRating` | `"again" \| "hard" \| "good" \| "easy"`. |
 | `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question rating, count, and review timestamps (LocalStorage). |
 | `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
+| `getDueQuestions` (`domain/due-questions.ts`) | **Pure domain rule** — selects unreviewed, legacy, or scheduled questions whose `nextReviewAt` is at or before a supplied instant. |
 | `orderQuestionsForStudy` (`domain/question-order.ts`) | **Pure domain rule** — maps topic questions + progress snapshot → study order. |
 | Study session queue (`sessionQuestions`) | **Fixed ordered queue** for one pass; stored in React state after queue creation. |
 | `SessionRatings` | **Current-session only** — ratings for summary counts; cleared on **Study again**. |
@@ -58,7 +59,7 @@ LocalStorage is unavailable on the server; the topic page passes questions as pr
 - Stores `lastReviewedAt` and `nextReviewAt` as ISO 8601 UTC strings
 - Not cleared by **Study again**; `reviewCount` accumulates across sessions
 
-**Boundary:** Persisted progress is read when creating a study queue (initial load and **Study again**). `TopicStudySession` does not keep the full progress map in React state—only the ordered question list produced by `orderQuestionsForStudy`. Ratings still read/write storage per question when the user rates.
+**Boundary:** Persisted progress is read when creating a study queue (initial load, **Study again**, and voluntary **Study all questions**). `TopicStudySession` does not keep the full progress map in React state—only the selected and ordered question list. Ratings still read/write storage per question when the user rates.
 
 ## LocalStorage strategy
 
@@ -73,19 +74,31 @@ Ordering uses `lastRating` only; `reviewCount` and review timestamps do not affe
 
 ## Review scheduling
 
-Each rating uses a fixed elapsed-time interval: **Again** 10 minutes, **Hard** 1 day, **Good** 3 days, and **Easy** 7 days. `TopicStudySession` obtains the current `Date` at the client boundary and passes it into pure domain logic. The policy does not expand intervals from history and does not filter due questions.
+Each rating uses a fixed elapsed-time interval: **Again** 10 minutes, **Hard** 1 day, **Good** 3 days, and **Easy** 7 days. `TopicStudySession` obtains the current `Date` at the client boundary and passes it into pure domain logic. The policy does not expand intervals from history.
+
+## Due question selection
+
+A normal session includes a question when it has no progress, has legacy progress without `nextReviewAt`, or has `nextReviewAt <= currentTime`. The current instant is captured once per queue creation and passed to `getDueQuestions`; domain logic does not read the system clock.
+
+Selection preserves topic order and is composed before ordering:
+
+`all questions → getDueQuestions → orderQuestionsForStudy → fixed session queue`
+
+If no questions are due, the UI offers **Study all questions**. This action skips due selection for one voluntary session but still applies the standard ordering rule.
 
 ## Question ordering
 
 Priority (lower number first): **Again** → **Hard** → unreviewed → **Good** → **Easy**, with stable tie-breaking by original topic order. Progress keys that do not match a topic question id are ignored for sort purposes.
 
-**When the queue is built:** after hydration on topic load, and when the user clicks **Study again** (re-read LocalStorage, new queue).
+**When the queue is built:** after hydration on topic load, and when the user clicks **Study again** (re-read LocalStorage, capture a new instant, select due questions, then order them). **Study all questions** also re-reads LocalStorage and orders the complete topic without due filtering.
 
 **During an active session:** the queue is not reordered; new ratings affect storage and the next queue only.
 
+**After voluntary practice:** **Study again** returns to the normal due-selection flow. The voluntary override is not persisted.
+
 ## Testing strategy
 
-- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `question-order`).
+- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`).
 - **Data:** Sanity checks on `NODEJS_TOPIC` content.
 - **UI:** `TopicStudySession.test.tsx` exercises user-visible flows (show answer, rate, summary, prioritization, **Study again**, LocalStorage side effects) with Testing Library.
 - No E2E or snapshot tests.
@@ -101,6 +114,7 @@ Run: `npm test -- --run` (or `npm run test:run`).
 - Strict LocalStorage validation to avoid corrupt partial state.
 - Client-only queue initialization to avoid SSR/hydration mismatch with stored progress.
 - Separate **fixed session queue** from **mutable persisted progress** so in-session ratings never reshuffle the current pass.
+- Separate due filtering from question ordering so each domain rule remains independently testable.
 
 ## Known technical debt
 

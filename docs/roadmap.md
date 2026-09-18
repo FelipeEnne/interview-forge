@@ -12,6 +12,7 @@ Stories are delivered incrementally. Details for completed work live under `docs
 | 4 | Local progress persistence |
 | 5 | Prioritize weaker questions |
 | 6 | Schedule next review timestamps |
+| 7 | Study questions due for review |
 
 ## Next
 
@@ -19,7 +20,6 @@ Planned direction (not fully specified until each story is written):
 
 | Item | Notes |
 | --- | --- |
-| Due questions | Use persisted `nextReviewAt` timestamps to select material for review. |
 | Spaced repetition | Adaptive intervals beyond the fixed scheduling policy. |
 | Additional topics | More question banks and topic navigation. |
 | Quizzes | Structured assessment flows. |
