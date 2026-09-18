@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import type { QuizQuestion } from "@/data/nodejs-quiz-questions";
@@ -46,6 +46,10 @@ const backLink = {
   href: "/topics/nodejs",
   label: "Back to Node.js",
 };
+
+function createUser() {
+  return userEvent.setup({ delay: null });
+}
 
 async function startQuiz(user: ReturnType<typeof userEvent.setup>) {
   render(
@@ -96,7 +100,7 @@ describe("NodejsQuiz", () => {
   });
 
   it("starts the first question and timer after Start quiz", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     await startQuiz(user);
 
@@ -107,7 +111,7 @@ describe("NodejsQuiz", () => {
   });
 
   it("advances after a selected answer and Next", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     await startQuiz(user);
     await answerAndAdvance(user, "q1 A");
@@ -117,7 +121,7 @@ describe("NodejsQuiz", () => {
   });
 
   it("finishes on the last question and shows the score", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
     const storageSpy = vi.spyOn(Storage.prototype, "setItem");
 
     await startQuiz(user);
@@ -153,29 +157,29 @@ describe("NodejsQuiz", () => {
   });
 
   it("ends when the timer reaches zero and counts a selected unanswered advance as answered", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-09-18T00:00:00.000Z"));
+    const startedAt = new Date("2026-09-18T00:00:00.000Z").getTime();
+    let currentTime = startedAt;
     const storageSpy = vi.spyOn(Storage.prototype, "setItem");
 
-    render(
-      <NodejsQuiz
-        questions={questions}
-        randomSource={stableRandom}
-        backLink={backLink}
-      />,
+    const quizProps = {
+      questions,
+      randomSource: stableRandom,
+      backLink,
+    };
+
+    const { rerender } = render(
+      <NodejsQuiz {...quizProps} now={() => currentTime} />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Start quiz" }));
     fireEvent.click(screen.getByRole("radio", { name: "q1 A" }));
 
-    act(() => {
-      vi.advanceTimersByTime(1000);
-    });
+    currentTime = startedAt + 1000;
+    rerender(<NodejsQuiz {...quizProps} now={() => currentTime} />);
     expect(screen.getByText("Time remaining: 07:59")).toBeInTheDocument();
 
-    act(() => {
-      vi.advanceTimersByTime(QUIZ_DURATION_MS - 1000);
-    });
+    currentTime = startedAt + QUIZ_DURATION_MS;
+    rerender(<NodejsQuiz {...quizProps} now={() => currentTime} />);
 
     expect(screen.getByText("1 / 10")).toBeInTheDocument();
     expect(screen.getByText("10%")).toBeInTheDocument();
@@ -193,7 +197,7 @@ describe("NodejsQuiz", () => {
   });
 
   it("starts a new attempt from Try again", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
     const storageSpy = vi.spyOn(Storage.prototype, "setItem");
 
     await startQuiz(user);

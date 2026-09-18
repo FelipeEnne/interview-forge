@@ -1,3 +1,5 @@
+/** @vitest-environment node */
+
 import { describe, expect, it } from "vitest";
 
 import { NODEJS_CODING_CHALLENGES } from "@/data/nodejs-coding-challenges";

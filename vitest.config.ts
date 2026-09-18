@@ -8,6 +8,19 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.test.{ts,tsx}"],
+    pool: "forks",
+    isolate: true,
+    poolOptions: {
+      forks: {
+        execArgv: [
+          "--require",
+          path.join(import.meta.dirname, "vitest.monotonic-now.cjs"),
+        ],
+      },
+    },
+    sequence: {
+      hooks: "stack",
+    },
   },
   resolve: {
     alias: {

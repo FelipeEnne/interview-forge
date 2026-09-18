@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import type { InterviewQuestion } from "@/data/nodejs-questions";
 import {
@@ -47,6 +47,21 @@ function ratingButtons() {
   };
 }
 
+function createClock(iso: string) {
+  let currentMs = new Date(iso).getTime();
+
+  return {
+    now: () => new Date(currentMs),
+    set: (nextIso: string) => {
+      currentMs = new Date(nextIso).getTime();
+    },
+  };
+}
+
+function createUser() {
+  return userEvent.setup({ delay: null });
+}
+
 async function completeSession(
   user: ReturnType<typeof userEvent.setup>,
   ratings: RecallRating[],
@@ -60,17 +75,20 @@ async function completeSession(
 }
 
 describe("TopicStudySession", () => {
+  let clock: ReturnType<typeof createClock>;
+
   beforeEach(() => {
     localStorage.clear();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
+    clock = createClock("2026-09-18T03:15:00.000Z");
   });
 
   it("shows the topic name Node.js", () => {
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     expect(screen.getByRole("heading", { name: "Node.js" })).toBeInTheDocument();
@@ -78,7 +96,11 @@ describe("TopicStudySession", () => {
 
   it("shows the first question and hides its answer initially", () => {
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     expect(screen.getByText("First question text?")).toBeInTheDocument();
@@ -86,10 +108,14 @@ describe("TopicStudySession", () => {
   });
 
   it("shows the category and updates it when the current question changes", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     expect(screen.getByText("Fundamentals")).toBeInTheDocument();
@@ -111,15 +137,17 @@ describe("TopicStudySession", () => {
     );
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     expect(await screen.findByText("Second question text?")).toBeInTheDocument();
   });
 
   it("starts with only due questions ordered by recall priority", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     localStorage.setItem(
       QUESTION_PROGRESS_STORAGE_KEY,
       JSON.stringify({
@@ -143,10 +171,14 @@ describe("TopicStudySession", () => {
         },
       }),
     );
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     expect(await screen.findByText("Second question text?")).toBeInTheDocument();
@@ -164,8 +196,6 @@ describe("TopicStudySession", () => {
   });
 
   it("studies every supplied question in recall priority order in practice mode", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     localStorage.setItem(
       QUESTION_PROGRESS_STORAGE_KEY,
       JSON.stringify({
@@ -189,13 +219,14 @@ describe("TopicStudySession", () => {
         },
       }),
     );
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
       <TopicStudySession
         topicName="Node.js"
         questions={sampleQuestions}
         sessionMode="practice"
+        now={clock.now}
       />,
     );
 
@@ -206,15 +237,14 @@ describe("TopicStudySession", () => {
   });
 
   it("rebuilds a practice session with every supplied question on Study again", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
       <TopicStudySession
         topicName="Node.js"
         questions={sampleQuestions}
         sessionMode="practice"
+        now={clock.now}
       />,
     );
 
@@ -227,8 +257,6 @@ describe("TopicStudySession", () => {
   });
 
   it("keeps the due queue fixed when time passes during a session", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     localStorage.setItem(
       QUESTION_PROGRESS_STORAGE_KEY,
       JSON.stringify({
@@ -246,14 +274,18 @@ describe("TopicStudySession", () => {
         },
       }),
     );
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     expect(await screen.findByText("First question text?")).toBeInTheDocument();
-    vi.setSystemTime(new Date("2026-09-18T03:21:00.000Z"));
+    clock.set("2026-09-18T03:21:00.000Z");
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
     await user.click(screen.getByRole("button", { name: "Good" }));
@@ -263,8 +295,6 @@ describe("TopicStudySession", () => {
   });
 
   it("recalculates due questions with a new time on Study again", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     localStorage.setItem(
       QUESTION_PROGRESS_STORAGE_KEY,
       JSON.stringify({
@@ -282,24 +312,26 @@ describe("TopicStudySession", () => {
         },
       }),
     );
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
     await screen.findByText("First question text?");
     await user.click(screen.getByRole("button", { name: "Show answer" }));
     await user.click(screen.getByRole("button", { name: "Good" }));
 
-    vi.setSystemTime(new Date("2026-09-18T03:20:00.000Z"));
+    clock.set("2026-09-18T03:20:00.000Z");
     await user.click(screen.getByRole("button", { name: "Study again" }));
 
     expect(screen.getByText("Second question text?")).toBeInTheDocument();
   });
 
   it("shows an empty state when no questions are due", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     localStorage.setItem(
       QUESTION_PROGRESS_STORAGE_KEY,
       JSON.stringify(
@@ -318,7 +350,11 @@ describe("TopicStudySession", () => {
     );
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     expect(await screen.findByText("You're all caught up")).toBeInTheDocument();
@@ -334,8 +370,6 @@ describe("TopicStudySession", () => {
   });
 
   it("studies all questions in priority order for one voluntary session", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     localStorage.setItem(
       QUESTION_PROGRESS_STORAGE_KEY,
       JSON.stringify({
@@ -359,10 +393,14 @@ describe("TopicStudySession", () => {
         },
       }),
     );
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
     await screen.findByText("You're all caught up");
     await user.click(
@@ -388,7 +426,11 @@ describe("TopicStudySession", () => {
 
   it("does not show recall rating buttons before the answer is revealed", () => {
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     const ratings = ratingButtons();
@@ -399,10 +441,14 @@ describe("TopicStudySession", () => {
   });
 
   it("reveals the answer when Show answer is clicked", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
@@ -411,10 +457,14 @@ describe("TopicStudySession", () => {
   });
 
   it("shows recall rating buttons after the answer is revealed", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
@@ -428,10 +478,14 @@ describe("TopicStudySession", () => {
   });
 
   it("advances to the next question when Good is selected and hides the new answer", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
@@ -442,10 +496,14 @@ describe("TopicStudySession", () => {
   });
 
   it("shows recall counts in the summary after ratings are recorded", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={[sampleQuestions[0]]} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={[sampleQuestions[0]]}
+        now={clock.now}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
@@ -457,10 +515,14 @@ describe("TopicStudySession", () => {
   });
 
   it("completes the session on the last question after a rating", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await completeSession(user, ["good", "good", "easy"]);
@@ -478,10 +540,14 @@ describe("TopicStudySession", () => {
   });
 
   it("shows correct Again, Hard, Good, and Easy counts in the summary", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await completeSession(user, ["again", "hard", "easy"]);
@@ -493,10 +559,14 @@ describe("TopicStudySession", () => {
   });
 
   it("hides all study content after the session is complete", async () => {
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await completeSession(user, ["good", "good", "good"]);
@@ -512,16 +582,18 @@ describe("TopicStudySession", () => {
   });
 
   it("starts a new session when Study again is clicked", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await completeSession(user, ["good", "good", "good"]);
-    vi.setSystemTime(new Date("2026-09-21T03:15:00.000Z"));
+    clock.set("2026-09-21T03:15:00.000Z");
     await user.click(screen.getByRole("button", { name: "Study again" }));
 
     expect(screen.queryByText("Session complete")).not.toBeInTheDocument();
@@ -530,16 +602,18 @@ describe("TopicStudySession", () => {
   });
 
   it("recalculates question priority when Study again is clicked", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await completeSession(user, ["easy", "again", "good"]);
-    vi.setSystemTime(new Date("2026-09-18T03:25:00.000Z"));
+    clock.set("2026-09-18T03:25:00.000Z");
     await user.click(screen.getByRole("button", { name: "Study again" }));
 
     expect(screen.getByText("Second question text?")).toBeInTheDocument();
@@ -547,16 +621,18 @@ describe("TopicStudySession", () => {
   });
 
   it("clears previous ratings when Study again is clicked", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await completeSession(user, ["again", "hard", "easy"]);
-    vi.setSystemTime(new Date("2026-09-25T03:15:00.000Z"));
+    clock.set("2026-09-25T03:15:00.000Z");
     await user.click(screen.getByRole("button", { name: "Study again" }));
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
@@ -577,12 +653,14 @@ describe("TopicStudySession", () => {
   });
 
   it("persists question progress to localStorage when a question is rated", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
@@ -600,16 +678,18 @@ describe("TopicStudySession", () => {
   });
 
   it("preserves persisted progress when Study again is clicked", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
-    const user = userEvent.setup();
+    const user = createUser();
 
     render(
-      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        now={clock.now}
+      />,
     );
 
     await completeSession(user, ["good", "good", "good"]);
-    vi.setSystemTime(new Date("2026-09-21T03:15:00.000Z"));
+    clock.set("2026-09-21T03:15:00.000Z");
     await user.click(screen.getByRole("button", { name: "Study again" }));
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));

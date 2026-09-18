@@ -31,16 +31,22 @@ type TopicStudySessionProps = {
   topicName: string;
   questions: InterviewQuestion[];
   sessionMode?: SessionMode;
+  now?: () => Date;
   backLink?: {
     href: string;
     label: string;
   };
 };
 
+function currentTime() {
+  return new Date();
+}
+
 export function TopicStudySession({
   topicName,
   questions,
   sessionMode = "due-review",
+  now = currentTime,
   backLink,
 }: TopicStudySessionProps) {
   const [sessionQuestions, setSessionQuestions] = useState<
@@ -56,12 +62,12 @@ export function TopicStudySession({
     const progress = readQuestionProgress();
     const selectedQuestions =
       sessionMode === "due-review"
-        ? getDueQuestions(questions, progress, new Date())
+        ? getDueQuestions(questions, progress, now())
         : questions;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessionQuestions(orderQuestionsForStudy(selectedQuestions, progress));
-  }, [questions, sessionMode]);
+  }, [now, questions, sessionMode]);
 
   const currentQuestion = sessionQuestions?.[currentIndex];
   const isLastQuestion =
@@ -86,7 +92,7 @@ export function TopicStudySession({
       readQuestionProgress(),
       questionId,
       rating,
-      new Date(),
+      now(),
     );
     saveQuestionProgress(nextProgress);
 
@@ -111,7 +117,7 @@ export function TopicStudySession({
     const progress = readQuestionProgress();
     const selectedQuestions =
       sessionMode === "due-review"
-        ? getDueQuestions(questions, progress, new Date())
+        ? getDueQuestions(questions, progress, now())
         : questions;
 
     startSession(orderQuestionsForStudy(selectedQuestions, progress));

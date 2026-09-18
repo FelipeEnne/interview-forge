@@ -25,8 +25,8 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 ## Server vs client boundary
 
 - **Server Components (default):** route pages validate URL segments, select static topic data, and render the topic overview, study shell, or quiz shell.
-- **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration.
-- **Client Component:** `NodejsQuiz` (`"use client"`) holds intro/active/result phases, samples questions after **Start quiz**, and runs the countdown from a deadline.
+- **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration. The current instant is read from an injectable `now` callback (default `() => new Date()`).
+- **Client Component:** `NodejsQuiz` (`"use client"`) holds intro/active/result phases, samples questions after **Start quiz**, and runs the countdown from a deadline. The current instant is read from an injectable `now` callback (default `Date.now`).
 - **Client Component:** `NodejsCategoryPerformance` (`"use client"`) reads quiz performance after hydration and renders category insights when enough evidence exists.
 - **Client Component:** `RevealSolution` (`"use client"`) hides a challenge's reference solution until **Reveal solution**. The surrounding challenge page stays a Server Component.
 
@@ -85,7 +85,7 @@ Study questions, quiz questions, and coding challenges are separate models. Quiz
 - Sparse answers keyed by question id
 - Deadline (`Date.now() + 8 minutes`) and remaining seconds derived from it
 
-The countdown starts only on **Start quiz** or **Try again**. Remaining time is `ceil((deadline - Date.now()) / 1000)`, not a decrement-only counter. At zero, the component clears the interval and scores the current answers. Normal completion and timeout share one guarded completion path that persists exactly once. **Try again** resets that guard and samples a new set.
+The countdown starts only on **Start quiz** or **Try again**. Remaining time is `ceil((deadline - now()) / 1000)`, not a decrement-only counter. The active-phase effect reads remaining time immediately and then every second. At zero, the component clears the interval and scores the current answers. Normal completion and timeout share one guarded completion path that persists exactly once. **Try again** resets that guard and samples a new set.
 
 Option order stays as authored. Tests inject `randomSource` into `selectQuizQuestions` so production can shuffle while domain tests stay deterministic.
 
@@ -133,7 +133,7 @@ Accumulated accuracy is `total correct / total encountered questions` for each c
 
 ## Review scheduling
 
-Each rating uses a fixed elapsed-time interval: **Again** 10 minutes, **Hard** 1 day, **Good** 3 days, and **Easy** 7 days. `TopicStudySession` obtains the current `Date` at the client boundary and passes it into pure domain logic. The policy does not expand intervals from history.
+Each rating uses a fixed elapsed-time interval: **Again** 10 minutes, **Hard** 1 day, **Good** 3 days, and **Easy** 7 days. `TopicStudySession` obtains the current `Date` through its `now` callback at the client boundary and passes it into pure domain logic. The policy does not expand intervals from history.
 
 ## Due question selection
 
@@ -165,11 +165,15 @@ The server preserves question-bank order while filtering. The client then applie
 
 ## Testing strategy
 
-- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, and `local-storage-quiz-performance`).
+- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, and `local-storage-quiz-performance`). Domain and data tests that do not need the DOM use the Node environment; jsdom is reserved for component, route, and LocalStorage tests.
 - **Data:** Sanity checks on `NODEJS_TOPIC`, `NODEJS_QUIZ_QUESTIONS`, and `NODEJS_CODING_CHALLENGES` content, categories, counts, unique ids, and option/correct-index validity.
 - **Routes:** topic, category, quiz, and coding-challenge page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed study UI.
-- **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, and the countdown with fake timers. `NodejsCategoryPerformance.test.tsx` covers category insights and study links. `NodejsCodingChallenge.test.tsx` covers prompt, starter code, checklist, and delayed reveal of the reference solution.
+- **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, and the countdown. `NodejsCategoryPerformance.test.tsx` covers category insights and study links. `NodejsCodingChallenge.test.tsx` covers prompt, starter code, checklist, and delayed reveal of the reference solution.
 - No E2E or snapshot tests.
+- Do not mock the global `Date` constructor or call `vi.setSystemTime` in component tests.
+- Inject a `now` callback into `TopicStudySession` and `NodejsQuiz` when a test needs a stable clock. Drive quiz timeout by changing that callback and rerendering so the active-phase effect reads the new instant.
+- Vitest 3.2 records test timeouts with `Date.now()`. Workers preload `vitest.monotonic-now.cjs` so that clock stays monotonic even if the WSL wall clock jumps under parallel jsdom load. That prevents false 5s timeouts without hiding a real hang.
+- `userEvent.setup({ delay: null })` avoids extra `setTimeout(0)` waits between pointer events.
 
 Run: `npm test -- --run` (or `npm run test:run`).
 

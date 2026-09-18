@@ -1,3 +1,5 @@
+/** @vitest-environment node */
+
 import { describe, expect, it } from "vitest";
 
 import { QUESTION_CATEGORY_LABELS } from "./nodejs-questions";

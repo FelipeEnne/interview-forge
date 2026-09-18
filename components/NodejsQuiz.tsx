@@ -29,6 +29,7 @@ type QuizPhase = "intro" | "active" | "result";
 type NodejsQuizProps = {
   questions: readonly QuizQuestion[];
   randomSource?: () => number;
+  now?: () => number;
   backLink: {
     href: string;
     label: string;
@@ -42,13 +43,14 @@ function formatTime(totalSeconds: number) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-function remainingSecondsFrom(deadline: number) {
-  return Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+function remainingSecondsFrom(deadline: number, now: number) {
+  return Math.max(0, Math.ceil((deadline - now) / 1000));
 }
 
 export function NodejsQuiz({
   questions,
   randomSource,
+  now = Date.now,
   backLink,
 }: NodejsQuizProps) {
   const [phase, setPhase] = useState<QuizPhase>("intro");
@@ -84,20 +86,29 @@ export function NodejsQuiz({
       return;
     }
 
-    const intervalId = window.setInterval(() => {
-      const remaining = remainingSecondsFrom(deadline);
+    const updateRemaining = () => {
+      const remaining = remainingSecondsFrom(deadline, now());
       setRemainingSeconds(remaining);
 
       if (remaining === 0) {
-        window.clearInterval(intervalId);
         finishAttempt();
+      }
+
+      return remaining;
+    };
+
+    updateRemaining();
+
+    const intervalId = window.setInterval(() => {
+      if (updateRemaining() === 0) {
+        window.clearInterval(intervalId);
       }
     }, 1000);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [phase, deadline, finishAttempt]);
+  }, [phase, deadline, finishAttempt, now]);
 
   const currentQuestion = attemptQuestions[currentIndex];
   const isLastQuestion = currentIndex === attemptQuestions.length - 1;
@@ -110,7 +121,7 @@ export function NodejsQuiz({
     );
     setCurrentIndex(0);
     setAnswers({});
-    setDeadline(Date.now() + QUIZ_DURATION_MS);
+    setDeadline(now() + QUIZ_DURATION_MS);
     setRemainingSeconds(QUIZ_DURATION_MS / 1000);
     setResult(null);
     setPhase("active");
