@@ -1,5 +1,7 @@
 # Product
 
+**Status:** MVP v0.1.0 (Node.js topic: Study, Test, and Practice).
+
 ## Purpose
 
 InterviewForge is a personal web app for preparing for technical interviews. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. It also offers a short timed Node.js proficiency quiz that is separate from study, and a small bank of Node.js coding challenges for implementation practice without running candidate code.

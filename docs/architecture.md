@@ -1,5 +1,7 @@
 # Architecture
 
+Architecture as of **MVP v0.1.0**: one Node.js topic with Study (active recall + LocalStorage scheduling), Test (timed quiz + category aggregates), and Practice (static coding challenges, no execution). Persistence is browser LocalStorage only; no server-side store.
+
 ## Current stack
 
 | Layer | Choice |
@@ -175,7 +177,7 @@ The server preserves question-bank order while filtering. The client then applie
 - Vitest 3.2 records test timeouts with `Date.now()`. Workers preload `vitest.monotonic-now.cjs` so that clock stays monotonic even if the WSL wall clock jumps under parallel jsdom load. That prevents false 5s timeouts without hiding a real hang.
 - `userEvent.setup({ delay: null })` avoids extra `setTimeout(0)` waits between pointer events.
 
-Run: `npm test -- --run` (or `npm run test:run`).
+Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 107 tests across domain, data, routes, and components.
 
 ## Important technical decisions
 

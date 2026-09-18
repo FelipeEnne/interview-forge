@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# InterviewForge
 
-## Getting Started
+Personal web app for technical interview preparation: active recall study, a timed proficiency quiz, and coding challenges—starting with Node.js.
 
-First, run the development server:
+**Status:** MVP v0.1.0
+
+## Features
+
+- **Study** — 30 Node.js questions in 8 categories; reveal answers and rate recall (Again / Hard / Good / Easy); session summary; LocalStorage progress; review scheduling; due questions; weaker questions first; study by category.
+- **Test** — Node.js Proficiency Quiz (20-question bank, 10 per attempt, 8-minute timer); score and per-category breakdown; accumulated performance and top weak categories for study links.
+- **Practice** — 6 Node.js coding challenges with prompts, starter code, review checklists, and on-demand reference solutions (no in-app code execution).
+
+## Stack
+
+- Next.js 16 (App Router), React 19, TypeScript
+- CSS Modules
+- Vitest, Testing Library, jsdom
+- ESLint (`eslint-config-next`)
+
+## Install
+
+```bash
+npm install
+```
+
+## Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Start from **Study Node.js questions**, then use Study (due or category), **Take proficiency quiz**, or **Practice coding challenges** on the Node.js topic page.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Production build:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Tests
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm test -- --run
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Also: `npm run lint`, `npm run build`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Study / Test / Practice
 
-## Deploy on Vercel
+| Mode | Purpose | Persistence |
+| --- | --- | --- |
+| **Study** | Active recall and spaced-style review scheduling | Question progress in LocalStorage |
+| **Test** | Timed multiple-choice assessment separate from recall ratings | Per-category quiz aggregates in LocalStorage |
+| **Practice** | Implementation exercises compared to reference solutions | None (client-only reveal) |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+More detail: `docs/product.md`, `docs/architecture.md`, `docs/roadmap.md`.
