@@ -13,16 +13,19 @@ import { TopicStudySession } from "./TopicStudySession";
 const sampleQuestions: InterviewQuestion[] = [
   {
     id: "q1",
+    category: "fundamentals",
     question: "First question text?",
     answer: "First answer text.",
   },
   {
     id: "q2",
+    category: "async",
     question: "Second question text?",
     answer: "Second answer text.",
   },
   {
     id: "q3",
+    category: "modules",
     question: "Third question text?",
     answer: "Third answer text.",
   },
@@ -80,6 +83,22 @@ describe("TopicStudySession", () => {
 
     expect(screen.getByText("First question text?")).toBeInTheDocument();
     expect(screen.queryByText("First answer text.")).not.toBeInTheDocument();
+  });
+
+  it("shows the category and updates it when the current question changes", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    expect(screen.getByText("Fundamentals")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(screen.getByText("Event Loop & Async")).toBeInTheDocument();
+    expect(screen.queryByText("Fundamentals")).not.toBeInTheDocument();
   });
 
   it("starts a new session with weaker questions prioritized", async () => {

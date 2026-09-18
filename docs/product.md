@@ -9,7 +9,7 @@ InterviewForge is a personal web app for preparing for technical interviews. It 
 1. Open a topic study session.
 2. Select questions that are due, then order them with weaker recall first.
 3. If none are due, optionally choose **Study all questions** for one voluntary practice session.
-4. Read the current question (answer hidden).
+4. Read the current question with its category for context (answer hidden).
 5. Click **Show answer** to reveal the reference answer.
 6. Rate recall with **Again**, **Hard**, **Good**, or **Easy**.
 7. Save when the question was reviewed and schedule its next review.
@@ -19,7 +19,7 @@ InterviewForge is a personal web app for preparing for technical interviews. It 
 
 ## Current target use case
 
-A single user studying **Node.js** interview questions in the browser, on their own device, without signing in. Progress survives page reloads via browser LocalStorage.
+A single user studying a curated bank of **30 Node.js questions across 8 categories** in the browser, on their own device, without signing in. Progress survives page reloads via browser LocalStorage.
 
 Entry path: home page → **Study Node.js questions** → `/topics/nodejs`.
 

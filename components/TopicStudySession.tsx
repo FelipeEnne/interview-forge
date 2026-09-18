@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-import type { InterviewQuestion } from "@/data/nodejs-questions";
+import {
+  QUESTION_CATEGORY_LABELS,
+  type InterviewQuestion,
+} from "@/data/nodejs-questions";
 import {
   readQuestionProgress,
   saveQuestionProgress,
@@ -148,6 +151,9 @@ export function TopicStudySession({
           </div>
         ) : currentQuestion ? (
           <>
+            <p className={styles.category}>
+              {QUESTION_CATEGORY_LABELS[currentQuestion.category]}
+            </p>
             <p className={styles.question}>{currentQuestion.question}</p>
             {isAnswerVisible ? (
               <p className={styles.answer}>{currentQuestion.answer}</p>

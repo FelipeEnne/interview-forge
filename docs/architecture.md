@@ -33,7 +33,8 @@ LocalStorage is unavailable on the server; the topic page passes questions as pr
 
 | Concept | Responsibility |
 | --- | --- |
-| `InterviewQuestion` | `id`, `question`, `answer` text. |
+| `InterviewQuestion` | Stable `id`, typed `category`, `question`, and `answer` text. |
+| `QuestionCategory` / `QUESTION_CATEGORY_LABELS` | Eight allowed Node.js category slugs and their UI labels. |
 | `RecallRating` | `"again" \| "hard" \| "good" \| "easy"`. |
 | `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question rating, count, and review timestamps (LocalStorage). |
 | `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
@@ -99,8 +100,8 @@ Priority (lower number first): **Again** → **Hard** → unreviewed → **Good*
 ## Testing strategy
 
 - **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`).
-- **Data:** Sanity checks on `NODEJS_TOPIC` content.
-- **UI:** `TopicStudySession.test.tsx` exercises user-visible flows (show answer, rate, summary, prioritization, **Study again**, LocalStorage side effects) with Testing Library.
+- **Data:** Sanity checks on `NODEJS_TOPIC` content, categories, count, unique ids, and preservation of original ids.
+- **UI:** `TopicStudySession.test.tsx` exercises user-visible flows (category context, show answer, rate, summary, prioritization, **Study again**, LocalStorage side effects) with Testing Library.
 - No E2E or snapshot tests.
 
 Run: `npm test -- --run` (or `npm run test:run`).
@@ -110,6 +111,8 @@ Run: `npm test -- --run` (or `npm run test:run`).
 - Keep business rules in `domain/` so UI stays thin and testable without Next.js.
 - Pass the current instant into domain functions so scheduling tests never depend on the real clock.
 - Static question data in TypeScript modules rather than a CMS or DB for now.
+- Keep all 30 Node.js questions and their category taxonomy in one readable data module; category display labels are the single source of truth for the category union.
+- Preserve question ids when content gains metadata because LocalStorage progress is keyed by question id. Category is not persisted.
 - Single topic route validates slug against `NODEJS_TOPIC`; unknown topics → `notFound()`.
 - Strict LocalStorage validation to avoid corrupt partial state.
 - Client-only queue initialization to avoid SSR/hydration mismatch with stored progress.

@@ -18,6 +18,13 @@
   background: color-mix(in srgb, var(--foreground) 4%, var(--background));
 }
 
+.category {
+  margin-bottom: 0.5rem;
+  color: color-mix(in srgb, var(--foreground) 65%, transparent);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
 .question {
   font-size: 1.125rem;
   line-height: 1.5;
