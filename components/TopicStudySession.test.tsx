@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { InterviewQuestion } from "@/data/nodejs-questions";
 import { TopicStudySession } from "./TopicStudySession";
@@ -23,6 +23,15 @@ const sampleQuestions: InterviewQuestion[] = [
   },
 ];
 
+function ratingButtons() {
+  return {
+    again: screen.queryByRole("button", { name: "Again" }),
+    hard: screen.queryByRole("button", { name: "Hard" }),
+    good: screen.queryByRole("button", { name: "Good" }),
+    easy: screen.queryByRole("button", { name: "Easy" }),
+  };
+}
+
 describe("TopicStudySession", () => {
   it("shows the topic name Node.js", () => {
     render(
@@ -41,6 +50,18 @@ describe("TopicStudySession", () => {
     expect(screen.queryByText("First answer text.")).not.toBeInTheDocument();
   });
 
+  it("does not show recall rating buttons before the answer is revealed", () => {
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    const ratings = ratingButtons();
+    expect(ratings.again).not.toBeInTheDocument();
+    expect(ratings.hard).not.toBeInTheDocument();
+    expect(ratings.good).not.toBeInTheDocument();
+    expect(ratings.easy).not.toBeInTheDocument();
+  });
+
   it("reveals the answer when Show answer is clicked", async () => {
     const user = userEvent.setup();
 
@@ -53,7 +74,7 @@ describe("TopicStudySession", () => {
     expect(screen.getByText("First answer text.")).toBeInTheDocument();
   });
 
-  it("shows the second question after Next question and hides the new answer", async () => {
+  it("shows recall rating buttons after the answer is revealed", async () => {
     const user = userEvent.setup();
 
     render(
@@ -61,39 +82,72 @@ describe("TopicStudySession", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
-    await user.click(screen.getByRole("button", { name: "Next question" }));
 
-    expect(screen.getByText("Second question text?")).toBeInTheDocument();
-    expect(screen.queryByText("Second answer text.")).not.toBeInTheDocument();
+    const ratings = ratingButtons();
+    expect(ratings.again).toBeInTheDocument();
+    expect(ratings.hard).toBeInTheDocument();
+    expect(ratings.good).toBeInTheDocument();
+    expect(ratings.easy).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Show answer" })).toBeDisabled();
   });
 
-  it("disables Next question on the last question", () => {
-    const singleQuestion: InterviewQuestion[] = [
-      {
-        id: "only",
-        question: "Only question?",
-        answer: "Only answer.",
-      },
-    ];
-
-    render(
-      <TopicStudySession topicName="Node.js" questions={singleQuestion} />,
-    );
-
-    expect(screen.getByRole("button", { name: "Next question" })).toBeDisabled();
-  });
-
-  it("disables Next question when viewing the last item in a longer list", async () => {
+  it("advances to the next question when Good is selected and hides the new answer", async () => {
     const user = userEvent.setup();
 
     render(
       <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Next question" }));
-    await user.click(screen.getByRole("button", { name: "Next question" }));
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(screen.getByText("Second question text?")).toBeInTheDocument();
+    expect(screen.queryByText("Second answer text.")).not.toBeInTheDocument();
+  });
+
+  it("calls onRatingRecorded with the question id and rating", async () => {
+    const user = userEvent.setup();
+    const onRatingRecorded = vi.fn();
+
+    render(
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        onRatingRecorded={onRatingRecorded}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(onRatingRecorded).toHaveBeenCalledTimes(1);
+    expect(onRatingRecorded).toHaveBeenCalledWith("q1", "good");
+  });
+
+  it("completes the session on the last question after a rating", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession topicName="Node.js" questions={sampleQuestions} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    await user.click(screen.getByRole("button", { name: "Easy" }));
 
     expect(screen.getByText("Third question text?")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Next question" })).toBeDisabled();
+    expect(screen.getByText("Third answer text.")).toBeInTheDocument();
+    expect(screen.getByText("Session complete")).toBeInTheDocument();
+
+    const ratings = ratingButtons();
+    expect(ratings.again).not.toBeInTheDocument();
+    expect(ratings.hard).not.toBeInTheDocument();
+    expect(ratings.good).not.toBeInTheDocument();
+    expect(ratings.easy).not.toBeInTheDocument();
   });
 });

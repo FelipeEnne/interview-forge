@@ -35,8 +35,21 @@
 
 .actions {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.ratings {
+  display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.sessionComplete {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 .button {
