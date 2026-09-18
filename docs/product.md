@@ -56,7 +56,7 @@ Entry path: home page → **Study Node.js questions** → `/topics/nodejs`. The 
 
 ## Language
 
-The interface can be used in **English** or **Portuguese**. A header selector (**EN | PT**) is available on every page. The choice is stored in the browser under `interview-forge:locale` and defaults to English. Changing language does not alter study progress, quiz performance, URLs, or the English technical content (questions, answers, quiz items, and coding challenges).
+The interface and technical content can be used in **English** or **Portuguese**. A header selector (**EN | PT**) is available on every page. The choice is stored in the browser under `interview-forge:locale` and defaults to English. Changing language does not alter study progress, quiz performance, URLs, or coding-challenge source code. Study questions, quiz items, and challenge prompts follow the selected language.
 
 ## Product principles
 

@@ -8,7 +8,7 @@ import { NODEJS_TOPIC } from "@/data/nodejs-questions";
 import styles from "./page.module.css";
 
 export function ChallengesList() {
-  const { t, categoryLabel } = useTranslations();
+  const { t, localize, categoryLabel } = useTranslations();
 
   return (
     <main className={styles.container}>
@@ -23,7 +23,7 @@ export function ChallengesList() {
               className={styles.link}
               href={`/topics/${NODEJS_TOPIC.slug}/challenges/${challenge.id}`}
             >
-              {challenge.title}
+              {localize(challenge.title)}
             </Link>
             <p className={styles.category}>
               {categoryLabel(challenge.category)}

@@ -13,6 +13,7 @@ import {
 import type { QuestionCategory } from "@/data/nodejs-questions";
 import type { RecallRating } from "@/domain/recall-rating";
 import { DEFAULT_LOCALE, type Locale } from "@/i18n/locale";
+import { getLocalizedText, type LocalizedTextSource } from "@/i18n/localized-text";
 import { readLocale, saveLocale } from "@/i18n/local-storage-locale";
 import {
   formatQuestionsReviewed,
@@ -84,6 +85,7 @@ export function useTranslations() {
     locale,
     t: (key: MessageKey, vars?: Record<string, string | number>) =>
       translate(locale, key, vars),
+    localize: (value: LocalizedTextSource) => getLocalizedText(value, locale),
     categoryLabel: (category: QuestionCategory) =>
       getCategoryLabel(locale, category),
     ratingLabel: (rating: RecallRating) => getRatingLabel(locale, rating),

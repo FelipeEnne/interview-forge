@@ -34,7 +34,7 @@ describe("CategoryStudyPage", () => {
       "/topics/nodejs",
     );
     expect(
-      screen.getByText(fundamentalsQuestions[0]!.question),
+      screen.getByText(fundamentalsQuestions[0]!.question.en),
     ).toBeInTheDocument();
     expect(
       screen.queryByText(

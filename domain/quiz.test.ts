@@ -10,8 +10,16 @@ function question(
 ): QuizQuestion {
   return {
     category: "fundamentals",
-    question: `${overrides.id}?`,
-    options: ["A", "B", "C", "D"],
+    question: {
+      en: `${overrides.id}?`,
+      pt: `${overrides.id}?`,
+    },
+    options: [
+      { en: "A", pt: "A" },
+      { en: "B", pt: "B" },
+      { en: "C", pt: "C" },
+      { en: "D", pt: "D" },
+    ],
     correctOption: 0,
     ...overrides,
   };

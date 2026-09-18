@@ -1,6 +1,6 @@
 # Architecture
 
-Architecture as of **Story 14**: one Node.js topic with Study, Test, and Practice, plus English/Portuguese UI chrome persisted in LocalStorage. Persistence remains browser LocalStorage only; no server-side store. Technical study, quiz, and challenge content is still English.
+Architecture as of **Story 15**: one Node.js topic with Study, Test, and Practice, plus English/Portuguese UI chrome and bilingual technical content persisted only as a locale preference in LocalStorage. Persistence remains browser LocalStorage only; no server-side store. Language is a presentation concern: the same question, quiz item, and challenge IDs are shown in English or Portuguese.
 
 ## Current stack
 
@@ -20,9 +20,9 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 | --- | --- |
 | `app/` | Routes and layouts. Home, topic overview, due study, category study, quiz, and coding challenge pages. Localized chrome is rendered by client views composed from the server pages. |
 | `components/` | Interactive UI plus the shared header, language selector, and locale provider. |
-| `data/` | Static in-repo banks: `nodejs-questions.ts` (study), `nodejs-quiz-questions.ts` (quiz), and `nodejs-coding-challenges.ts` (practice problems). |
+| `data/` | Static in-repo banks: `nodejs-questions.ts` (study), `nodejs-quiz-questions.ts` (quiz), and `nodejs-coding-challenges.ts` (practice problems). Translatable fields use `LocalizedText`. |
 | `domain/` | Pure TypeScript logic: ratings, progress, due selection, ordering, LocalStorage I/O, quiz selection and scoring. |
-| `i18n/` | Locale type, LocalStorage locale I/O, and the UI translation catalog. |
+| `i18n/` | Locale type, LocalStorage locale I/O, the UI translation catalog, and `LocalizedText` resolution. |
 | `docs/` | Product and technical documentation. |
 
 ## Server vs client boundary
@@ -43,9 +43,10 @@ The first HTML after a reload is English. If the stored locale is Portuguese, ch
 
 | Concept | Responsibility |
 | --- | --- |
-| `InterviewQuestion` | Study/active-recall item: stable `id`, typed `category`, `question`, and `answer` text. |
-| `QuizQuestion` | Assessment item: stable `id`, typed `category`, `question`, four `options`, and `correctOption`. |
-| `CodingChallenge` | Implementation practice item: stable `id`, typed `category`, `prompt`, `requirements`, `starterCode`, `referenceSolution`, and `reviewChecklist`. |
+| `InterviewQuestion` | Study/active-recall item: stable `id`, typed `category`, and bilingual `question`/`answer` (`LocalizedText`). |
+| `QuizQuestion` | Assessment item: stable `id`, typed `category`, bilingual `question`, four bilingual `options`, and `correctOption`. |
+| `CodingChallenge` | Implementation practice item: stable `id`, typed `category`, bilingual `title`/`prompt`/`requirements`/`reviewChecklist`, plus shared `starterCode` and `referenceSolution` strings. |
+| `LocalizedText` | `{ en: string; pt: string }` value used by technical content. `getLocalizedText` selects the active locale and falls back to English if that locale is missing at runtime. |
 | `QuestionCategory` / `QUESTION_CATEGORIES` | Nine allowed Node.js category slugs in canonical order, shared by study, quiz, and challenges. Display names are localized in `i18n/translations.ts`. |
 | `RecallRating` | `"again" \| "hard" \| "good" \| "easy"`. |
 | `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question rating, count, and review timestamps (LocalStorage). |
@@ -138,7 +139,7 @@ Ordering uses `lastRating` only; `reviewCount` and review timestamps do not affe
 - **Format:** the string `en` or `pt`
 - **Read:** `readLocale()` returns `en` on SSR, a missing key, or any value other than `en`/`pt`
 - **Write:** `saveLocale()` writes only this key; study progress and quiz aggregates are untouched
-- Changing language re-renders chrome only. Question IDs, category slugs, recall-rating slugs, and URLs stay the same.
+- Changing language re-renders chrome and technical text only. Question IDs, category slugs, recall-rating slugs, URLs, quiz answers, timers, and challenge source code stay the same. Session React state is not rebuilt because locale is not a queue-creation dependency.
 
 ## Quiz category performance
 
@@ -180,17 +181,17 @@ The server preserves question-bank order while filtering. The client then applie
 
 ## Testing strategy
 
-- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, `local-storage-quiz-performance`, locale parsing, and translations). Domain and data tests that do not need the DOM use the Node environment; jsdom is reserved for component, route, and LocalStorage tests.
-- **Data:** Sanity checks on `NODEJS_TOPIC`, `NODEJS_QUIZ_QUESTIONS`, and `NODEJS_CODING_CHALLENGES` content, categories, counts, unique ids, and option/correct-index validity.
+- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, `local-storage-quiz-performance`, locale parsing, translations, and `getLocalizedText`). Domain and data tests that do not need the DOM use the Node environment; jsdom is reserved for component, route, and LocalStorage tests.
+- **Data:** Sanity checks on `NODEJS_TOPIC`, `NODEJS_QUIZ_QUESTIONS`, and `NODEJS_CODING_CHALLENGES` content, bilingual `LocalizedText` fields, categories, counts, unique ids, option/correct-index validity, and shared challenge source code.
 - **Routes:** topic, category, quiz, and coding-challenge page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed study UI.
-- **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, and the countdown. `NodejsCategoryPerformance.test.tsx` covers category insights and study links. `NodejsCodingChallenge.test.tsx` covers prompt, starter code, checklist, and delayed reveal of the reference solution.
+- **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, the countdown, and language switching during an attempt. `NodejsCategoryPerformance.test.tsx` covers category insights and study links. `NodejsCodingChallenge.test.tsx` covers prompt, starter code, checklist, delayed reveal of the reference solution, and language switching with code unchanged.
 - No E2E or snapshot tests.
 - Do not mock the global `Date` constructor or call `vi.setSystemTime` in component tests.
 - Inject a `now` callback into `TopicStudySession` and `NodejsQuiz` when a test needs a stable clock. Drive quiz timeout by changing that callback and rerendering so the active-phase effect reads the new instant.
 - Vitest 3.2 records test timeouts with `Date.now()`. Workers preload `vitest.monotonic-now.cjs` so that clock stays monotonic even if the WSL wall clock jumps under parallel jsdom load. That prevents false 5s timeouts without hiding a real hang.
 - `userEvent.setup({ delay: null })` avoids extra `setTimeout(0)` waits between pointer events.
 
-Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 144 tests across domain, data, i18n, routes, and components.
+Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 151 tests across domain, data, i18n, routes, and components.
 
 ## Important technical decisions
 
@@ -211,7 +212,7 @@ Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 144 te
 - Separate scheduled review from manual category practice through an explicit session mode.
 - Keep the full quiz result in memory and persist only bounded per-category aggregates because current insights do not require attempt history or timestamps.
 - Require two encountered questions before presenting a category and show the three lowest accuracies without a pass/fail threshold.
-- Keep UI localization in a small typed catalog with LocalStorage preference and no locale in the URL. Technical content stays English until a later story.
+- Keep UI localization in a small typed catalog with LocalStorage preference and no locale in the URL. Technical content uses the same locale through `LocalizedText` and `getLocalizedText`, resolved at render time so switching language does not rebuild study or quiz sessions.
 
 ## Known technical debt
 

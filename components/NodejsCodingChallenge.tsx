@@ -18,23 +18,25 @@ export function NodejsCodingChallenge({
   challenge,
   backLink,
 }: NodejsCodingChallengeProps) {
-  const { t, categoryLabel } = useTranslations();
+  const { t, localize, categoryLabel } = useTranslations();
 
   return (
     <main className={styles.container}>
       <Link className={styles.backLink} href={backLink.href}>
         {t("backToChallenges")}
       </Link>
-      <h1 className={styles.title}>{challenge.title}</h1>
+      <h1 className={styles.title}>{localize(challenge.title)}</h1>
       <p className={styles.category}>{categoryLabel(challenge.category)}</p>
-      <p className={styles.prompt}>{challenge.prompt}</p>
+      <p className={styles.prompt}>{localize(challenge.prompt)}</p>
       <section aria-labelledby="requirements-title">
         <h2 id="requirements-title" className={styles.sectionTitle}>
           {t("requirements")}
         </h2>
         <ul className={styles.list}>
-          {challenge.requirements.map((requirement) => (
-            <li key={requirement}>{requirement}</li>
+          {challenge.requirements.map((requirement, index) => (
+            <li key={`${challenge.id}-requirement-${index}`}>
+              {localize(requirement)}
+            </li>
           ))}
         </ul>
       </section>
@@ -51,8 +53,10 @@ export function NodejsCodingChallenge({
           {t("reviewChecklist")}
         </h2>
         <ul className={styles.list}>
-          {challenge.reviewChecklist.map((item) => (
-            <li key={item}>{item}</li>
+          {challenge.reviewChecklist.map((item, index) => (
+            <li key={`${challenge.id}-checklist-${index}`}>
+              {localize(item)}
+            </li>
           ))}
         </ul>
       </section>

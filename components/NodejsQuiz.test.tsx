@@ -8,6 +8,8 @@ import {
   readQuizPerformance,
 } from "@/domain/local-storage-quiz-performance";
 import { QUIZ_DURATION_MS } from "@/domain/quiz";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { LocaleProvider } from "@/components/LocaleProvider";
 import { NodejsQuiz } from "@/components/NodejsQuiz";
 import { renderWithLocale } from "@/i18n/render-with-locale";
 
@@ -16,12 +18,15 @@ function question(
 ): QuizQuestion {
   return {
     category: "fundamentals",
-    question: `${overrides.id} prompt`,
+    question: {
+      en: `${overrides.id} prompt`,
+      pt: `${overrides.id} pergunta`,
+    },
     options: [
-      `${overrides.id} A`,
-      `${overrides.id} B`,
-      `${overrides.id} C`,
-      `${overrides.id} D`,
+      { en: `${overrides.id} A`, pt: `${overrides.id} A PT` },
+      { en: `${overrides.id} B`, pt: `${overrides.id} B PT` },
+      { en: `${overrides.id} C`, pt: `${overrides.id} C PT` },
+      { en: `${overrides.id} D`, pt: `${overrides.id} D PT` },
     ],
     correctOption: 0,
     ...overrides,
@@ -220,7 +225,7 @@ describe("NodejsQuiz", () => {
     expect(storageSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("translates quiz chrome while keeping question content in English", async () => {
+  it("translates quiz chrome, question, and options to Portuguese and scores the correct option", async () => {
     const user = createUser();
 
     renderWithLocale(
@@ -243,9 +248,63 @@ describe("NodejsQuiz", () => {
 
     await user.click(screen.getByRole("button", { name: "Começar quiz" }));
 
-    expect(screen.getByText("q1 prompt")).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: "q1 A" })).toBeInTheDocument();
+    expect(screen.getByText("q1 pergunta")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "q1 A PT" })).toBeInTheDocument();
     expect(screen.getByText("Pergunta 1 de 10")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Próxima" })).toBeDisabled();
+
+    for (let index = 1; index <= 9; index += 1) {
+      await answerAndAdvance(user, `q${index} A PT`, "Próxima");
+    }
+
+    await answerAndAdvance(user, "q10 A PT", "Finalizar quiz");
+
+    expect(screen.getByText("10 / 10")).toBeInTheDocument();
+    expect(screen.getByText("100%")).toBeInTheDocument();
+  });
+
+  it("keeps the current question, selected answer, and timer when switching language", async () => {
+    const user = createUser();
+    const startedAt = new Date("2026-09-18T00:00:00.000Z").getTime();
+    let currentTime = startedAt;
+    const quizProps = {
+      questions,
+      randomSource: stableRandom,
+      topicName: "Node.js",
+      backLink,
+    };
+
+    const { rerender } = render(
+      <>
+        <LanguageSelector />
+        <NodejsQuiz {...quizProps} now={() => currentTime} />
+      </>,
+      { wrapper: LocaleProvider },
+    );
+
+    await user.click(screen.getByRole("button", { name: "Start quiz" }));
+    await answerAndAdvance(user, "q1 A");
+    await user.click(screen.getByRole("radio", { name: "q2 B" }));
+
+    currentTime = startedAt + 1000;
+    rerender(
+      <>
+        <LanguageSelector />
+        <NodejsQuiz {...quizProps} now={() => currentTime} />
+      </>,
+    );
+
+    expect(screen.getByText("Question 2 of 10")).toBeInTheDocument();
+    expect(screen.getByText("Time remaining: 07:59")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "q2 B" })).toBeChecked();
+
+    await user.click(screen.getByRole("button", { name: "PT" }));
+
+    expect(screen.getByText("Pergunta 2 de 10")).toBeInTheDocument();
+    expect(screen.getByText("q2 pergunta")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "q2 B PT" })).toBeChecked();
+    expect(screen.getByText("Tempo restante: 07:59")).toBeInTheDocument();
+    expect(screen.queryByText("Pergunta 1 de 10")).not.toBeInTheDocument();
+    expect(screen.queryByText("q1 pergunta")).not.toBeInTheDocument();
   });
 });

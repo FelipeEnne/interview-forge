@@ -52,7 +52,7 @@ export function NodejsQuiz({
   backLink,
   topicName,
 }: NodejsQuizProps) {
-  const { t, categoryLabel } = useTranslations();
+  const { t, localize, categoryLabel } = useTranslations();
   const [phase, setPhase] = useState<QuizPhase>("intro");
   const [attemptQuestions, setAttemptQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -186,18 +186,23 @@ export function NodejsQuiz({
                 total: attemptQuestions.length,
               })}
             </p>
-            <p className={styles.question}>{currentQuestion.question}</p>
+            <p className={styles.question}>
+              {localize(currentQuestion.question)}
+            </p>
             <fieldset className={styles.options}>
               <legend className={styles.legend}>{t("chooseAnswer")}</legend>
               {currentQuestion.options.map((option, optionIndex) => (
-                <label key={option} className={styles.option}>
+                <label
+                  key={`${currentQuestion.id}-${optionIndex}`}
+                  className={styles.option}
+                >
                   <input
                     type="radio"
                     name={currentQuestion.id}
                     checked={answers[currentQuestion.id] === optionIndex}
                     onChange={() => handleSelectOption(optionIndex)}
                   />
-                  {option}
+                  {localize(option)}
                 </label>
               ))}
             </fieldset>

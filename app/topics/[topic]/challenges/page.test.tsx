@@ -22,7 +22,7 @@ describe("TopicChallengesPage", () => {
     );
 
     for (const challenge of NODEJS_CODING_CHALLENGES) {
-      const link = screen.getByRole("link", { name: challenge.title });
+      const link = screen.getByRole("link", { name: challenge.title.en });
 
       expect(link).toHaveAttribute(
         "href",

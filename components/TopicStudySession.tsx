@@ -50,7 +50,7 @@ export function TopicStudySession({
   now = currentTime,
   backLink,
 }: TopicStudySessionProps) {
-  const { t, categoryLabel, ratingLabel, questionsReviewed } =
+  const { t, localize, categoryLabel, ratingLabel, questionsReviewed } =
     useTranslations();
   const [sessionQuestions, setSessionQuestions] = useState<
     InterviewQuestion[] | null
@@ -188,9 +188,13 @@ export function TopicStudySession({
             <p className={styles.category}>
               {categoryLabel(currentQuestion.category)}
             </p>
-            <p className={styles.question}>{currentQuestion.question}</p>
+            <p className={styles.question}>
+              {localize(currentQuestion.question)}
+            </p>
             {isAnswerVisible ? (
-              <p className={styles.answer}>{currentQuestion.answer}</p>
+              <p className={styles.answer}>
+                {localize(currentQuestion.answer)}
+              </p>
             ) : null}
             <div className={styles.actions}>
               <button

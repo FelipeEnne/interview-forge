@@ -18,9 +18,9 @@ describe("TopicChallengePage", () => {
     );
 
     expect(
-      screen.getByRole("heading", { name: challenge.title }),
+      screen.getByRole("heading", { name: challenge.title.en }),
     ).toBeInTheDocument();
-    expect(screen.getByText(challenge.prompt)).toBeInTheDocument();
+    expect(screen.getByText(challenge.prompt.en)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Reveal solution" }),
     ).toBeInTheDocument();
