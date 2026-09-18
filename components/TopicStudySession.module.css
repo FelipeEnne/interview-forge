@@ -49,7 +49,27 @@
 .sessionComplete {
   font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.summaryTotal {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.summaryCounts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .button {
