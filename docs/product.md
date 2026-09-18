@@ -10,9 +10,10 @@ InterviewForge is a personal web app for preparing for technical interviews. It 
 2. Read the current question (answer hidden).
 3. Click **Show answer** to reveal the reference answer.
 4. Rate recall with **Again**, **Hard**, **Good**, or **Easy**.
-5. Move through all questions in the session queue.
-6. View a session summary with rating counts.
-7. Optionally click **Study again** to start a new session (queue and in-session ratings reset; persisted progress remains).
+5. Save when the question was reviewed and schedule its next review.
+6. Move through all questions in the session queue.
+7. View a session summary with rating counts.
+8. Optionally click **Study again** to start a new session (queue and in-session ratings reset; persisted progress remains).
 
 ## Current target use case
 
@@ -33,7 +34,7 @@ The product does **not** currently provide:
 
 - User accounts or authentication
 - Server-side or database persistence
-- Spaced repetition scheduling (dates, intervals, due queues)
+- Due-based sessions or adaptive spaced repetition algorithms
 - Multiple topics beyond Node.js (only `nodejs` is wired in routing)
 - Quizzes, mock interviews, or coding challenge environments
 - AI evaluation of answers

@@ -68,6 +68,7 @@ export function TopicStudySession({
       readQuestionProgress(),
       questionId,
       rating,
+      new Date(),
     );
     saveQuestionProgress(nextProgress);
 

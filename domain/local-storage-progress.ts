@@ -1,4 +1,7 @@
-import type { QuestionProgressState } from "./question-progress";
+import type {
+  QuestionProgress,
+  QuestionProgressState,
+} from "./question-progress";
 import { RECALL_RATING_OPTIONS, type RecallRating } from "./recall-rating";
 
 export const QUESTION_PROGRESS_STORAGE_KEY = "interview-forge:question-progress";
@@ -9,7 +12,17 @@ function isRecallRating(value: unknown): value is RecallRating {
   return typeof value === "string" && VALID_RATINGS.has(value);
 }
 
-function isValidQuestionProgress(value: unknown): boolean {
+function isCanonicalUtcIsoTimestamp(value: unknown): value is string {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const date = new Date(value);
+
+  return !Number.isNaN(date.getTime()) && date.toISOString() === value;
+}
+
+function isValidQuestionProgress(value: unknown): value is QuestionProgress {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
     return false;
   }
@@ -17,12 +30,20 @@ function isValidQuestionProgress(value: unknown): boolean {
   const record = value as Record<string, unknown>;
   const reviewCount = record.reviewCount;
   const lastRating = record.lastRating;
+  const lastReviewedAt = record.lastReviewedAt;
+  const nextReviewAt = record.nextReviewAt;
+  const hasLegacyTimestamps =
+    lastReviewedAt === undefined && nextReviewAt === undefined;
+  const hasValidTimestamps =
+    isCanonicalUtcIsoTimestamp(lastReviewedAt) &&
+    isCanonicalUtcIsoTimestamp(nextReviewAt);
 
   return (
     typeof reviewCount === "number" &&
     Number.isInteger(reviewCount) &&
     reviewCount >= 1 &&
-    isRecallRating(lastRating)
+    isRecallRating(lastRating) &&
+    (hasLegacyTimestamps || hasValidTimestamps)
   );
 }
 
@@ -47,11 +68,11 @@ function parseQuestionProgressState(raw: string): QuestionProgressState {
       return {};
     }
 
-    const { lastRating, reviewCount } = progress as {
-      lastRating: RecallRating;
-      reviewCount: number;
-    };
-    state[questionId] = { lastRating, reviewCount };
+    const { lastRating, reviewCount, lastReviewedAt, nextReviewAt } = progress;
+    state[questionId] =
+      lastReviewedAt === undefined || nextReviewAt === undefined
+        ? { lastRating, reviewCount }
+        : { lastRating, reviewCount, lastReviewedAt, nextReviewAt };
   }
 
   return state;

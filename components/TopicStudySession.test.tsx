@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { InterviewQuestion } from "@/data/nodejs-questions";
 import {
@@ -59,6 +59,10 @@ async function completeSession(
 describe("TopicStudySession", () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("shows the topic name Node.js", () => {
@@ -293,6 +297,8 @@ describe("TopicStudySession", () => {
   });
 
   it("persists question progress to localStorage when a question is rated", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
     const user = userEvent.setup();
 
     render(
@@ -303,7 +309,12 @@ describe("TopicStudySession", () => {
     await user.click(screen.getByRole("button", { name: "Good" }));
 
     expect(readQuestionProgress()).toEqual({
-      q1: { lastRating: "good", reviewCount: 1 },
+      q1: {
+        lastRating: "good",
+        reviewCount: 1,
+        lastReviewedAt: "2026-09-18T03:15:00.000Z",
+        nextReviewAt: "2026-09-21T03:15:00.000Z",
+      },
     });
     expect(localStorage.getItem(QUESTION_PROGRESS_STORAGE_KEY)).not.toBeNull();
   });
@@ -321,7 +332,7 @@ describe("TopicStudySession", () => {
     await user.click(screen.getByRole("button", { name: "Show answer" }));
     await user.click(screen.getByRole("button", { name: "Good" }));
 
-    expect(readQuestionProgress()).toEqual({
+    expect(readQuestionProgress()).toMatchObject({
       q1: { lastRating: "good", reviewCount: 2 },
       q2: { lastRating: "good", reviewCount: 1 },
       q3: { lastRating: "good", reviewCount: 1 },

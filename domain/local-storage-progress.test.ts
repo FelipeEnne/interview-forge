@@ -8,8 +8,18 @@ import {
 import type { QuestionProgressState } from "./question-progress";
 
 const sampleState: QuestionProgressState = {
-  q1: { lastRating: "good", reviewCount: 2 },
-  q2: { lastRating: "again", reviewCount: 1 },
+  q1: {
+    lastRating: "good",
+    reviewCount: 2,
+    lastReviewedAt: "2026-09-18T03:15:00.000Z",
+    nextReviewAt: "2026-09-21T03:15:00.000Z",
+  },
+  q2: {
+    lastRating: "again",
+    reviewCount: 1,
+    lastReviewedAt: "2026-09-18T04:00:00.000Z",
+    nextReviewAt: "2026-09-18T04:10:00.000Z",
+  },
 };
 
 describe("local-storage-progress", () => {
@@ -51,6 +61,49 @@ describe("local-storage-progress", () => {
         QUESTION_PROGRESS_STORAGE_KEY,
         JSON.stringify({
           q1: { lastRating: "good", reviewCount: 0 },
+        }),
+      );
+
+      expect(readQuestionProgress()).toEqual({});
+    });
+
+    it("accepts legacy progress without review timestamps", () => {
+      const legacyState = {
+        q1: { lastRating: "good", reviewCount: 2 },
+      };
+      localStorage.setItem(
+        QUESTION_PROGRESS_STORAGE_KEY,
+        JSON.stringify(legacyState),
+      );
+
+      expect(readQuestionProgress()).toEqual(legacyState);
+    });
+
+    it("returns an empty state when only one review timestamp is present", () => {
+      localStorage.setItem(
+        QUESTION_PROGRESS_STORAGE_KEY,
+        JSON.stringify({
+          q1: {
+            lastRating: "good",
+            reviewCount: 1,
+            lastReviewedAt: "2026-09-18T03:15:00.000Z",
+          },
+        }),
+      );
+
+      expect(readQuestionProgress()).toEqual({});
+    });
+
+    it("returns an empty state when a review timestamp is not canonical UTC ISO", () => {
+      localStorage.setItem(
+        QUESTION_PROGRESS_STORAGE_KEY,
+        JSON.stringify({
+          q1: {
+            lastRating: "good",
+            reviewCount: 1,
+            lastReviewedAt: "2026-09-18T00:15:00-03:00",
+            nextReviewAt: "2026-09-21T03:15:00.000Z",
+          },
         }),
       );
 

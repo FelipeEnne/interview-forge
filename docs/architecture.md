@@ -35,7 +35,8 @@ LocalStorage is unavailable on the server; the topic page passes questions as pr
 | --- | --- |
 | `InterviewQuestion` | `id`, `question`, `answer` text. |
 | `RecallRating` | `"again" \| "hard" \| "good" \| "easy"`. |
-| `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question `lastRating` and `reviewCount` (LocalStorage). |
+| `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question rating, count, and review timestamps (LocalStorage). |
+| `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
 | `orderQuestionsForStudy` (`domain/question-order.ts`) | **Pure domain rule** — maps topic questions + progress snapshot → study order. |
 | Study session queue (`sessionQuestions`) | **Fixed ordered queue** for one pass; stored in React state after queue creation. |
 | `SessionRatings` | **Current-session only** — ratings for summary counts; cleared on **Study again**. |
@@ -54,6 +55,7 @@ LocalStorage is unavailable on the server; the topic page passes questions as pr
 
 - `QuestionProgressState` under key `interview-forge:question-progress`
 - Updated on each rating via `recordQuestionProgress` + `saveQuestionProgress`
+- Stores `lastReviewedAt` and `nextReviewAt` as ISO 8601 UTC strings
 - Not cleared by **Study again**; `reviewCount` accumulates across sessions
 
 **Boundary:** Persisted progress is read when creating a study queue (initial load and **Study again**). `TopicStudySession` does not keep the full progress map in React state—only the ordered question list produced by `orderQuestionsForStudy`. Ratings still read/write storage per question when the user rates.
@@ -61,11 +63,17 @@ LocalStorage is unavailable on the server; the topic page passes questions as pr
 ## LocalStorage strategy
 
 - **Key:** `interview-forge:question-progress`
-- **Format:** JSON object keyed by question id; each value must have valid `lastRating` and integer `reviewCount >= 1`.
+- **Format:** JSON object keyed by question id; each value has valid `lastRating`, integer `reviewCount >= 1`, and either both review timestamps or neither for legacy records.
 - **Read:** `readQuestionProgress()` returns `{}` on SSR, missing key, invalid JSON, or any invalid entry (fail whole blob).
 - **Write:** `saveQuestionProgress()` serializes the full state (no partial merge in storage layer).
 
-Ordering uses `lastRating` only; `reviewCount` is stored for future stories and does not affect sort priority.
+Legacy records without timestamps remain valid and receive timestamps on their next rating. New timestamps use canonical ISO 8601 UTC with milliseconds.
+
+Ordering uses `lastRating` only; `reviewCount` and review timestamps do not affect sort priority.
+
+## Review scheduling
+
+Each rating uses a fixed elapsed-time interval: **Again** 10 minutes, **Hard** 1 day, **Good** 3 days, and **Easy** 7 days. `TopicStudySession` obtains the current `Date` at the client boundary and passes it into pure domain logic. The policy does not expand intervals from history and does not filter due questions.
 
 ## Question ordering
 
@@ -77,7 +85,7 @@ Priority (lower number first): **Again** → **Hard** → unreviewed → **Good*
 
 ## Testing strategy
 
-- **Domain:** Pure functions tested in isolation (`recall-rating`, `question-progress`, `local-storage-progress`, `question-order`).
+- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `question-order`).
 - **Data:** Sanity checks on `NODEJS_TOPIC` content.
 - **UI:** `TopicStudySession.test.tsx` exercises user-visible flows (show answer, rate, summary, prioritization, **Study again**, LocalStorage side effects) with Testing Library.
 - No E2E or snapshot tests.
@@ -87,6 +95,7 @@ Run: `npm test -- --run` (or `npm run test:run`).
 ## Important technical decisions
 
 - Keep business rules in `domain/` so UI stays thin and testable without Next.js.
+- Pass the current instant into domain functions so scheduling tests never depend on the real clock.
 - Static question data in TypeScript modules rather than a CMS or DB for now.
 - Single topic route validates slug against `NODEJS_TOPIC`; unknown topics → `notFound()`.
 - Strict LocalStorage validation to avoid corrupt partial state.
@@ -95,7 +104,7 @@ Run: `npm test -- --run` (or `npm run test:run`).
 
 ## Known technical debt
 
-- Duplicate `.js` files alongside `.ts` sources in `domain/` (`question-order.js`, `question-progress.js`, `recall-rating.js`, and related tests) — likely stray artifacts; TypeScript sources are authoritative for the app build.
+- Duplicate `.js` files alongside some `.ts` sources in `domain/` (`question-order.js`, `recall-rating.js`, and related tests) — likely stray artifacts; TypeScript sources are authoritative for the app build.
 - Topic registry is hard-coded in the topic page (not a shared topic index).
 - No app-route-level tests; coverage is centered on `TopicStudySession` and domain modules.
 - `reviewCount` is persisted but not used in ordering or UI yet.
