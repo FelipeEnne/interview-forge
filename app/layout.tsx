@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+
+import { AppHeader } from "@/components/AppHeader";
+import { LocaleProvider } from "@/components/LocaleProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <LocaleProvider>
+          <AppHeader />
+          {children}
+        </LocaleProvider>
+      </body>
     </html>
   );
 }

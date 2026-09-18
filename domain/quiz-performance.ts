@@ -1,5 +1,5 @@
 import {
-  QUESTION_CATEGORY_LABELS,
+  QUESTION_CATEGORIES,
   type QuestionCategory,
 } from "@/data/nodejs-questions";
 import type { CategoryScore } from "./quiz";
@@ -16,9 +16,7 @@ export type CategoryPerformance = CategoryScore & {
   percentage: number;
 };
 
-const CATEGORY_ORDER = Object.keys(
-  QUESTION_CATEGORY_LABELS,
-) as QuestionCategory[];
+const CATEGORY_ORDER = QUESTION_CATEGORIES;
 
 export function recordQuizPerformance(
   current: QuizPerformance,

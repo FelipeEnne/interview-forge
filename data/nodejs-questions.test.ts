@@ -2,10 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import {
-  NODEJS_TOPIC,
-  QUESTION_CATEGORY_LABELS,
-} from "./nodejs-questions";
+import { NODEJS_TOPIC, QUESTION_CATEGORIES } from "./nodejs-questions";
 
 describe("NODEJS_TOPIC", () => {
   it("has slug nodejs", () => {
@@ -21,7 +18,7 @@ describe("NODEJS_TOPIC", () => {
   });
 
   it("each question has a valid category and non-empty content", () => {
-    const validCategories = Object.keys(QUESTION_CATEGORY_LABELS);
+    const validCategories = QUESTION_CATEGORIES;
 
     for (const item of NODEJS_TOPIC.questions) {
       expect(item.id.trim()).not.toBe("");

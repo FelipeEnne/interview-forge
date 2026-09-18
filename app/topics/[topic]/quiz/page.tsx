@@ -18,9 +18,9 @@ export default async function TopicQuizPage({ params }: TopicQuizPageProps) {
   return (
     <NodejsQuiz
       questions={NODEJS_QUIZ_QUESTIONS}
+      topicName={NODEJS_TOPIC.displayName}
       backLink={{
         href: `/topics/${NODEJS_TOPIC.slug}`,
-        label: `Back to ${NODEJS_TOPIC.displayName}`,
       }}
     />
   );

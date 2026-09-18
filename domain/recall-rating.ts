@@ -9,13 +9,6 @@ export const RECALL_RATING_OPTIONS: readonly RecallRating[] = [
   "easy",
 ] as const;
 
-export const RECALL_RATING_LABELS: Record<RecallRating, string> = {
-  again: "Again",
-  hard: "Hard",
-  good: "Good",
-  easy: "Easy",
-};
-
 export function recordSessionRating(
   ratings: SessionRatings,
   questionId: string,

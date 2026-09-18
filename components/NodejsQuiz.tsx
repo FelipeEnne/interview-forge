@@ -3,10 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  QUESTION_CATEGORY_LABELS,
-  type QuestionCategory,
-} from "@/data/nodejs-questions";
+import type { QuestionCategory } from "@/data/nodejs-questions";
 import type { QuizQuestion } from "@/data/nodejs-quiz-questions";
 import {
   readQuizPerformance,
@@ -21,6 +18,7 @@ import {
   type QuizResult,
 } from "@/domain/quiz";
 import { recordQuizPerformance } from "@/domain/quiz-performance";
+import { useTranslations } from "./LocaleProvider";
 
 import styles from "./NodejsQuiz.module.css";
 
@@ -32,8 +30,8 @@ type NodejsQuizProps = {
   now?: () => number;
   backLink: {
     href: string;
-    label: string;
   };
+  topicName: string;
 };
 
 function formatTime(totalSeconds: number) {
@@ -52,7 +50,9 @@ export function NodejsQuiz({
   randomSource,
   now = Date.now,
   backLink,
+  topicName,
 }: NodejsQuizProps) {
+  const { t, categoryLabel } = useTranslations();
   const [phase, setPhase] = useState<QuizPhase>("intro");
   const [attemptQuestions, setAttemptQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -154,34 +154,41 @@ export function NodejsQuiz({
   return (
     <div className={styles.container}>
       <Link className={styles.backLink} href={backLink.href}>
-        {backLink.label}
+        {t("backToTopic", { topic: topicName })}
       </Link>
-      <h1 className={styles.title}>Node.js Proficiency Quiz</h1>
+      <h1 className={styles.title}>{t("quizTitle")}</h1>
       <article className={styles.card} aria-live="polite">
         {phase === "intro" ? (
           <div className={styles.summary}>
-            <p className={styles.meta}>10 questions</p>
-            <p className={styles.meta}>8 minutes</p>
+            <p className={styles.meta}>
+              {t("quizQuestionCount", { count: QUIZ_QUESTION_COUNT })}
+            </p>
+            <p className={styles.meta}>
+              {t("quizDuration", { minutes: QUIZ_DURATION_MS / 60000 })}
+            </p>
             <button
               type="button"
               className={`${styles.button} ${styles.buttonPrimary}`}
               onClick={startAttempt}
             >
-              Start quiz
+              {t("startQuiz")}
             </button>
           </div>
         ) : null}
         {phase === "active" && currentQuestion ? (
           <>
             <p className={styles.timer}>
-              Time remaining: {formatTime(remainingSeconds)}
+              {t("timeRemaining", { time: formatTime(remainingSeconds) })}
             </p>
             <p className={styles.progress}>
-              Question {currentIndex + 1} of {attemptQuestions.length}
+              {t("questionProgress", {
+                current: currentIndex + 1,
+                total: attemptQuestions.length,
+              })}
             </p>
             <p className={styles.question}>{currentQuestion.question}</p>
             <fieldset className={styles.options}>
-              <legend className={styles.legend}>Choose an answer</legend>
+              <legend className={styles.legend}>{t("chooseAnswer")}</legend>
               {currentQuestion.options.map((option, optionIndex) => (
                 <label key={option} className={styles.option}>
                   <input
@@ -200,7 +207,7 @@ export function NodejsQuiz({
               onClick={handleAdvance}
               disabled={!hasCurrentAnswer}
             >
-              {isLastQuestion ? "Finish quiz" : "Next"}
+              {isLastQuestion ? t("finishQuiz") : t("next")}
             </button>
           </>
         ) : null}
@@ -214,7 +221,7 @@ export function NodejsQuiz({
               {Object.entries(result.byCategory).map(([category, score]) =>
                 score ? (
                   <li key={category}>
-                    {QUESTION_CATEGORY_LABELS[category as QuestionCategory]}:{" "}
+                    {categoryLabel(category as QuestionCategory)}:{" "}
                     {score.correct} / {score.total}
                   </li>
                 ) : null,
@@ -225,7 +232,7 @@ export function NodejsQuiz({
               className={`${styles.button} ${styles.buttonPrimary}`}
               onClick={startAttempt}
             >
-              Try again
+              {t("tryAgain")}
             </button>
           </div>
         ) : null}

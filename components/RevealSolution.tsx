@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useTranslations } from "./LocaleProvider";
 import styles from "./RevealSolution.module.css";
 
 type RevealSolutionProps = {
@@ -9,13 +10,14 @@ type RevealSolutionProps = {
 };
 
 export function RevealSolution({ code }: RevealSolutionProps) {
+  const { t } = useTranslations();
   const [isSolutionVisible, setIsSolutionVisible] = useState(false);
 
   if (isSolutionVisible) {
     return (
       <section aria-labelledby="reference-solution-title">
         <h2 id="reference-solution-title" className={styles.sectionTitle}>
-          Reference solution
+          {t("referenceSolution")}
         </h2>
         <pre className={styles.code}>
           <code>{code}</code>
@@ -30,7 +32,7 @@ export function RevealSolution({ code }: RevealSolutionProps) {
       type="button"
       onClick={() => setIsSolutionVisible(true)}
     >
-      Reveal solution
+      {t("revealSolution")}
     </button>
   );
 }

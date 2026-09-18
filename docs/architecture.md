@@ -1,6 +1,6 @@
 # Architecture
 
-Architecture as of **MVP v0.1.0**: one Node.js topic with Study (active recall + LocalStorage scheduling), Test (timed quiz + category aggregates), and Practice (static coding challenges, no execution). Persistence is browser LocalStorage only; no server-side store.
+Architecture as of **Story 14**: one Node.js topic with Study, Test, and Practice, plus English/Portuguese UI chrome persisted in LocalStorage. Persistence remains browser LocalStorage only; no server-side store. Technical study, quiz, and challenge content is still English.
 
 ## Current stack
 
@@ -18,21 +18,26 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 
 | Path | Role |
 | --- | --- |
-| `app/` | Routes and layouts. Home, topic overview, due study, category study, quiz, and coding challenge pages. |
-| `components/` | Interactive UI. `TopicStudySession` owns the study flow, `NodejsQuiz` owns the quiz flow, `NodejsCategoryPerformance` reads accumulated quiz performance, and `NodejsCodingChallenge` shows a challenge with a client-only solution reveal. |
+| `app/` | Routes and layouts. Home, topic overview, due study, category study, quiz, and coding challenge pages. Localized chrome is rendered by client views composed from the server pages. |
+| `components/` | Interactive UI plus the shared header, language selector, and locale provider. |
 | `data/` | Static in-repo banks: `nodejs-questions.ts` (study), `nodejs-quiz-questions.ts` (quiz), and `nodejs-coding-challenges.ts` (practice problems). |
 | `domain/` | Pure TypeScript logic: ratings, progress, due selection, ordering, LocalStorage I/O, quiz selection and scoring. |
+| `i18n/` | Locale type, LocalStorage locale I/O, and the UI translation catalog. |
 | `docs/` | Product and technical documentation. |
 
 ## Server vs client boundary
 
-- **Server Components (default):** route pages validate URL segments, select static topic data, and render the topic overview, study shell, or quiz shell.
+- **Server Components (default):** route pages validate URL segments, select static topic data, and compose client views for localized chrome.
+- **Client Component:** `LocaleProvider` (`"use client"`) holds the active locale, restores it from LocalStorage after hydration, and exposes `useTranslations`.
+- **Client Component:** `AppHeader` and `LanguageSelector` render the shared shell and persist `interview-forge:locale`.
 - **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration. The current instant is read from an injectable `now` callback (default `() => new Date()`).
 - **Client Component:** `NodejsQuiz` (`"use client"`) holds intro/active/result phases, samples questions after **Start quiz**, and runs the countdown from a deadline. The current instant is read from an injectable `now` callback (default `Date.now`).
 - **Client Component:** `NodejsCategoryPerformance` (`"use client"`) reads quiz performance after hydration and renders category insights when enough evidence exists.
-- **Client Component:** `RevealSolution` (`"use client"`) hides a challenge's reference solution until **Reveal solution**. The surrounding challenge page stays a Server Component.
+- **Client Component:** `NodejsCodingChallenge` and `RevealSolution` (`"use client"`) localize challenge chrome and hide a challenge's reference solution until **Reveal solution**. Challenge pages still validate the URL on the server.
 
-LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`. Quiz pages pass the static quiz bank; the client samples an attempt only after an explicit start. The topic overview remains a Server Component and composes the small client performance block.
+LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`. Quiz pages pass the static quiz bank; the client samples an attempt only after an explicit start. The topic overview remains a thin Server Component that renders a client overview.
+
+The first HTML after a reload is English. If the stored locale is Portuguese, chrome updates after hydration. That flash is accepted so the app can keep static rendering, avoid cookies, and skip hydration mismatches.
 
 ## Domain concepts
 
@@ -41,7 +46,7 @@ LocalStorage is unavailable on the server; study pages pass questions and a sess
 | `InterviewQuestion` | Study/active-recall item: stable `id`, typed `category`, `question`, and `answer` text. |
 | `QuizQuestion` | Assessment item: stable `id`, typed `category`, `question`, four `options`, and `correctOption`. |
 | `CodingChallenge` | Implementation practice item: stable `id`, typed `category`, `prompt`, `requirements`, `starterCode`, `referenceSolution`, and `reviewChecklist`. |
-| `QuestionCategory` / `QUESTION_CATEGORY_LABELS` | Nine allowed Node.js category slugs and their UI labels, shared by study and quiz. |
+| `QuestionCategory` / `QUESTION_CATEGORIES` | Nine allowed Node.js category slugs in canonical order, shared by study, quiz, and challenges. Display names are localized in `i18n/translations.ts`. |
 | `RecallRating` | `"again" \| "hard" \| "good" \| "easy"`. |
 | `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question rating, count, and review timestamps (LocalStorage). |
 | `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
@@ -93,7 +98,7 @@ Option order stays as authored. Tests inject `randomSource` into `selectQuizQues
 
 ## Topic and study routes
 
-- `/topics/nodejs` is the Node.js entry page. It links to due review, the proficiency quiz, and all categories from `QUESTION_CATEGORY_LABELS`.
+- `/topics/nodejs` is the Node.js entry page. It links to due review, the proficiency quiz, and all categories from `QUESTION_CATEGORIES`.
 - `/topics/nodejs/study` starts the normal due-review session.
 - `/topics/nodejs/categories/[category]` validates the category slug, filters the static bank on the server, and starts a manual practice session.
 - `/topics/nodejs/quiz` hosts the full quiz flow (intro, attempt, result) in one client component.
@@ -127,11 +132,19 @@ Ordering uses `lastRating` only; `reviewCount` and review timestamps do not affe
 - **Boundary:** a completed attempt adds its `byCategory` counts to storage. Incomplete attempts are not saved, and no quiz data is written to `interview-forge:question-progress`.
 - No attempt list, timestamp, global score, or retention policy is needed because storage is bounded to nine category entries.
 
+### UI locale
+
+- **Key:** `interview-forge:locale`
+- **Format:** the string `en` or `pt`
+- **Read:** `readLocale()` returns `en` on SSR, a missing key, or any value other than `en`/`pt`
+- **Write:** `saveLocale()` writes only this key; study progress and quiz aggregates are untouched
+- Changing language re-renders chrome only. Question IDs, category slugs, recall-rating slugs, and URLs stay the same.
+
 ## Quiz category performance
 
 Accumulated accuracy is `total correct / total encountered questions` for each category, not an average of attempt percentages. Categories with fewer than two encountered questions are omitted to avoid one answer producing an overly strong insight.
 
-`getLowestCategoryPerformance` orders eligible categories by exact accuracy, returns at most three, and uses the canonical order from `QUESTION_CATEGORY_LABELS` for exact ties. Display percentages are rounded only after ordering. No pass/fail threshold is applied.
+`getLowestCategoryPerformance` orders eligible categories by exact accuracy, returns at most three, and uses the canonical order from `QUESTION_CATEGORIES` for exact ties. Display percentages are rounded only after ordering. No pass/fail threshold is applied.
 
 ## Review scheduling
 
@@ -167,7 +180,7 @@ The server preserves question-bank order while filtering. The client then applie
 
 ## Testing strategy
 
-- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, and `local-storage-quiz-performance`). Domain and data tests that do not need the DOM use the Node environment; jsdom is reserved for component, route, and LocalStorage tests.
+- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, `local-storage-quiz-performance`, locale parsing, and translations). Domain and data tests that do not need the DOM use the Node environment; jsdom is reserved for component, route, and LocalStorage tests.
 - **Data:** Sanity checks on `NODEJS_TOPIC`, `NODEJS_QUIZ_QUESTIONS`, and `NODEJS_CODING_CHALLENGES` content, categories, counts, unique ids, and option/correct-index validity.
 - **Routes:** topic, category, quiz, and coding-challenge page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed study UI.
 - **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, and the countdown. `NodejsCategoryPerformance.test.tsx` covers category insights and study links. `NodejsCodingChallenge.test.tsx` covers prompt, starter code, checklist, and delayed reveal of the reference solution.
@@ -177,7 +190,7 @@ The server preserves question-bank order while filtering. The client then applie
 - Vitest 3.2 records test timeouts with `Date.now()`. Workers preload `vitest.monotonic-now.cjs` so that clock stays monotonic even if the WSL wall clock jumps under parallel jsdom load. That prevents false 5s timeouts without hiding a real hang.
 - `userEvent.setup({ delay: null })` avoids extra `setTimeout(0)` waits between pointer events.
 
-Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 107 tests across domain, data, routes, and components.
+Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 144 tests across domain, data, i18n, routes, and components.
 
 ## Important technical decisions
 
@@ -187,10 +200,10 @@ Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 107 te
 - Derive remaining quiz time from a deadline so tests can fake the clock without a real wait.
 - Static question data in TypeScript modules rather than a CMS or DB for now.
 - Keep study questions, quiz questions, and coding challenges in separate data modules because they are different shapes.
-- Keep all 60 Node.js study questions and their category taxonomy in one readable data module; category display labels are the single source of truth for the category union.
+- Keep all 60 Node.js study questions and their category taxonomy in one readable data module; `QUESTION_CATEGORIES` is the single source of truth for the category union and canonical order.
 - Preserve study question ids when content gains metadata because LocalStorage progress is keyed by question id. Category is not persisted.
 - Single topic route validates slug against `NODEJS_TOPIC`; unknown topics → `notFound()`.
-- Category slugs are validated against `QUESTION_CATEGORY_LABELS`; unknown categories → `notFound()`.
+- Category slugs are validated against `QUESTION_CATEGORIES`; unknown categories → `notFound()`.
 - Strict LocalStorage validation to avoid corrupt partial state.
 - Client-only queue initialization to avoid SSR/hydration mismatch with stored progress.
 - Separate **fixed session queue** from **mutable persisted progress** so in-session ratings never reshuffle the current pass.
@@ -198,6 +211,7 @@ Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 107 te
 - Separate scheduled review from manual category practice through an explicit session mode.
 - Keep the full quiz result in memory and persist only bounded per-category aggregates because current insights do not require attempt history or timestamps.
 - Require two encountered questions before presenting a category and show the three lowest accuracies without a pass/fail threshold.
+- Keep UI localization in a small typed catalog with LocalStorage preference and no locale in the URL. Technical content stays English until a later story.
 
 ## Known technical debt
 

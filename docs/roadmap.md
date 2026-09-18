@@ -24,6 +24,10 @@ The initial MVP is shipped. Stories 1–12 are done; details live under `docs/st
 
 ## Post-MVP
 
+| Story | Title |
+| --- | --- |
+| 14 | Internationalization foundation |
+
 - Use the application in real interview preparation.
 - Collect friction and missing-content observations.
 - Prioritize future work based on actual usage.

@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { NODEJS_CODING_CHALLENGES } from "@/data/nodejs-coding-challenges";
-import { QUESTION_CATEGORY_LABELS } from "@/data/nodejs-questions";
+import { QUESTION_CATEGORIES } from "@/data/nodejs-questions";
 
 describe("NODEJS_CODING_CHALLENGES", () => {
   it("has exactly 6 challenges in a fixed progression", () => {
@@ -25,7 +25,7 @@ describe("NODEJS_CODING_CHALLENGES", () => {
   });
 
   it("each challenge has valid category and non-empty content", () => {
-    const validCategories = Object.keys(QUESTION_CATEGORY_LABELS);
+    const validCategories = QUESTION_CATEGORIES;
 
     for (const challenge of NODEJS_CODING_CHALLENGES) {
       expect(challenge.id.trim()).not.toBe("");

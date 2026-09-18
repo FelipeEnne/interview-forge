@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 
-import { QUESTION_CATEGORY_LABELS } from "@/data/nodejs-questions";
+import { NODEJS_TOPIC } from "@/data/nodejs-questions";
 import {
   QUIZ_PERFORMANCE_STORAGE_KEY,
   readQuizPerformance,
@@ -12,6 +12,7 @@ import {
   getLowestCategoryPerformance,
   type CategoryPerformance,
 } from "@/domain/quiz-performance";
+import { useTranslations } from "./LocaleProvider";
 
 import styles from "./NodejsCategoryPerformance.module.css";
 
@@ -28,6 +29,7 @@ function getServerPerformance() {
 }
 
 export function NodejsCategoryPerformance() {
+  const { t, categoryLabel } = useTranslations();
   const storedPerformance = useSyncExternalStore(
     subscribeToPerformance,
     getStoredPerformance,
@@ -45,11 +47,11 @@ export function NodejsCategoryPerformance() {
   return (
     <section className={styles.performance} aria-labelledby="performance-title">
       <h2 id="performance-title" className={styles.title}>
-        Performance
+        {t("performance")}
       </h2>
       <ul className={styles.list}>
         {categories.map(({ category, correct, total, percentage }) => {
-          const label = QUESTION_CATEGORY_LABELS[category];
+          const label = categoryLabel(category);
 
           return (
             <li key={category} className={styles.item}>
@@ -58,15 +60,15 @@ export function NodejsCategoryPerformance() {
                 <p className={styles.score}>
                   <strong>{percentage}%</strong>
                   <span>
-                    {correct} / {total} correct
+                    {t("correctCount", { correct, total })}
                   </span>
                 </p>
               </div>
               <Link
                 className={styles.link}
-                href={`/topics/nodejs/categories/${category}`}
+                href={`/topics/${NODEJS_TOPIC.slug}/categories/${category}`}
               >
-                Study {label}
+                {t("studyCategory", { label })}
               </Link>
             </li>
           );

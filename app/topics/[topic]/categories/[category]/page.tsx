@@ -2,9 +2,8 @@ import { notFound } from "next/navigation";
 
 import { TopicStudySession } from "@/components/TopicStudySession";
 import {
+  isQuestionCategory,
   NODEJS_TOPIC,
-  QUESTION_CATEGORY_LABELS,
-  type QuestionCategory,
 } from "@/data/nodejs-questions";
 
 type CategoryStudyPageProps = {
@@ -16,26 +15,22 @@ export default async function CategoryStudyPage({
 }: CategoryStudyPageProps) {
   const { topic, category } = await params;
 
-  if (
-    topic !== NODEJS_TOPIC.slug ||
-    !Object.hasOwn(QUESTION_CATEGORY_LABELS, category)
-  ) {
+  if (topic !== NODEJS_TOPIC.slug || !isQuestionCategory(category)) {
     notFound();
   }
 
-  const questionCategory = category as QuestionCategory;
   const questions = NODEJS_TOPIC.questions.filter(
-    (question) => question.category === questionCategory,
+    (question) => question.category === category,
   );
 
   return (
     <TopicStudySession
-      topicName={`${NODEJS_TOPIC.displayName} — ${QUESTION_CATEGORY_LABELS[questionCategory]}`}
+      topicName={NODEJS_TOPIC.displayName}
+      category={category}
       questions={questions}
       sessionMode="practice"
       backLink={{
         href: `/topics/${NODEJS_TOPIC.slug}`,
-        label: `Back to ${NODEJS_TOPIC.displayName}`,
       }}
     />
   );

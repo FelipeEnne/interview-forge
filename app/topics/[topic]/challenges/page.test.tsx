@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { NODEJS_CODING_CHALLENGES } from "@/data/nodejs-coding-challenges";
-import { QUESTION_CATEGORY_LABELS } from "@/data/nodejs-questions";
+import { getCategoryLabel } from "@/i18n/translations";
 import TopicChallengesPage from "./page";
 
 describe("TopicChallengesPage", () => {
@@ -29,7 +29,7 @@ describe("TopicChallengesPage", () => {
         `/topics/nodejs/challenges/${challenge.id}`,
       );
       expect(link.parentElement).toHaveTextContent(
-        QUESTION_CATEGORY_LABELS[challenge.category],
+        getCategoryLabel("en", challenge.category),
       );
     }
   });

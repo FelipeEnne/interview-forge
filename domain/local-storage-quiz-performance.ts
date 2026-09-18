@@ -1,5 +1,5 @@
 import {
-  QUESTION_CATEGORY_LABELS,
+  QUESTION_CATEGORIES,
   type QuestionCategory,
 } from "@/data/nodejs-questions";
 import type { CategoryScore } from "./quiz";
@@ -8,9 +8,7 @@ import type { QuizPerformance } from "./quiz-performance";
 export const QUIZ_PERFORMANCE_STORAGE_KEY =
   "interview-forge:quiz-attempts";
 
-const VALID_CATEGORIES = new Set<string>(
-  Object.keys(QUESTION_CATEGORY_LABELS),
-);
+const VALID_CATEGORIES = new Set<string>(QUESTION_CATEGORIES);
 
 function isQuestionCategory(value: string): value is QuestionCategory {
   return VALID_CATEGORIES.has(value);

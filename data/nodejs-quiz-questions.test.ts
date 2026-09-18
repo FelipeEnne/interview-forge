@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { QUESTION_CATEGORY_LABELS } from "./nodejs-questions";
+import { QUESTION_CATEGORIES } from "./nodejs-questions";
 import { NODEJS_QUIZ_QUESTIONS } from "./nodejs-quiz-questions";
 
 describe("NODEJS_QUIZ_QUESTIONS", () => {
@@ -17,7 +17,7 @@ describe("NODEJS_QUIZ_QUESTIONS", () => {
   });
 
   it("each question has valid content, four options, and a valid correct option", () => {
-    const validCategories = Object.keys(QUESTION_CATEGORY_LABELS);
+    const validCategories = QUESTION_CATEGORIES;
 
     for (const item of NODEJS_QUIZ_QUESTIONS) {
       expect(item.id.trim()).not.toBe("");

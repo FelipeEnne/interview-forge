@@ -1,0 +1,39 @@
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.separator {
+  opacity: 0.45;
+}
+
+.button {
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.55;
+}
+
+.button[aria-pressed="true"] {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.button:hover,
+.button:focus-visible {
+  opacity: 1;
+}

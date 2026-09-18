@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { NodejsCategoryPerformance } from "@/components/NodejsCategoryPerformance";
 import { saveQuizPerformance } from "@/domain/local-storage-quiz-performance";
+import { renderWithLocale } from "@/i18n/render-with-locale";
 
 describe("NodejsCategoryPerformance", () => {
   beforeEach(() => {
@@ -35,6 +36,25 @@ describe("NodejsCategoryPerformance", () => {
       within(items[0]).getByRole("link", {
         name: "Study Streams & Buffers",
       }),
+    ).toHaveAttribute("href", "/topics/nodejs/categories/streams");
+  });
+
+  it("translates performance chrome and category names", async () => {
+    saveQuizPerformance({
+      streams: { correct: 2, total: 5 },
+    });
+
+    renderWithLocale(<NodejsCategoryPerformance />, "pt");
+
+    expect(
+      await screen.findByRole("heading", { name: "Desempenho" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Streams e Buffers", level: 3 }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("2 / 5 corretas")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Estudar Streams e Buffers" }),
     ).toHaveAttribute("href", "/topics/nodejs/categories/streams");
   });
 

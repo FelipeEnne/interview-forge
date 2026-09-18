@@ -20,7 +20,6 @@ export default async function TopicStudyPage({ params }: TopicStudyPageProps) {
       questions={NODEJS_TOPIC.questions}
       backLink={{
         href: `/topics/${NODEJS_TOPIC.slug}`,
-        label: `Back to ${NODEJS_TOPIC.displayName}`,
       }}
     />
   );

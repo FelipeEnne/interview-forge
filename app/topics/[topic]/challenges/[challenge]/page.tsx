@@ -26,7 +26,6 @@ export default async function TopicChallengePage({
       challenge={challenge}
       backLink={{
         href: `/topics/${NODEJS_TOPIC.slug}/challenges`,
-        label: "Back to challenges",
       }}
     />
   );

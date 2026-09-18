@@ -54,6 +54,10 @@ The same topic also offers a timed multiple-choice quiz from a separate bank of 
 
 Entry path: home page → **Study Node.js questions** → `/topics/nodejs`. The topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, coding challenges at `/topics/nodejs/challenges`, manual practice for each category, and category practice from accumulated quiz performance.
 
+## Language
+
+The interface can be used in **English** or **Portuguese**. A header selector (**EN | PT**) is available on every page. The choice is stored in the browser under `interview-forge:locale` and defaults to English. Changing language does not alter study progress, quiz performance, URLs, or the English technical content (questions, answers, quiz items, and coding challenges).
+
 ## Product principles
 
 - **Incremental delivery** — ship the smallest slice that completes the current story.
@@ -73,7 +77,7 @@ The product does **not** currently provide:
 - Multiple topics beyond Node.js (only `nodejs` is wired in routing)
 - Mock interviews or coding execution environments
 - AI evaluation of answers
-- Analytics, gamification, or localization
+- Analytics or gamification
 - Cross-device sync
 
 These may appear in future stories; they are not part of the shipped experience today.

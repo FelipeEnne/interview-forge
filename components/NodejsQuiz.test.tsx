@@ -9,6 +9,7 @@ import {
 } from "@/domain/local-storage-quiz-performance";
 import { QUIZ_DURATION_MS } from "@/domain/quiz";
 import { NodejsQuiz } from "@/components/NodejsQuiz";
+import { renderWithLocale } from "@/i18n/render-with-locale";
 
 function question(
   overrides: Partial<QuizQuestion> & Pick<QuizQuestion, "id">,
@@ -44,7 +45,6 @@ const stableRandom = () => 0.999;
 
 const backLink = {
   href: "/topics/nodejs",
-  label: "Back to Node.js",
 };
 
 function createUser() {
@@ -56,6 +56,7 @@ async function startQuiz(user: ReturnType<typeof userEvent.setup>) {
     <NodejsQuiz
       questions={questions}
       randomSource={stableRandom}
+      topicName="Node.js"
       backLink={backLink}
     />,
   );
@@ -87,6 +88,7 @@ describe("NodejsQuiz", () => {
       <NodejsQuiz
         questions={questions}
         randomSource={stableRandom}
+        topicName="Node.js"
         backLink={backLink}
       />,
     );
@@ -164,6 +166,7 @@ describe("NodejsQuiz", () => {
     const quizProps = {
       questions,
       randomSource: stableRandom,
+      topicName: "Node.js",
       backLink,
     };
 
@@ -215,5 +218,34 @@ describe("NodejsQuiz", () => {
     expect(screen.getByText("Time remaining: 08:00")).toBeInTheDocument();
     expect(screen.queryByText("10 / 10")).not.toBeInTheDocument();
     expect(storageSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("translates quiz chrome while keeping question content in English", async () => {
+    const user = createUser();
+
+    renderWithLocale(
+      <NodejsQuiz
+        questions={questions}
+        randomSource={stableRandom}
+        topicName="Node.js"
+        backLink={backLink}
+      />,
+      "pt",
+    );
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Quiz de Proficiência em Node.js",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("10 perguntas")).toBeInTheDocument();
+    expect(screen.getByText("8 minutos")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Começar quiz" }));
+
+    expect(screen.getByText("q1 prompt")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "q1 A" })).toBeInTheDocument();
+    expect(screen.getByText("Pergunta 1 de 10")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Próxima" })).toBeDisabled();
   });
 });

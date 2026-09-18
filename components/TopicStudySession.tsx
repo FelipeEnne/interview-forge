@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import {
-  QUESTION_CATEGORY_LABELS,
-  type InterviewQuestion,
+import type {
+  InterviewQuestion,
+  QuestionCategory,
 } from "@/data/nodejs-questions";
 import {
   readQuestionProgress,
@@ -16,12 +16,12 @@ import { orderQuestionsForStudy } from "@/domain/question-order";
 import { recordQuestionProgress } from "@/domain/question-progress";
 import {
   countSessionRatings,
-  RECALL_RATING_LABELS,
   RECALL_RATING_OPTIONS,
   recordSessionRating,
   type RecallRating,
   type SessionRatings,
 } from "@/domain/recall-rating";
+import { useTranslations } from "./LocaleProvider";
 
 import styles from "./TopicStudySession.module.css";
 
@@ -31,10 +31,10 @@ type TopicStudySessionProps = {
   topicName: string;
   questions: InterviewQuestion[];
   sessionMode?: SessionMode;
+  category?: QuestionCategory;
   now?: () => Date;
   backLink?: {
     href: string;
-    label: string;
   };
 };
 
@@ -46,9 +46,12 @@ export function TopicStudySession({
   topicName,
   questions,
   sessionMode = "due-review",
+  category,
   now = currentTime,
   backLink,
 }: TopicStudySessionProps) {
+  const { t, categoryLabel, ratingLabel, questionsReviewed } =
+    useTranslations();
   const [sessionQuestions, setSessionQuestions] = useState<
     InterviewQuestion[] | null
   >(null);
@@ -74,6 +77,12 @@ export function TopicStudySession({
     sessionQuestions !== null && currentIndex >= sessionQuestions.length - 1;
   const showRatings = isAnswerVisible && !isSessionComplete;
   const ratingCounts = countSessionRatings(sessionRatings);
+  const title = category
+    ? t("topicCategoryTitle", {
+        topic: topicName,
+        category: categoryLabel(category),
+      })
+    : topicName;
 
   function handleShowAnswer() {
     setIsAnswerVisible(true);
@@ -133,24 +142,23 @@ export function TopicStudySession({
     <div className={styles.container}>
       {backLink ? (
         <Link className={styles.backLink} href={backLink.href}>
-          {backLink.label}
+          {t("backToTopic", { topic: topicName })}
         </Link>
       ) : null}
-      <h1 className={styles.title}>{topicName}</h1>
+      <h1 className={styles.title}>{title}</h1>
       <article className={styles.card} aria-live="polite">
         {sessionQuestions === null ? (
-          <p className={styles.question}>Preparing study session...</p>
+          <p className={styles.question}>{t("preparingStudySession")}</p>
         ) : isSessionComplete ? (
           <div className={styles.summary}>
-            <p className={styles.sessionComplete}>Session complete</p>
+            <p className={styles.sessionComplete}>{t("sessionComplete")}</p>
             <p className={styles.summaryTotal}>
-              {ratingCounts.total}{" "}
-              {ratingCounts.total === 1 ? "question" : "questions"} reviewed
+              {questionsReviewed(ratingCounts.total)}
             </p>
             <ul className={styles.summaryCounts}>
               {RECALL_RATING_OPTIONS.map((rating) => (
                 <li key={rating}>
-                  {RECALL_RATING_LABELS[rating]}: {ratingCounts[rating]}
+                  {ratingLabel(rating)}: {ratingCounts[rating]}
                 </li>
               ))}
             </ul>
@@ -159,28 +167,26 @@ export function TopicStudySession({
               className={`${styles.button} ${styles.buttonPrimary}`}
               onClick={handleStudyAgain}
             >
-              Study again
+              {t("studyAgain")}
             </button>
           </div>
         ) : sessionMode === "due-review" &&
           sessionQuestions.length === 0 ? (
           <div className={styles.summary}>
-            <p className={styles.sessionComplete}>You&apos;re all caught up</p>
-            <p className={styles.summaryTotal}>
-              No questions are due for review right now.
-            </p>
+            <p className={styles.sessionComplete}>{t("allCaughtUp")}</p>
+            <p className={styles.summaryTotal}>{t("noQuestionsDue")}</p>
             <button
               type="button"
               className={`${styles.button} ${styles.buttonPrimary}`}
               onClick={handleStudyAllQuestions}
             >
-              Study all questions
+              {t("studyAllQuestions")}
             </button>
           </div>
         ) : currentQuestion ? (
           <>
             <p className={styles.category}>
-              {QUESTION_CATEGORY_LABELS[currentQuestion.category]}
+              {categoryLabel(currentQuestion.category)}
             </p>
             <p className={styles.question}>{currentQuestion.question}</p>
             {isAnswerVisible ? (
@@ -193,7 +199,7 @@ export function TopicStudySession({
                 onClick={handleShowAnswer}
                 disabled={isAnswerVisible}
               >
-                Show answer
+                {t("showAnswer")}
               </button>
               {showRatings ? (
                 <div className={styles.ratings}>
@@ -204,7 +210,7 @@ export function TopicStudySession({
                       className={styles.button}
                       onClick={() => handleRating(rating)}
                     >
-                      {RECALL_RATING_LABELS[rating]}
+                      {ratingLabel(rating)}
                     </button>
                   ))}
                 </div>

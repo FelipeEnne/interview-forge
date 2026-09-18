@@ -9,6 +9,7 @@ import {
 } from "@/domain/local-storage-progress";
 import type { RecallRating } from "@/domain/recall-rating";
 import { TopicStudySession } from "./TopicStudySession";
+import { renderWithLocale } from "@/i18n/render-with-locale";
 
 const sampleQuestions: InterviewQuestion[] = [
   {
@@ -700,5 +701,33 @@ describe("TopicStudySession", () => {
       q2: { lastRating: "good", reviewCount: 1 },
       q3: { lastRating: "good", reviewCount: 1 },
     });
+  });
+
+  it("translates study chrome and ratings while keeping question content in English", async () => {
+    const user = createUser();
+
+    renderWithLocale(
+      <TopicStudySession
+        topicName="Node.js"
+        questions={[sampleQuestions[0]!]}
+        now={clock.now}
+      />,
+      "pt",
+    );
+
+    expect(
+      await screen.findByRole("button", { name: "Mostrar resposta" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Fundamentos")).toBeInTheDocument();
+    expect(screen.getByText("First question text?")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Mostrar resposta" }));
+    expect(screen.getByText("First answer text.")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Bom" }));
+
+    expect(readQuestionProgress().q1?.lastRating).toBe("good");
+    expect(screen.getByText("1 pergunta revisada")).toBeInTheDocument();
+    expect(screen.getByText("Bom: 1")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Estudar novamente" })).toBeInTheDocument();
   });
 });

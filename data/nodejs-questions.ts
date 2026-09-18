@@ -1,16 +1,20 @@
-export const QUESTION_CATEGORY_LABELS = {
-  fundamentals: "Fundamentals",
-  async: "Event Loop & Async",
-  modules: "Modules",
-  http: "HTTP & APIs",
-  express: "Express",
-  streams: "Streams & Buffers",
-  testing: "Testing",
-  security: "Security",
-  production: "Production & Architecture",
-} as const;
+export const QUESTION_CATEGORIES = [
+  "fundamentals",
+  "async",
+  "modules",
+  "http",
+  "express",
+  "streams",
+  "testing",
+  "security",
+  "production",
+] as const;
 
-export type QuestionCategory = keyof typeof QUESTION_CATEGORY_LABELS;
+export type QuestionCategory = (typeof QUESTION_CATEGORIES)[number];
+
+export function isQuestionCategory(value: string): value is QuestionCategory {
+  return (QUESTION_CATEGORIES as readonly string[]).includes(value);
+}
 
 export type InterviewQuestion = {
   id: string;
