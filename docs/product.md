@@ -6,7 +6,7 @@ InterviewForge is a personal web app for preparing for technical interviews. It 
 
 ## Core study loop
 
-1. Open a topic study session.
+1. Open a topic study session (new sessions order questions with weaker recall first, using saved ratings when present).
 2. Read the current question (answer hidden).
 3. Click **Show answer** to reveal the reference answer.
 4. Rate recall with **Again**, **Hard**, **Good**, or **Easy**.

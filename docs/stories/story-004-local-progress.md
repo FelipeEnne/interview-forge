@@ -26,9 +26,8 @@ As I study over multiple days, I want my latest recall rating and review count s
 
 - Server or database sync.
 - Cross-browser migration or export.
+- Reordering study sessions by weakness (Story 5).
 - Using `reviewCount` in UI or scheduling (field stored for later stories).
-
-Note: Question queue ordering by `lastRating` was added in the codebase after this story’s core persistence work (`domain/question-order.ts` integrated into `TopicStudySession`). That behavior aligns with Roadmap Story 5; see architecture docs for current sort rules.
 
 ## Final status
 

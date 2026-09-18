@@ -10,6 +10,7 @@ Stories are delivered incrementally. Details for completed work live under `docs
 | 2 | Rate recall |
 | 3 | Session summary |
 | 4 | Local progress persistence |
+| 5 | Prioritize weaker questions |
 
 ## Next
 
@@ -17,9 +18,8 @@ Planned direction (not fully specified until each story is written):
 
 | Item | Notes |
 | --- | --- |
-| Story 5 — Prioritize weaker questions | Product intent: surface weaker items earlier using persisted ratings. **Note:** `orderQuestionsForStudy` already reorders sessions by `lastRating`; any remaining Story 5 scope should be defined against that baseline (e.g. UX, `reviewCount`, or scheduling). |
-| Scheduling | When-to-review logic (beyond manual study sessions). |
-| Spaced repetition | Intervals and due dates; not started. |
+| Scheduling | When-to-review logic beyond manual full-topic sessions. |
+| Spaced repetition | Intervals and due dates; builds on persisted ratings and ordering. |
 | Additional topics | More question banks and topic navigation. |
 | Quizzes | Structured assessment flows. |
 | Coding challenges | Practice with executable code; out of scope today. |
