@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { NODEJS_TOPIC } from "@/data/nodejs-questions";
 import { readQuestionProgress } from "@/domain/local-storage-progress";
 import CategoryStudyPage from "./page";
 
@@ -12,6 +13,9 @@ describe("CategoryStudyPage", () => {
 
   it("studies and persists only questions from the selected category", async () => {
     const user = userEvent.setup();
+    const fundamentalsQuestions = NODEJS_TOPIC.questions.filter(
+      (question) => question.category === "fundamentals",
+    );
 
     render(
       await CategoryStudyPage({
@@ -30,9 +34,7 @@ describe("CategoryStudyPage", () => {
       "/topics/nodejs",
     );
     expect(
-      screen.getByText(
-        "What is Node.js, and what is it commonly used for in backend development?",
-      ),
+      screen.getByText(fundamentalsQuestions[0]!.question),
     ).toBeInTheDocument();
     expect(
       screen.queryByText(
@@ -40,18 +42,17 @@ describe("CategoryStudyPage", () => {
       ),
     ).not.toBeInTheDocument();
 
-    for (let index = 0; index < 4; index += 1) {
+    for (let index = 0; index < fundamentalsQuestions.length; index += 1) {
       await user.click(screen.getByRole("button", { name: "Show answer" }));
       await user.click(screen.getByRole("button", { name: "Good" }));
     }
 
-    expect(screen.getByText("4 questions reviewed")).toBeInTheDocument();
-    expect(Object.keys(readQuestionProgress())).toEqual([
-      "nodejs-fundamentals",
-      "v8-and-libuv",
-      "single-threaded-nodejs",
-      "graceful-shutdown",
-    ]);
+    expect(
+      screen.getByText(`${fundamentalsQuestions.length} questions reviewed`),
+    ).toBeInTheDocument();
+    expect(Object.keys(readQuestionProgress())).toEqual(
+      fundamentalsQuestions.map(({ id }) => id),
+    );
   });
 
   it("returns not found for an unknown category", async () => {

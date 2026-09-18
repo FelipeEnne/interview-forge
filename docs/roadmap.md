@@ -20,6 +20,7 @@ The initial MVP is shipped. Stories 1–12 are done; details live under `docs/st
 | 10 | Node.js proficiency quiz |
 | 11 | Identify lowest-performing quiz categories |
 | 12 | Node.js coding challenges |
+| 13 | Expanded Node.js question bank |
 
 ## Post-MVP
 

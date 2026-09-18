@@ -41,7 +41,7 @@ LocalStorage is unavailable on the server; study pages pass questions and a sess
 | `InterviewQuestion` | Study/active-recall item: stable `id`, typed `category`, `question`, and `answer` text. |
 | `QuizQuestion` | Assessment item: stable `id`, typed `category`, `question`, four `options`, and `correctOption`. |
 | `CodingChallenge` | Implementation practice item: stable `id`, typed `category`, `prompt`, `requirements`, `starterCode`, `referenceSolution`, and `reviewChecklist`. |
-| `QuestionCategory` / `QUESTION_CATEGORY_LABELS` | Eight allowed Node.js category slugs and their UI labels, shared by study and quiz. |
+| `QuestionCategory` / `QUESTION_CATEGORY_LABELS` | Nine allowed Node.js category slugs and their UI labels, shared by study and quiz. |
 | `RecallRating` | `"again" \| "hard" \| "good" \| "easy"`. |
 | `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question rating, count, and review timestamps (LocalStorage). |
 | `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
@@ -125,7 +125,7 @@ Ordering uses `lastRating` only; `reviewCount` and review timestamps do not affe
 - **Read:** `readQuizPerformance()` returns `{}` on SSR, missing key, invalid JSON, unknown categories, or any invalid entry.
 - **Write:** `saveQuizPerformance()` serializes the complete aggregate.
 - **Boundary:** a completed attempt adds its `byCategory` counts to storage. Incomplete attempts are not saved, and no quiz data is written to `interview-forge:question-progress`.
-- No attempt list, timestamp, global score, or retention policy is needed because storage is bounded to eight category entries.
+- No attempt list, timestamp, global score, or retention policy is needed because storage is bounded to nine category entries.
 
 ## Quiz category performance
 
@@ -187,7 +187,7 @@ Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 107 te
 - Derive remaining quiz time from a deadline so tests can fake the clock without a real wait.
 - Static question data in TypeScript modules rather than a CMS or DB for now.
 - Keep study questions, quiz questions, and coding challenges in separate data modules because they are different shapes.
-- Keep all 30 Node.js study questions and their category taxonomy in one readable data module; category display labels are the single source of truth for the category union.
+- Keep all 60 Node.js study questions and their category taxonomy in one readable data module; category display labels are the single source of truth for the category union.
 - Preserve study question ids when content gains metadata because LocalStorage progress is keyed by question id. Category is not persisted.
 - Single topic route validates slug against `NODEJS_TOPIC`; unknown topics → `notFound()`.
 - Category slugs are validated against `QUESTION_CATEGORY_LABELS`; unknown categories → `notFound()`.

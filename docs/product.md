@@ -48,7 +48,7 @@ challenges do not change study progress or quiz performance.
 
 ## Current target use case
 
-A single user studying a curated bank of **30 Node.js questions across 8 categories** in the browser, on their own device, without signing in. Study progress survives page reloads via browser LocalStorage.
+A single user studying a curated bank of **60 Node.js questions across 9 categories** in the browser, on their own device, without signing in. Study progress survives page reloads via browser LocalStorage.
 
 The same topic also offers a timed multiple-choice quiz from a separate bank of **20 Node.js quiz questions**. Each attempt samples 10 of those questions.
 

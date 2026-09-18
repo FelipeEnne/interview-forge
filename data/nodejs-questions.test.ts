@@ -16,8 +16,8 @@ describe("NODEJS_TOPIC", () => {
     expect(NODEJS_TOPIC.displayName).toBe("Node.js");
   });
 
-  it("has exactly 30 questions", () => {
-    expect(NODEJS_TOPIC.questions).toHaveLength(30);
+  it("has exactly 60 questions", () => {
+    expect(NODEJS_TOPIC.questions).toHaveLength(60);
   });
 
   it("each question has a valid category and non-empty content", () => {
@@ -43,10 +43,35 @@ describe("NODEJS_TOPIC", () => {
     expect(ids).toEqual(
       expect.arrayContaining([
         "nodejs-fundamentals",
+        "v8-and-libuv",
+        "single-threaded-nodejs",
+        "graceful-shutdown",
         "event-loop",
         "sync-vs-async",
+        "promises-and-async-await",
+        "microtasks-and-nexttick",
+        "blocking-the-event-loop",
+        "worker-threads",
         "cjs-vs-esm",
+        "module-caching",
+        "package-json-role",
+        "node-http-server",
+        "http-methods-idempotency",
+        "api-status-codes",
+        "http-keep-alive",
         "middleware",
+        "express-routers",
+        "express-error-middleware",
+        "stream-types",
+        "stream-backpressure",
+        "stream-pipeline",
+        "buffers",
+        "unit-vs-integration-tests",
+        "testing-async-code",
+        "test-mocking-boundaries",
+        "input-validation",
+        "authentication-vs-authorization",
+        "api-security-baseline",
       ]),
     );
   });
