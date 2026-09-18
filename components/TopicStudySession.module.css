@@ -5,6 +5,13 @@
   padding: 2rem 1.25rem 3rem;
 }
 
+.backLink {
+  display: inline-block;
+  margin-bottom: 1rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .title {
   font-size: 1.75rem;
   font-weight: 600;

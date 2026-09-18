@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import {
@@ -24,14 +25,23 @@ import {
 
 import styles from "./TopicStudySession.module.css";
 
+type SessionMode = "due-review" | "practice";
+
 type TopicStudySessionProps = {
   topicName: string;
   questions: InterviewQuestion[];
+  sessionMode?: SessionMode;
+  backLink?: {
+    href: string;
+    label: string;
+  };
 };
 
 export function TopicStudySession({
   topicName,
   questions,
+  sessionMode = "due-review",
+  backLink,
 }: TopicStudySessionProps) {
   const [sessionQuestions, setSessionQuestions] = useState<
     InterviewQuestion[] | null
@@ -44,11 +54,14 @@ export function TopicStudySession({
   useEffect(() => {
     // LocalStorage is client-only, so the session queue is initialized after hydration.
     const progress = readQuestionProgress();
-    const dueQuestions = getDueQuestions(questions, progress, new Date());
+    const selectedQuestions =
+      sessionMode === "due-review"
+        ? getDueQuestions(questions, progress, new Date())
+        : questions;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSessionQuestions(orderQuestionsForStudy(dueQuestions, progress));
-  }, [questions]);
+    setSessionQuestions(orderQuestionsForStudy(selectedQuestions, progress));
+  }, [questions, sessionMode]);
 
   const currentQuestion = sessionQuestions?.[currentIndex];
   const isLastQuestion =
@@ -96,9 +109,12 @@ export function TopicStudySession({
 
   function handleStudyAgain() {
     const progress = readQuestionProgress();
-    const dueQuestions = getDueQuestions(questions, progress, new Date());
+    const selectedQuestions =
+      sessionMode === "due-review"
+        ? getDueQuestions(questions, progress, new Date())
+        : questions;
 
-    startSession(orderQuestionsForStudy(dueQuestions, progress));
+    startSession(orderQuestionsForStudy(selectedQuestions, progress));
   }
 
   function handleStudyAllQuestions() {
@@ -109,6 +125,11 @@ export function TopicStudySession({
 
   return (
     <div className={styles.container}>
+      {backLink ? (
+        <Link className={styles.backLink} href={backLink.href}>
+          {backLink.label}
+        </Link>
+      ) : null}
       <h1 className={styles.title}>{topicName}</h1>
       <article className={styles.card} aria-live="polite">
         {sessionQuestions === null ? (
@@ -135,7 +156,8 @@ export function TopicStudySession({
               Study again
             </button>
           </div>
-        ) : sessionQuestions.length === 0 ? (
+        ) : sessionMode === "due-review" &&
+          sessionQuestions.length === 0 ? (
           <div className={styles.summary}>
             <p className={styles.sessionComplete}>You&apos;re all caught up</p>
             <p className={styles.summaryTotal}>

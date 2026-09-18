@@ -1,0 +1,67 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { readQuestionProgress } from "@/domain/local-storage-progress";
+import CategoryStudyPage from "./page";
+
+describe("CategoryStudyPage", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("studies and persists only questions from the selected category", async () => {
+    const user = userEvent.setup();
+
+    render(
+      await CategoryStudyPage({
+        params: Promise.resolve({
+          topic: "nodejs",
+          category: "fundamentals",
+        }),
+      }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Node.js — Fundamentals" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to Node.js" })).toHaveAttribute(
+      "href",
+      "/topics/nodejs",
+    );
+    expect(
+      screen.getByText(
+        "What is Node.js, and what is it commonly used for in backend development?",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        "What is the event loop in Node.js, and why does it matter?",
+      ),
+    ).not.toBeInTheDocument();
+
+    for (let index = 0; index < 4; index += 1) {
+      await user.click(screen.getByRole("button", { name: "Show answer" }));
+      await user.click(screen.getByRole("button", { name: "Good" }));
+    }
+
+    expect(screen.getByText("4 questions reviewed")).toBeInTheDocument();
+    expect(Object.keys(readQuestionProgress())).toEqual([
+      "nodejs-fundamentals",
+      "v8-and-libuv",
+      "single-threaded-nodejs",
+      "graceful-shutdown",
+    ]);
+  });
+
+  it("returns not found for an unknown category", async () => {
+    await expect(
+      CategoryStudyPage({
+        params: Promise.resolve({
+          topic: "nodejs",
+          category: "unknown",
+        }),
+      }),
+    ).rejects.toThrow();
+  });
+});

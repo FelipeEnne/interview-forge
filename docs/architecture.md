@@ -16,7 +16,7 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 
 | Path | Role |
 | --- | --- |
-| `app/` | Routes and layouts. Home (`/`) and dynamic topic page (`/topics/[topic]`). |
+| `app/` | Routes and layouts. Home, topic overview, due study, and category study pages. |
 | `components/` | Interactive UI. `TopicStudySession` owns the study flow. |
 | `data/` | Static in-repo question banks (currently `nodejs-questions.ts`). |
 | `domain/` | Pure TypeScript logic: ratings, progress, due selection, ordering, LocalStorage I/O. |
@@ -24,10 +24,10 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 
 ## Server vs client boundary
 
-- **Server Components (default):** `app/layout.tsx`, `app/page.tsx`, `app/topics/[topic]/page.tsx` load topic data and render the study shell.
+- **Server Components (default):** route pages validate URL segments, select static topic data, and render either the topic overview or study shell.
 - **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration.
 
-LocalStorage is unavailable on the server; the topic page passes questions as props from the server, and the client initializes the ordered queue in `useEffect`.
+LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`.
 
 ## Domain concepts
 
@@ -40,6 +40,7 @@ LocalStorage is unavailable on the server; the topic page passes questions as pr
 | `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
 | `getDueQuestions` (`domain/due-questions.ts`) | **Pure domain rule** — selects unreviewed, legacy, or scheduled questions whose `nextReviewAt` is at or before a supplied instant. |
 | `orderQuestionsForStudy` (`domain/question-order.ts`) | **Pure domain rule** — maps topic questions + progress snapshot → study order. |
+| Session mode | `due-review` lets scheduling select questions; `practice` includes every supplied question. |
 | Study session queue (`sessionQuestions`) | **Fixed ordered queue** for one pass; stored in React state after queue creation. |
 | `SessionRatings` | **Current-session only** — ratings for summary counts; cleared on **Study again**. |
 
@@ -61,6 +62,15 @@ LocalStorage is unavailable on the server; the topic page passes questions as pr
 - Not cleared by **Study again**; `reviewCount` accumulates across sessions
 
 **Boundary:** Persisted progress is read when creating a study queue (initial load, **Study again**, and voluntary **Study all questions**). `TopicStudySession` does not keep the full progress map in React state—only the selected and ordered question list. Ratings still read/write storage per question when the user rates.
+
+## Topic and study routes
+
+- `/topics/nodejs` is the Node.js entry page. It links to due review and lists all categories from `QUESTION_CATEGORY_LABELS`.
+- `/topics/nodejs/study` starts the normal due-review session.
+- `/topics/nodejs/categories/[category]` validates the category slug, filters the static bank on the server, and starts a manual practice session.
+- Unknown topic or category slugs return not found.
+
+Category filtering stays at the application boundary because it is a single, explicit use of `Array.filter`; no separate domain rule is needed.
 
 ## LocalStorage strategy
 
@@ -97,11 +107,20 @@ Priority (lower number first): **Again** → **Hard** → unreviewed → **Good*
 
 **After voluntary practice:** **Study again** returns to the normal due-selection flow. The voluntary override is not persisted.
 
+## Category practice
+
+A category session is deliberate practice and does not apply due selection:
+
+`all topic questions → filter selected category → orderQuestionsForStudy → fixed session queue`
+
+The server preserves question-bank order while filtering. The client then applies the same recall-priority ordering used by due review. **Study again** re-reads LocalStorage, includes every question supplied for that category, and recalculates ordering without applying `getDueQuestions`.
+
 ## Testing strategy
 
 - **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`).
 - **Data:** Sanity checks on `NODEJS_TOPIC` content, categories, count, unique ids, and preservation of original ids.
-- **UI:** `TopicStudySession.test.tsx` exercises user-visible flows (category context, show answer, rate, summary, prioritization, **Study again**, LocalStorage side effects) with Testing Library.
+- **Routes:** topic and category page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed UI.
+- **UI:** `TopicStudySession.test.tsx` exercises user-visible flows (category context, show answer, rate, summary, due and practice selection, prioritization, **Study again**, LocalStorage side effects) with Testing Library.
 - No E2E or snapshot tests.
 
 Run: `npm test -- --run` (or `npm run test:run`).
@@ -114,13 +133,14 @@ Run: `npm test -- --run` (or `npm run test:run`).
 - Keep all 30 Node.js questions and their category taxonomy in one readable data module; category display labels are the single source of truth for the category union.
 - Preserve question ids when content gains metadata because LocalStorage progress is keyed by question id. Category is not persisted.
 - Single topic route validates slug against `NODEJS_TOPIC`; unknown topics → `notFound()`.
+- Category slugs are validated against `QUESTION_CATEGORY_LABELS`; unknown categories → `notFound()`.
 - Strict LocalStorage validation to avoid corrupt partial state.
 - Client-only queue initialization to avoid SSR/hydration mismatch with stored progress.
 - Separate **fixed session queue** from **mutable persisted progress** so in-session ratings never reshuffle the current pass.
 - Separate due filtering from question ordering so each domain rule remains independently testable.
+- Separate scheduled review from manual category practice through an explicit session mode.
 
 ## Known technical debt
 
-- Topic registry is hard-coded in the topic page (not a shared topic index).
-- No app-route-level tests; coverage is centered on `TopicStudySession` and domain modules.
+- Topic lookup is repeated in the small route set rather than extracted into a registry.
 - `reviewCount` is persisted but not used in ordering or UI yet.

@@ -14,6 +14,7 @@ Stories are delivered incrementally. Details for completed work live under `docs
 | 6 | Schedule next review timestamps |
 | 7 | Study questions due for review |
 | 8 | Categorized Node.js question bank |
+| 9 | Study Node.js questions by category |
 
 ## Next
 

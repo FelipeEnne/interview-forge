@@ -163,6 +163,69 @@ describe("TopicStudySession", () => {
     expect(screen.queryByText("Third question text?")).not.toBeInTheDocument();
   });
 
+  it("studies every supplied question in recall priority order in practice mode", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
+    localStorage.setItem(
+      QUESTION_PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        q1: {
+          lastRating: "good",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-18T03:00:00.000Z",
+          nextReviewAt: "2026-09-21T03:00:00.000Z",
+        },
+        q2: {
+          lastRating: "again",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-18T03:10:00.000Z",
+          nextReviewAt: "2026-09-18T03:20:00.000Z",
+        },
+        q3: {
+          lastRating: "easy",
+          reviewCount: 1,
+          lastReviewedAt: "2026-09-17T03:15:00.000Z",
+          nextReviewAt: "2026-09-24T03:15:00.000Z",
+        },
+      }),
+    );
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        sessionMode="practice"
+      />,
+    );
+
+    expect(await screen.findByText("Second question text?")).toBeInTheDocument();
+    await completeSession(user, ["good", "good", "good"]);
+
+    expect(screen.getByText("3 questions reviewed")).toBeInTheDocument();
+  });
+
+  it("rebuilds a practice session with every supplied question on Study again", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
+    const user = userEvent.setup();
+
+    render(
+      <TopicStudySession
+        topicName="Node.js"
+        questions={sampleQuestions}
+        sessionMode="practice"
+      />,
+    );
+
+    await completeSession(user, ["easy", "again", "good"]);
+    await user.click(screen.getByRole("button", { name: "Study again" }));
+
+    expect(screen.getByText("Second question text?")).toBeInTheDocument();
+    await completeSession(user, ["good", "good", "good"]);
+    expect(screen.getByText("3 questions reviewed")).toBeInTheDocument();
+  });
+
   it("keeps the due queue fixed when time passes during a session", async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-09-18T03:15:00.000Z"));
