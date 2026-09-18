@@ -25,9 +25,13 @@ InterviewForge is a personal web app for preparing for technical interviews. It 
 3. Select one of four answers and click **Next**. The last question uses **Finish quiz**.
 4. If time reaches 00:00, the attempt ends with answers given so far. Unanswered questions count as incorrect.
 5. View the score, percentage, and per-category breakdown for that attempt.
-6. Optionally click **Try again** for a new in-memory attempt, or **Back to Node.js**.
+6. On completion, add correct and encountered question counts to persistent per-category quiz performance.
+7. Optionally click **Try again** for a new attempt, or **Back to Node.js**.
 
-Quiz results are not saved and do not change study progress.
+The Node.js topic page shows up to three categories with the lowest accumulated
+quiz accuracy once each has at least two encountered questions. Each category
+links directly to its existing study session. Quiz performance is stored
+separately and does not change study progress.
 
 ## Current target use case
 
@@ -35,7 +39,7 @@ A single user studying a curated bank of **30 Node.js questions across 8 categor
 
 The same topic also offers a timed multiple-choice quiz from a separate bank of **20 Node.js quiz questions**. Each attempt samples 10 of those questions.
 
-Entry path: home page → **Study Node.js questions** → `/topics/nodejs`. The topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, and manual practice for each category.
+Entry path: home page → **Study Node.js questions** → `/topics/nodejs`. The topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, manual practice for each category, and category practice from accumulated quiz performance.
 
 ## Product principles
 
@@ -51,7 +55,7 @@ The product does **not** currently provide:
 
 - User accounts or authentication
 - Server-side or database persistence
-- Quiz history, quiz LocalStorage, or weak-category analysis
+- Visual quiz history or performance over time
 - Adaptive spaced repetition algorithms beyond the current fixed schedule
 - Multiple topics beyond Node.js (only `nodejs` is wired in routing)
 - Mock interviews or coding challenge environments

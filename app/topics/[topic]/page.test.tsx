@@ -1,10 +1,15 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { QUESTION_CATEGORY_LABELS } from "@/data/nodejs-questions";
+import { saveQuizPerformance } from "@/domain/local-storage-quiz-performance";
 import TopicPage from "./page";
 
 describe("TopicPage", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it("shows due review and every category as study choices", async () => {
     render(
       await TopicPage({
@@ -28,6 +33,25 @@ describe("TopicPage", () => {
         `/topics/nodejs/categories/${category}`,
       );
     }
+  });
+
+  it("includes persisted quiz performance on the Node.js page", async () => {
+    saveQuizPerformance({
+      streams: { correct: 1, total: 3 },
+    });
+
+    render(
+      await TopicPage({
+        params: Promise.resolve({ topic: "nodejs" }),
+      }),
+    );
+
+    expect(
+      await screen.findByRole("heading", { name: "Performance" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Streams & Buffers", level: 3 }),
+    ).toBeInTheDocument();
   });
 
   it("returns not found for an unknown topic", async () => {

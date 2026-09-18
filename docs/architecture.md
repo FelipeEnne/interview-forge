@@ -17,7 +17,7 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 | Path | Role |
 | --- | --- |
 | `app/` | Routes and layouts. Home, topic overview, due study, category study, and quiz pages. |
-| `components/` | Interactive UI. `TopicStudySession` owns the study flow. `NodejsQuiz` owns the quiz flow. |
+| `components/` | Interactive UI. `TopicStudySession` owns the study flow, `NodejsQuiz` owns the quiz flow, and `NodejsCategoryPerformance` reads accumulated quiz performance. |
 | `data/` | Static in-repo banks: `nodejs-questions.ts` (study) and `nodejs-quiz-questions.ts` (quiz). |
 | `domain/` | Pure TypeScript logic: ratings, progress, due selection, ordering, LocalStorage I/O, quiz selection and scoring. |
 | `docs/` | Product and technical documentation. |
@@ -27,8 +27,9 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 - **Server Components (default):** route pages validate URL segments, select static topic data, and render the topic overview, study shell, or quiz shell.
 - **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration.
 - **Client Component:** `NodejsQuiz` (`"use client"`) holds intro/active/result phases, samples questions after **Start quiz**, and runs the countdown from a deadline.
+- **Client Component:** `NodejsCategoryPerformance` (`"use client"`) reads quiz performance after hydration and renders category insights when enough evidence exists.
 
-LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`. Quiz pages pass the static quiz bank; the client samples an attempt only after an explicit start.
+LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`. Quiz pages pass the static quiz bank; the client samples an attempt only after an explicit start. The topic overview remains a Server Component and composes the small client performance block.
 
 ## Domain concepts
 
@@ -44,10 +45,12 @@ LocalStorage is unavailable on the server; study pages pass questions and a sess
 | `orderQuestionsForStudy` (`domain/question-order.ts`) | **Pure domain rule** — maps topic questions + progress snapshot → study order. |
 | `selectQuizQuestions` (`domain/quiz.ts`) | **Pure domain rule** — samples `count` unique questions using an injected `randomSource`. |
 | `calculateQuizResult` (`domain/quiz.ts`) | **Pure domain rule** — scores an attempt; unanswered items are incorrect; aggregates by category. |
+| `QuizPerformance` | **Persistent quiz-only aggregate** — correct and encountered counts keyed by category. |
+| `recordQuizPerformance` / `getLowestCategoryPerformance` | **Pure domain rules** — accumulate a completed result and select the lowest-accuracy categories. |
 | Session mode | `due-review` lets scheduling select questions; `practice` includes every supplied question. |
 | Study session queue (`sessionQuestions`) | **Fixed ordered queue** for one pass; stored in React state after queue creation. |
 | `SessionRatings` | **Current-session only** — ratings for summary counts; cleared on **Study again**. |
-| Quiz attempt | **Current-attempt only** — selected questions, sparse answers, and deadline; not persisted. |
+| Quiz attempt | **Current-attempt only** — selected questions, sparse answers, and deadline; only its category aggregate is persisted at completion. |
 
 Study questions and quiz questions are separate models. Quiz scoring does not read or write `QuestionProgress`.
 
@@ -80,7 +83,7 @@ Study questions and quiz questions are separate models. Quiz scoring does not re
 - Sparse answers keyed by question id
 - Deadline (`Date.now() + 8 minutes`) and remaining seconds derived from it
 
-The countdown starts only on **Start quiz** or **Try again**. Remaining time is `ceil((deadline - Date.now()) / 1000)`, not a decrement-only counter. At zero, the component clears the interval and scores the current answers. **Try again** samples a new set and does not keep the previous result.
+The countdown starts only on **Start quiz** or **Try again**. Remaining time is `ceil((deadline - Date.now()) / 1000)`, not a decrement-only counter. At zero, the component clears the interval and scores the current answers. Normal completion and timeout share one guarded completion path that persists exactly once. **Try again** resets that guard and samples a new set.
 
 Option order stays as authored. Tests inject `randomSource` into `selectQuizQuestions` so production can shuffle while domain tests stay deterministic.
 
@@ -94,7 +97,11 @@ Option order stays as authored. Tests inject `randomSource` into `selectQuizQues
 
 Category filtering stays at the application boundary because it is a single, explicit use of `Array.filter`; no separate domain rule is needed.
 
+The Node.js entry page also composes `NodejsCategoryPerformance`. After hydration, it shows up to three eligible categories and links each one to the existing category practice route.
+
 ## LocalStorage strategy
+
+### Study progress
 
 - **Key:** `interview-forge:question-progress`
 - **Format:** JSON object keyed by question id; each value has valid `lastRating`, integer `reviewCount >= 1`, and either both review timestamps or neither for legacy records.
@@ -104,6 +111,21 @@ Category filtering stays at the application boundary because it is a single, exp
 Legacy records without timestamps remain valid and receive timestamps on their next rating. New timestamps use canonical ISO 8601 UTC with milliseconds.
 
 Ordering uses `lastRating` only; `reviewCount` and review timestamps do not affect sort priority.
+
+### Quiz performance
+
+- **Key:** `interview-forge:quiz-attempts`
+- **Format:** JSON object keyed by known category slug; each present value has integer `correct` and `total` counts with `total >= 1` and `0 <= correct <= total`.
+- **Read:** `readQuizPerformance()` returns `{}` on SSR, missing key, invalid JSON, unknown categories, or any invalid entry.
+- **Write:** `saveQuizPerformance()` serializes the complete aggregate.
+- **Boundary:** a completed attempt adds its `byCategory` counts to storage. Incomplete attempts are not saved, and no quiz data is written to `interview-forge:question-progress`.
+- No attempt list, timestamp, global score, or retention policy is needed because storage is bounded to eight category entries.
+
+## Quiz category performance
+
+Accumulated accuracy is `total correct / total encountered questions` for each category, not an average of attempt percentages. Categories with fewer than two encountered questions are omitted to avoid one answer producing an overly strong insight.
+
+`getLowestCategoryPerformance` orders eligible categories by exact accuracy, returns at most three, and uses the canonical order from `QUESTION_CATEGORY_LABELS` for exact ties. Display percentages are rounded only after ordering. No pass/fail threshold is applied.
 
 ## Review scheduling
 
@@ -139,10 +161,10 @@ The server preserves question-bank order while filtering. The client then applie
 
 ## Testing strategy
 
-- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`).
+- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, and `local-storage-quiz-performance`).
 - **Data:** Sanity checks on `NODEJS_TOPIC` and `NODEJS_QUIZ_QUESTIONS` content, categories, counts, unique ids, and option/correct-index validity.
 - **Routes:** topic, category, and quiz page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed study UI.
-- **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, **Try again**, and the countdown with fake timers.
+- **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, and the countdown with fake timers. `NodejsCategoryPerformance.test.tsx` covers category insights and study links.
 - No E2E or snapshot tests.
 
 Run: `npm test -- --run` (or `npm run test:run`).
@@ -164,7 +186,8 @@ Run: `npm test -- --run` (or `npm run test:run`).
 - Separate **fixed session queue** from **mutable persisted progress** so in-session ratings never reshuffle the current pass.
 - Separate due filtering from question ordering so each domain rule remains independently testable.
 - Separate scheduled review from manual category practice through an explicit session mode.
-- Keep quiz results in memory for the current attempt only.
+- Keep the full quiz result in memory and persist only bounded per-category aggregates because current insights do not require attempt history or timestamps.
+- Require two encountered questions before presenting a category and show the three lowest accuracies without a pass/fail threshold.
 
 ## Known technical debt
 

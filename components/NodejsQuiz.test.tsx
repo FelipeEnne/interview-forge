@@ -1,8 +1,12 @@
-import { describe, expect, it, vi, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import type { QuizQuestion } from "@/data/nodejs-quiz-questions";
+import {
+  QUIZ_PERFORMANCE_STORAGE_KEY,
+  readQuizPerformance,
+} from "@/domain/local-storage-quiz-performance";
 import { QUIZ_DURATION_MS } from "@/domain/quiz";
 import { NodejsQuiz } from "@/components/NodejsQuiz";
 
@@ -65,8 +69,13 @@ async function answerAndAdvance(
 }
 
 describe("NodejsQuiz", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it("shows the intro with duration and question count", () => {
@@ -109,6 +118,7 @@ describe("NodejsQuiz", () => {
 
   it("finishes on the last question and shows the score", async () => {
     const user = userEvent.setup();
+    const storageSpy = vi.spyOn(Storage.prototype, "setItem");
 
     await startQuiz(user);
 
@@ -125,11 +135,27 @@ describe("NodejsQuiz", () => {
     expect(
       screen.getByRole("link", { name: "Back to Node.js" }),
     ).toHaveAttribute("href", "/topics/nodejs");
+    expect(readQuizPerformance()).toEqual({
+      fundamentals: { correct: 1, total: 1 },
+      async: { correct: 2, total: 2 },
+      http: { correct: 2, total: 2 },
+      modules: { correct: 1, total: 1 },
+      express: { correct: 1, total: 1 },
+      streams: { correct: 1, total: 1 },
+      testing: { correct: 1, total: 1 },
+      security: { correct: 1, total: 1 },
+    });
+    expect(storageSpy).toHaveBeenCalledTimes(1);
+    expect(storageSpy).toHaveBeenCalledWith(
+      QUIZ_PERFORMANCE_STORAGE_KEY,
+      expect.any(String),
+    );
   });
 
   it("ends when the timer reaches zero and counts a selected unanswered advance as answered", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-09-18T00:00:00.000Z"));
+    const storageSpy = vi.spyOn(Storage.prototype, "setItem");
 
     render(
       <NodejsQuiz
@@ -153,10 +179,22 @@ describe("NodejsQuiz", () => {
 
     expect(screen.getByText("1 / 10")).toBeInTheDocument();
     expect(screen.getByText("10%")).toBeInTheDocument();
+    expect(readQuizPerformance()).toEqual({
+      fundamentals: { correct: 0, total: 1 },
+      async: { correct: 1, total: 2 },
+      modules: { correct: 0, total: 1 },
+      http: { correct: 0, total: 2 },
+      express: { correct: 0, total: 1 },
+      streams: { correct: 0, total: 1 },
+      testing: { correct: 0, total: 1 },
+      security: { correct: 0, total: 1 },
+    });
+    expect(storageSpy).toHaveBeenCalledTimes(1);
   });
 
   it("starts a new attempt from Try again", async () => {
     const user = userEvent.setup();
+    const storageSpy = vi.spyOn(Storage.prototype, "setItem");
 
     await startQuiz(user);
 
@@ -165,10 +203,13 @@ describe("NodejsQuiz", () => {
     }
 
     await answerAndAdvance(user, "q10 A", "Finish quiz");
+    expect(storageSpy).toHaveBeenCalledTimes(1);
+
     await user.click(screen.getByRole("button", { name: "Try again" }));
 
     expect(screen.getByText("Question 1 of 10")).toBeInTheDocument();
     expect(screen.getByText("Time remaining: 08:00")).toBeInTheDocument();
     expect(screen.queryByText("10 / 10")).not.toBeInTheDocument();
+    expect(storageSpy).toHaveBeenCalledTimes(1);
   });
 });

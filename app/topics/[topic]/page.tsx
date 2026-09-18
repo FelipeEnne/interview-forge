@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { NodejsCategoryPerformance } from "@/components/NodejsCategoryPerformance";
 import {
   NODEJS_TOPIC,
   QUESTION_CATEGORY_LABELS,
@@ -50,6 +51,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
           ))}
         </ul>
       </section>
+      <NodejsCategoryPerformance />
     </main>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   QUESTION_CATEGORY_LABELS,
@@ -9,12 +9,18 @@ import {
 } from "@/data/nodejs-questions";
 import type { QuizQuestion } from "@/data/nodejs-quiz-questions";
 import {
+  readQuizPerformance,
+  saveQuizPerformance,
+} from "@/domain/local-storage-quiz-performance";
+import {
   calculateQuizResult,
   QUIZ_DURATION_MS,
   QUIZ_QUESTION_COUNT,
   selectQuizQuestions,
   type QuizAnswers,
+  type QuizResult,
 } from "@/domain/quiz";
+import { recordQuizPerformance } from "@/domain/quiz-performance";
 
 import styles from "./NodejsQuiz.module.css";
 
@@ -53,6 +59,25 @@ export function NodejsQuiz({
   const [remainingSeconds, setRemainingSeconds] = useState(
     QUIZ_DURATION_MS / 1000,
   );
+  const [result, setResult] = useState<QuizResult | null>(null);
+  const isAttemptRecorded = useRef(false);
+
+  const finishAttempt = useCallback(() => {
+    if (isAttemptRecorded.current) {
+      return;
+    }
+
+    isAttemptRecorded.current = true;
+    const completedResult = calculateQuizResult(attemptQuestions, answers);
+    const performance = recordQuizPerformance(
+      readQuizPerformance(),
+      completedResult.byCategory,
+    );
+
+    saveQuizPerformance(performance);
+    setResult(completedResult);
+    setPhase("result");
+  }, [answers, attemptQuestions]);
 
   useEffect(() => {
     if (phase !== "active" || deadline === null) {
@@ -65,25 +90,21 @@ export function NodejsQuiz({
 
       if (remaining === 0) {
         window.clearInterval(intervalId);
-        setPhase("result");
+        finishAttempt();
       }
     }, 1000);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [phase, deadline]);
+  }, [phase, deadline, finishAttempt]);
 
   const currentQuestion = attemptQuestions[currentIndex];
   const isLastQuestion = currentIndex === attemptQuestions.length - 1;
   const hasCurrentAnswer =
     currentQuestion !== undefined && answers[currentQuestion.id] !== undefined;
-  const result =
-    phase === "result"
-      ? calculateQuizResult(attemptQuestions, answers)
-      : null;
-
   function startAttempt() {
+    isAttemptRecorded.current = false;
     setAttemptQuestions(
       selectQuizQuestions(questions, QUIZ_QUESTION_COUNT, randomSource),
     );
@@ -91,6 +112,7 @@ export function NodejsQuiz({
     setAnswers({});
     setDeadline(Date.now() + QUIZ_DURATION_MS);
     setRemainingSeconds(QUIZ_DURATION_MS / 1000);
+    setResult(null);
     setPhase("active");
   }
 
@@ -111,7 +133,7 @@ export function NodejsQuiz({
     }
 
     if (isLastQuestion) {
-      setPhase("result");
+      finishAttempt();
       return;
     }
 
