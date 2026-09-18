@@ -2,7 +2,7 @@
 
 ## Purpose
 
-InterviewForge is a personal web app for preparing for technical interviews. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. It also offers a short timed Node.js proficiency quiz that is separate from study.
+InterviewForge is a personal web app for preparing for technical interviews. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. It also offers a short timed Node.js proficiency quiz that is separate from study, and a small bank of Node.js coding challenges for implementation practice without running candidate code.
 
 ## Core study loop
 
@@ -33,13 +33,24 @@ quiz accuracy once each has at least two encountered questions. Each category
 links directly to its existing study session. Quiz performance is stored
 separately and does not change study progress.
 
+## Node.js coding challenges
+
+1. From the Node.js topic page, choose **Practice coding challenges**.
+2. Browse the six challenges and open one.
+3. Read the prompt, requirements, starter code, and review checklist.
+4. Solve the challenge in a local editor.
+5. Click **Reveal solution** to compare against a reference implementation.
+
+The application does not execute, compile, or judge candidate code. Coding
+challenges do not change study progress or quiz performance.
+
 ## Current target use case
 
 A single user studying a curated bank of **30 Node.js questions across 8 categories** in the browser, on their own device, without signing in. Study progress survives page reloads via browser LocalStorage.
 
 The same topic also offers a timed multiple-choice quiz from a separate bank of **20 Node.js quiz questions**. Each attempt samples 10 of those questions.
 
-Entry path: home page → **Study Node.js questions** → `/topics/nodejs`. The topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, manual practice for each category, and category practice from accumulated quiz performance.
+Entry path: home page → **Study Node.js questions** → `/topics/nodejs`. The topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, coding challenges at `/topics/nodejs/challenges`, manual practice for each category, and category practice from accumulated quiz performance.
 
 ## Product principles
 
@@ -58,7 +69,7 @@ The product does **not** currently provide:
 - Visual quiz history or performance over time
 - Adaptive spaced repetition algorithms beyond the current fixed schedule
 - Multiple topics beyond Node.js (only `nodejs` is wired in routing)
-- Mock interviews or coding challenge environments
+- Mock interviews or coding execution environments
 - AI evaluation of answers
 - Analytics, gamification, or localization
 - Cross-device sync

@@ -1,0 +1,55 @@
+.container {
+  width: 100%;
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 1rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.category {
+  margin-bottom: 1rem;
+  color: color-mix(in srgb, var(--foreground) 65%, transparent);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.prompt {
+  font-size: 1.125rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.list {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+  line-height: 1.5;
+}
+
+.code {
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 20%, transparent);
+  background: color-mix(in srgb, var(--foreground) 6%, var(--background));
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}

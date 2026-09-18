@@ -34,6 +34,12 @@ export default async function TopicPage({ params }: TopicPageProps) {
       >
         Take proficiency quiz
       </Link>
+      <Link
+        className={styles.link}
+        href={`/topics/${NODEJS_TOPIC.slug}/challenges`}
+      >
+        Practice coding challenges
+      </Link>
       <section className={styles.categories} aria-labelledby="categories-title">
         <h2 id="categories-title" className={styles.subtitle}>
           Categories

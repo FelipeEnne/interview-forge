@@ -16,9 +16,9 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 
 | Path | Role |
 | --- | --- |
-| `app/` | Routes and layouts. Home, topic overview, due study, category study, and quiz pages. |
-| `components/` | Interactive UI. `TopicStudySession` owns the study flow, `NodejsQuiz` owns the quiz flow, and `NodejsCategoryPerformance` reads accumulated quiz performance. |
-| `data/` | Static in-repo banks: `nodejs-questions.ts` (study) and `nodejs-quiz-questions.ts` (quiz). |
+| `app/` | Routes and layouts. Home, topic overview, due study, category study, quiz, and coding challenge pages. |
+| `components/` | Interactive UI. `TopicStudySession` owns the study flow, `NodejsQuiz` owns the quiz flow, `NodejsCategoryPerformance` reads accumulated quiz performance, and `NodejsCodingChallenge` shows a challenge with a client-only solution reveal. |
+| `data/` | Static in-repo banks: `nodejs-questions.ts` (study), `nodejs-quiz-questions.ts` (quiz), and `nodejs-coding-challenges.ts` (practice problems). |
 | `domain/` | Pure TypeScript logic: ratings, progress, due selection, ordering, LocalStorage I/O, quiz selection and scoring. |
 | `docs/` | Product and technical documentation. |
 
@@ -28,6 +28,7 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 - **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration.
 - **Client Component:** `NodejsQuiz` (`"use client"`) holds intro/active/result phases, samples questions after **Start quiz**, and runs the countdown from a deadline.
 - **Client Component:** `NodejsCategoryPerformance` (`"use client"`) reads quiz performance after hydration and renders category insights when enough evidence exists.
+- **Client Component:** `RevealSolution` (`"use client"`) hides a challenge's reference solution until **Reveal solution**. The surrounding challenge page stays a Server Component.
 
 LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`. Quiz pages pass the static quiz bank; the client samples an attempt only after an explicit start. The topic overview remains a Server Component and composes the small client performance block.
 
@@ -37,6 +38,7 @@ LocalStorage is unavailable on the server; study pages pass questions and a sess
 | --- | --- |
 | `InterviewQuestion` | Study/active-recall item: stable `id`, typed `category`, `question`, and `answer` text. |
 | `QuizQuestion` | Assessment item: stable `id`, typed `category`, `question`, four `options`, and `correctOption`. |
+| `CodingChallenge` | Implementation practice item: stable `id`, typed `category`, `prompt`, `requirements`, `starterCode`, `referenceSolution`, and `reviewChecklist`. |
 | `QuestionCategory` / `QUESTION_CATEGORY_LABELS` | Eight allowed Node.js category slugs and their UI labels, shared by study and quiz. |
 | `RecallRating` | `"again" \| "hard" \| "good" \| "easy"`. |
 | `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question rating, count, and review timestamps (LocalStorage). |
@@ -52,7 +54,7 @@ LocalStorage is unavailable on the server; study pages pass questions and a sess
 | `SessionRatings` | **Current-session only** — ratings for summary counts; cleared on **Study again**. |
 | Quiz attempt | **Current-attempt only** — selected questions, sparse answers, and deadline; only its category aggregate is persisted at completion. |
 
-Study questions and quiz questions are separate models. Quiz scoring does not read or write `QuestionProgress`.
+Study questions, quiz questions, and coding challenges are separate models. Quiz scoring does not read or write `QuestionProgress`. Coding challenges do not persist attempts and do not execute candidate code.
 
 ## Session state vs persistent progress
 
@@ -93,7 +95,9 @@ Option order stays as authored. Tests inject `randomSource` into `selectQuizQues
 - `/topics/nodejs/study` starts the normal due-review session.
 - `/topics/nodejs/categories/[category]` validates the category slug, filters the static bank on the server, and starts a manual practice session.
 - `/topics/nodejs/quiz` hosts the full quiz flow (intro, attempt, result) in one client component.
-- Unknown topic or category slugs return not found.
+- `/topics/nodejs/challenges` lists the six coding challenges.
+- `/topics/nodejs/challenges/[challenge]` shows one challenge and reveals its reference solution on demand.
+- Unknown topic, category, or challenge slugs return not found.
 
 Category filtering stays at the application boundary because it is a single, explicit use of `Array.filter`; no separate domain rule is needed.
 
@@ -162,9 +166,9 @@ The server preserves question-bank order while filtering. The client then applie
 ## Testing strategy
 
 - **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, and `local-storage-quiz-performance`).
-- **Data:** Sanity checks on `NODEJS_TOPIC` and `NODEJS_QUIZ_QUESTIONS` content, categories, counts, unique ids, and option/correct-index validity.
-- **Routes:** topic, category, and quiz page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed study UI.
-- **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, and the countdown with fake timers. `NodejsCategoryPerformance.test.tsx` covers category insights and study links.
+- **Data:** Sanity checks on `NODEJS_TOPIC`, `NODEJS_QUIZ_QUESTIONS`, and `NODEJS_CODING_CHALLENGES` content, categories, counts, unique ids, and option/correct-index validity.
+- **Routes:** topic, category, quiz, and coding-challenge page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed study UI.
+- **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, and the countdown with fake timers. `NodejsCategoryPerformance.test.tsx` covers category insights and study links. `NodejsCodingChallenge.test.tsx` covers prompt, starter code, checklist, and delayed reveal of the reference solution.
 - No E2E or snapshot tests.
 
 Run: `npm test -- --run` (or `npm run test:run`).
@@ -176,7 +180,7 @@ Run: `npm test -- --run` (or `npm run test:run`).
 - Keep quiz selection testable by injecting `randomSource`; production uses `Math.random`.
 - Derive remaining quiz time from a deadline so tests can fake the clock without a real wait.
 - Static question data in TypeScript modules rather than a CMS or DB for now.
-- Keep study questions and quiz questions in separate data modules because they are different shapes.
+- Keep study questions, quiz questions, and coding challenges in separate data modules because they are different shapes.
 - Keep all 30 Node.js study questions and their category taxonomy in one readable data module; category display labels are the single source of truth for the category union.
 - Preserve study question ids when content gains metadata because LocalStorage progress is keyed by question id. Category is not persisted.
 - Single topic route validates slug against `NODEJS_TOPIC`; unknown topics → `notFound()`.

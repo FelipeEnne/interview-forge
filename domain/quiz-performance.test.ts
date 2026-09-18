@@ -4,7 +4,7 @@ import {
   getLowestCategoryPerformance,
   recordQuizPerformance,
   type QuizPerformance,
-} from "./quiz-performance";
+} from "@/domain/quiz-performance";
 
 describe("recordQuizPerformance", () => {
   it("records a first result and accumulates later category results", () => {

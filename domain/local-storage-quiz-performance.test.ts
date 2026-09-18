@@ -4,8 +4,8 @@ import {
   QUIZ_PERFORMANCE_STORAGE_KEY,
   readQuizPerformance,
   saveQuizPerformance,
-} from "./local-storage-quiz-performance";
-import type { QuizPerformance } from "./quiz-performance";
+} from "@/domain/local-storage-quiz-performance";
+import type { QuizPerformance } from "@/domain/quiz-performance";
 
 const samplePerformance: QuizPerformance = {
   async: { correct: 3, total: 5 },

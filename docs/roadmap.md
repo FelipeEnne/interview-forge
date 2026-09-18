@@ -17,6 +17,7 @@ Stories are delivered incrementally. Details for completed work live under `docs
 | 9 | Study Node.js questions by category |
 | 10 | Node.js proficiency quiz |
 | 11 | Identify lowest-performing quiz categories |
+| 12 | Node.js coding challenges |
 
 ## Next
 
@@ -26,6 +27,6 @@ Planned direction (not fully specified until each story is written):
 | --- | --- |
 | Spaced repetition | Adaptive intervals beyond the fixed scheduling policy. |
 | Additional topics | More question banks and topic navigation. |
-| Coding challenges | Practice with executable code; out of scope today. |
+| Coding execution | In-app runners, sandboxes, or automated judging remain out of scope. |
 
 Future items are placeholders only—implement when a dedicated story requires them.
