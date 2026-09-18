@@ -2,14 +2,14 @@
 
 Personal web app for technical interview preparation: active recall study, a timed proficiency quiz, and coding challenges—starting with Node.js.
 
-**Status:** MVP v0.1.0
+**Status:** v0.2.0 (MVP v0.1.0 + bilingual English/Portuguese)
 
 ## Features
 
 - **Study** — 60 Node.js questions in 9 categories; reveal answers and rate recall (Again / Hard / Good / Easy); session summary; LocalStorage progress; review scheduling; due questions; weaker questions first; study by category.
 - **Test** — Node.js Proficiency Quiz (20-question bank, 10 per attempt, 8-minute timer); score and per-category breakdown; accumulated performance and top weak categories for study links.
 - **Practice** — 6 Node.js coding challenges with prompts, starter code, review checklists, and on-demand reference solutions (no in-app code execution).
-- **Language** — English or Portuguese UI and technical content (study questions, quiz items, and challenge prompts); coding-challenge source code stays the same in both languages.
+- **Language (EN / PT)** — Bilingual UI chrome and bilingual technical content (study Q&A, quiz prompts and options, challenge titles and checklists). Use the header selector to switch anytime; your choice is saved in the browser. Study progress, quiz aggregates, review scheduling, and question IDs are **shared across languages**—only presentation changes. Coding-challenge starter code and reference solutions stay the same in both languages.
 
 ## Stack
 

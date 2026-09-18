@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.2.0
+
+Bilingual English and Portuguese experience.
+
+- **Bilingual UI** — Header language selector (EN / PT), translated chrome, category display names, and recall-rating labels across Study, Test, and Practice.
+- **Bilingual technical content** — Study questions and answers, quiz items and options, and coding-challenge text follow the selected language; challenge source code stays shared.
+- **Persistent language preference** — Locale stored in LocalStorage (`interview-forge:locale`); restored on reload and client navigation.
+- **Shared progress across languages** — Question IDs, review scheduling, study progress, and quiz aggregates are unchanged when switching locale; only presentation updates.
+
 ## v0.1.0
 
 First MVP release.

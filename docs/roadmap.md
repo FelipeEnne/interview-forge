@@ -1,8 +1,13 @@
 # Roadmap
 
-## InterviewForge v0.1.0 — MVP Complete
+## Milestones
 
-The initial MVP is shipped. Stories 1–15 are done; details live under `docs/stories/`.
+| Version | Scope | Status |
+| --- | --- | --- |
+| **v0.1.0** | MVP — Node.js Study, Test, Practice (Stories 1–13) | Shipped |
+| **v0.2.0** | English/Portuguese UI and bilingual technical content (Stories 14–15) | Shipped |
+
+Story write-ups live under `docs/stories/`.
 
 ## Completed
 

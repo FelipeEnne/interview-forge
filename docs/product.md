@@ -1,6 +1,6 @@
 # Product
 
-**Status:** MVP v0.1.0 (Node.js topic: Study, Test, and Practice).
+**Status:** v0.2.0 — Node.js topic with Study, Test, Practice, and English/Portuguese presentation.
 
 ## Purpose
 
@@ -56,7 +56,13 @@ Entry path: home page → **Study Node.js questions** → `/topics/nodejs`. The 
 
 ## Language
 
-The interface and technical content can be used in **English** or **Portuguese**. A header selector (**EN | PT**) is available on every page. The choice is stored in the browser under `interview-forge:locale` and defaults to English. Changing language does not alter study progress, quiz performance, URLs, or coding-challenge source code. Study questions, quiz items, and challenge prompts follow the selected language.
+The interface and technical content can be used in **English** or **Portuguese**. A header selector (**EN | PT**) is available on every page. The choice is stored in the browser under `interview-forge:locale` and defaults to English.
+
+**What locale changes:** UI labels, category display names, recall-rating button text, and bilingual technical fields (study questions and answers, quiz stems and options, coding-challenge titles, prompts, requirements, and review checklists).
+
+**What stays the same across languages:** question, quiz, and challenge **IDs**; category **slugs**; recall-rating **values** stored in progress; review **scheduling** and due selection; **study progress** and **quiz performance** in LocalStorage; routes and URLs; quiz **correctOption** indices; timers and in-session UI state (current item, revealed answer, selected option); coding-challenge **starter code** and **reference solution**.
+
+Switching EN ↔ PT during an active study session, quiz attempt, or challenge view updates visible text only—the same item stays on screen and persisted data is untouched.
 
 ## Product principles
 

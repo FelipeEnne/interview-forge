@@ -14,6 +14,19 @@ Architecture as of **Story 15**: one Node.js topic with Study, Test, and Practic
 
 Runtime dependencies are intentionally minimal: Next.js, React, and React DOM only.
 
+## Internationalization
+
+| Piece | Role |
+| --- | --- |
+| `Locale` (`"en" \| "pt"`) | Canonical locale type; `parseLocale` and `readLocale` fall back to `en` for SSR, missing keys, or invalid stored values. |
+| `LocalizedText` | `{ en: string; pt?: string }` on static content records; TypeScript expects both locales on authored banks. |
+| `getLocalizedText` | Resolves a string at **render time**: `value[locale] ?? value.en`. Empty strings are not treated as missing. |
+| `i18n/translations.ts` | UI string catalog keyed by locale; category display names and rating labels live here, not in data modules. |
+| `LocaleProvider` / `useTranslations` | Client context for active locale and a `localize` helper that wraps `getLocalizedText` for components. |
+| `interview-forge:locale` | Persists preference only; study and quiz storage keys are independent. |
+
+Components call `localize` (or `getLocalizedText` directly in tests) when rendering translatable fields—they do not pre-resolve banks into session state. Study queues, quiz attempts, and challenge views keep the same entity IDs and React state when the user toggles EN ↔ PT; only dependent UI re-renders with new strings. `TopicStudySession` and `NodejsQuiz` do not treat locale as a queue- or attempt-reset dependency.
+
 ## Folder responsibilities
 
 | Path | Role |
