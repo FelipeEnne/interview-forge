@@ -1,6 +1,6 @@
 # Architecture
 
-Architecture as of **Story 15**: one Node.js topic with Study, Test, and Practice, plus English/Portuguese UI chrome and bilingual technical content persisted only as a locale preference in LocalStorage. Persistence remains browser LocalStorage only; no server-side store. Language is a presentation concern: the same question, quiz item, and challenge IDs are shown in English or Portuguese.
+Architecture as of **Story 16**: one Node.js topic with Study, Test, and Practice, plus English/Portuguese UI chrome and bilingual technical content persisted only as a locale preference in LocalStorage. Persistence remains browser LocalStorage only; no server-side store. Language is a presentation concern: the same question, quiz item, and challenge IDs are shown in English or Portuguese. Quiz options are authored so the correct answer is not identifiable from presentation.
 
 ## Current stack
 
@@ -110,6 +110,14 @@ The countdown starts only on **Start quiz** or **Try again**. Remaining time is 
 
 Option order stays as authored. Tests inject `randomSource` into `selectQuizQuestions` so production can shuffle while domain tests stay deterministic.
 
+## Quiz option authoring
+
+Correct answers must not be identifiable from option length, specificity, or writing style.
+
+Each quiz item has exactly one technically correct option. The three distractors belong to the same conceptual domain, use a similar grammatical structure, and match a comparable level of specificity. They represent plausible mistakes (for example confusing `process.nextTick()` with `setImmediate()`, or `Promise.all()` with `Promise.allSettled()`), not nonsense, artificial negations, or answers from another domain.
+
+Do not pad options to equalize character counts. English and Portuguese must both satisfy the same presentation standard; a Portuguese translation must not reintroduce a length or style cue. Option order stays authored. `correctOption` is shared across locales and is spread evenly across the four indices in the bank.
+
 ## Topic and study routes
 
 - `/topics/nodejs` is the Node.js entry page. It links to due review, the proficiency quiz, and all categories from `QUESTION_CATEGORIES`.
@@ -195,7 +203,7 @@ The server preserves question-bank order while filtering. The client then applie
 ## Testing strategy
 
 - **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, `local-storage-quiz-performance`, locale parsing, translations, and `getLocalizedText`). Domain and data tests that do not need the DOM use the Node environment; jsdom is reserved for component, route, and LocalStorage tests.
-- **Data:** Sanity checks on `NODEJS_TOPIC`, `NODEJS_QUIZ_QUESTIONS`, and `NODEJS_CODING_CHALLENGES` content, bilingual `LocalizedText` fields, categories, counts, unique ids, option/correct-index validity, and shared challenge source code.
+- **Data:** Sanity checks on `NODEJS_TOPIC`, `NODEJS_QUIZ_QUESTIONS`, and `NODEJS_CODING_CHALLENGES` content, bilingual `LocalizedText` fields, categories, counts, unique ids, option/correct-index validity, shared challenge source code, quiz `correctOption` distribution, and a length-outlier heuristic that flags only a dramatically longer correct option.
 - **Routes:** topic, category, quiz, and coding-challenge page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed study UI.
 - **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, the countdown, and language switching during an attempt. `NodejsCategoryPerformance.test.tsx` covers category insights and study links. `NodejsCodingChallenge.test.tsx` covers prompt, starter code, checklist, delayed reveal of the reference solution, and language switching with code unchanged.
 - No E2E or snapshot tests.
@@ -204,7 +212,7 @@ The server preserves question-bank order while filtering. The client then applie
 - Vitest 3.2 records test timeouts with `Date.now()`. Workers preload `vitest.monotonic-now.cjs` so that clock stays monotonic even if the WSL wall clock jumps under parallel jsdom load. That prevents false 5s timeouts without hiding a real hang.
 - `userEvent.setup({ delay: null })` avoids extra `setTimeout(0)` waits between pointer events.
 
-Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 151 tests across domain, data, i18n, routes, and components.
+Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 156 tests across domain, data, i18n, routes, and components.
 
 ## Important technical decisions
 
@@ -226,6 +234,7 @@ Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 151 te
 - Keep the full quiz result in memory and persist only bounded per-category aggregates because current insights do not require attempt history or timestamps.
 - Require two encountered questions before presenting a category and show the three lowest accuracies without a pass/fail threshold.
 - Keep UI localization in a small typed catalog with LocalStorage preference and no locale in the URL. Technical content uses the same locale through `LocalizedText` and `getLocalizedText`, resolved at render time so switching language does not rebuild study or quiz sessions.
+- Author quiz options so the correct answer cannot be identified from length, specificity, or writing style; keep option order authored and spread `correctOption` evenly in the bank.
 
 ## Known technical debt
 

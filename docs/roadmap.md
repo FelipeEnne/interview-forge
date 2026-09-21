@@ -28,6 +28,7 @@ Story write-ups live under `docs/stories/`.
 | 13 | Expanded Node.js question bank |
 | 14 | Internationalization foundation |
 | 15 | Bilingual technical content |
+| 16 | Quiz distractor quality |
 
 ## Post-MVP
 

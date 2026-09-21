@@ -20,23 +20,23 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "A browser engine for rendering HTML",
-        pt: "Um motor de browser para renderizar HTML",
-      },
-      {
         en: "A JavaScript runtime for running JavaScript outside the browser",
         pt: "Um runtime de JavaScript para executar JavaScript fora do browser",
       },
       {
-        en: "A relational database for JavaScript applications",
-        pt: "Um banco relacional para aplicações JavaScript",
+        en: "A JavaScript engine used only to render pages inside a browser",
+        pt: "Um engine de JavaScript usado só para renderizar páginas dentro de um browser",
       },
       {
-        en: "A CSS preprocessor for backend templates",
-        pt: "Um preprocessador CSS para templates de backend",
+        en: "A JavaScript package manager for installing libraries from a registry",
+        pt: "Um gerenciador de pacotes JavaScript para instalar bibliotecas de um registry",
+      },
+      {
+        en: "A JavaScript compiler that turns TypeScript into browser bundles",
+        pt: "Um compilador JavaScript que transforma TypeScript em bundles de browser",
       },
     ],
-    correctOption: 1,
+    correctOption: 0,
   },
   {
     id: "quiz-v8-libuv",
@@ -47,20 +47,20 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "V8 serves HTTP requests; libuv compiles JavaScript",
-        pt: "V8 atende requests HTTP; libuv compila JavaScript",
+        en: "V8 compiles JavaScript; libuv executes it on a dedicated thread",
+        pt: "V8 compila JavaScript; libuv executa em uma thread dedicada",
       },
       {
-        en: "V8 stores files on disk; libuv renders the UI",
-        pt: "V8 guarda arquivos em disco; libuv renderiza a UI",
+        en: "V8 manages worker threads; libuv executes JavaScript on the main thread",
+        pt: "V8 gerencia worker threads; libuv executa JavaScript na thread principal",
       },
       {
         en: "V8 executes JavaScript; libuv provides the event loop and async I/O",
         pt: "V8 executa JavaScript; libuv fornece o Event Loop e I/O assíncrono",
       },
       {
-        en: "V8 manages npm packages; libuv types TypeScript",
-        pt: "V8 gerencia pacotes npm; libuv tipa TypeScript",
+        en: "V8 provides the event loop; libuv executes JavaScript on worker threads",
+        pt: "V8 fornece o Event Loop; libuv executa JavaScript em worker threads",
       },
     ],
     correctOption: 2,
@@ -78,19 +78,19 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
         pt: "Ele inicia um novo processo do sistema operacional para cada request que chega",
       },
       {
-        en: "It lets one thread schedule callbacks so slow I/O does not block other work",
-        pt: "Ele permite que uma thread agende callbacks para I/O lento não bloquear outro trabalho",
+        en: "It runs each callback on a dedicated worker thread to isolate failures",
+        pt: "Ele roda cada callback em uma worker thread dedicada para isolar falhas",
       },
       {
-        en: "It compiles TypeScript before each request reaches a handler",
-        pt: "Ele compila TypeScript antes de cada request chegar a um handler",
+        en: "It lets one thread schedule I/O callbacks without blocking other work",
+        pt: "Ele permite que uma thread agende callbacks de I/O sem bloquear outro trabalho",
       },
       {
-        en: "It guarantees every callback runs in a dedicated worker thread",
-        pt: "Ele garante que todo callback rode em uma worker thread dedicada",
+        en: "It waits until every request finishes before accepting another connection",
+        pt: "Ele espera cada request terminar antes de aceitar outra conexão",
       },
     ],
-    correctOption: 1,
+    correctOption: 2,
   },
   {
     id: "quiz-blocking-work",
@@ -128,23 +128,23 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "Ignore it; Node converts every rejection into a successful empty result",
-        pt: "Ignore; o Node converte toda rejection em um resultado vazio de sucesso",
+        en: "Leave it unhandled so Node converts the rejection into a successful result",
+        pt: "Deixe sem tratamento para o Node converter a rejection em um resultado de sucesso",
+      },
+      {
+        en: "Attach only a then() fulfillment handler and skip any catch() path",
+        pt: "Anexe só um handler then() de fulfillment e pule qualquer caminho catch()",
+      },
+      {
+        en: "Replace the rejection with process.nextTick so the error is deferred forever",
+        pt: "Troque a rejection por process.nextTick para o erro ficar adiado para sempre",
       },
       {
         en: "Catch it with try/catch or attach a rejection handler so the failure is observed",
         pt: "Capture com try/catch ou anexe um handler de rejection para a falha ser observada",
       },
-      {
-        en: "Call process.exit immediately from inside the async function",
-        pt: "Chame process.exit imediatamente de dentro da função async",
-      },
-      {
-        en: "Wrap the function in JSON.stringify so errors become strings",
-        pt: "Envolva a função em JSON.stringify para os erros virarem strings",
-      },
     ],
-    correctOption: 1,
+    correctOption: 3,
   },
   {
     id: "quiz-nexttick-microtasks",
@@ -159,16 +159,16 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
         pt: "Callbacks de I/O podem ser famintos porque essas filas rodam antes das fases posteriores do Event Loop",
       },
       {
-        en: "Node automatically moves the work onto the GPU",
-        pt: "O Node move o trabalho automaticamente para a GPU",
+        en: "Timer callbacks run first, so nextTick work is delayed until after all I/O",
+        pt: "Callbacks de timer rodam primeiro, então nextTick só ocorre depois de todo I/O",
       },
       {
-        en: "The event loop skips timers forever and then shuts down cleanly",
-        pt: "O Event Loop pula timers para sempre e depois encerra de forma limpa",
+        en: "Worker threads drain the queue, so the main thread skips I/O until shutdown",
+        pt: "Worker threads drenam a fila, então a thread principal pula I/O até o shutdown",
       },
       {
-        en: "Libuv converts the callbacks into synchronous file writes",
-        pt: "O libuv converte os callbacks em escritas síncronas de arquivo",
+        en: "setImmediate callbacks run first and prevent microtasks from running at all",
+        pt: "Callbacks de setImmediate rodam primeiro e impedem microtasks de rodarem",
       },
     ],
     correctOption: 0,
@@ -182,23 +182,23 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "Both always load asynchronously through HTTP",
-        pt: "Os dois sempre carregam de forma assíncrona via HTTP",
+        en: "CommonJS uses import/export asynchronously; ES Modules use require synchronously",
+        pt: "CommonJS usa import/export de forma assíncrona; ES Modules usam require de forma síncrona",
+      },
+      {
+        en: "CommonJS uses require over HTTP; ES Modules use import only from JSON files",
+        pt: "CommonJS usa require via HTTP; ES Modules usam import só a partir de arquivos JSON",
       },
       {
         en: "CommonJS uses require and loads synchronously; ES Modules use import/export",
         pt: "CommonJS usa require e carrega de forma síncrona; ES Modules usam import/export",
       },
       {
-        en: "ES Modules use require; CommonJS uses import only",
-        pt: "ES Modules usam require; CommonJS usa só import",
-      },
-      {
-        en: "Neither system caches modules after the first load",
-        pt: "Nenhum dos dois sistemas coloca módulos em cache depois do primeiro load",
+        en: "CommonJS uses import only; ES Modules use require and never cache after load",
+        pt: "CommonJS usa só import; ES Modules usam require e nunca colocam em cache depois do load",
       },
     ],
-    correctOption: 1,
+    correctOption: 2,
   },
   {
     id: "quiz-module-cache",
@@ -209,23 +209,23 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "Every import re-executes the module from disk",
-        pt: "Todo import reexecuta o módulo a partir do disco",
+        en: "Every later import re-executes the module from disk and isolates its state",
+        pt: "Todo import posterior reexecuta o módulo a partir do disco e isola o estado",
       },
       {
-        en: "Later imports of the same resolved module reuse one instance, so module-level state can be shared",
-        pt: "Imports posteriores do mesmo módulo resolvido reutilizam uma instância, então estado no nível do módulo pode ser compartilhado",
+        en: "Cached modules reuse the file path but create a new instance on every import",
+        pt: "Módulos em cache reutilizam o caminho do arquivo, mas criam uma instância nova em cada import",
       },
       {
-        en: "Cached modules cannot export functions",
-        pt: "Módulos em cache não podem exportar funções",
+        en: "Caching applies only to JSON, so JavaScript modules reload and isolate state",
+        pt: "O cache vale só para JSON, então módulos JavaScript recarregam e isolam o estado",
       },
       {
-        en: "Caching only applies to JSON files, not JavaScript",
-        pt: "O cache vale só para arquivos JSON, não para JavaScript",
+        en: "Later imports of the same resolved module reuse one instance, sharing its state",
+        pt: "Imports posteriores do mesmo módulo resolvido reutilizam uma instância, compartilhando o estado",
       },
     ],
-    correctOption: 1,
+    correctOption: 3,
   },
   {
     id: "quiz-http-handler",
@@ -236,23 +236,23 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "A database transaction and a CSS stylesheet",
-        pt: "Uma transaction de banco e uma stylesheet CSS",
+        en: "Only a numeric status code used to inspect the request and send a response",
+        pt: "Só um status code numérico usado para inspecionar a request e enviar uma response",
+      },
+      {
+        en: "A raw TCP socket pair used to inspect the request and send a response",
+        pt: "Um par de sockets TCP crus usado para inspecionar a request e enviar uma response",
       },
       {
         en: "Request and response objects used to inspect the request and send a response",
         pt: "Objetos request e response usados para inspecionar a request e enviar uma response",
       },
       {
-        en: "A compiled WebAssembly module and a thread pool",
-        pt: "Um módulo WebAssembly compilado e um thread pool",
-      },
-      {
-        en: "Only a numeric status code with no headers or body",
-        pt: "Só um status code numérico, sem headers nem body",
+        en: "A single IncomingMessage used to inspect the request and send a response",
+        pt: "Um único IncomingMessage usado para inspecionar a request e enviar uma response",
       },
     ],
-    correctOption: 1,
+    correctOption: 2,
   },
   {
     id: "quiz-http-idempotency",
@@ -263,23 +263,23 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "POST is always idempotent; GET is never idempotent",
-        pt: "POST é sempre idempotente; GET nunca é idempotente",
+        en: "Repeating POST should have the same intended effect; repeating GET should not",
+        pt: "Repetir POST deve ter o mesmo efeito pretendido; repetir GET não deve",
       },
       {
-        en: "Repeating GET, PUT, or DELETE should have the same intended effect as sending the request once",
-        pt: "Repetir GET, PUT ou DELETE deve ter o mesmo efeito pretendido de enviar a request uma vez",
+        en: "Repeating GET, PUT, or DELETE is allowed only when the response body is empty",
+        pt: "Repetir GET, PUT ou DELETE só é permitido quando o body da response está vazio",
       },
       {
-        en: "Idempotency means the response body must be empty",
-        pt: "Idempotência significa que o body da response precisa estar vazio",
+        en: "Repeating GET, PUT, or DELETE applies only to WebSocket upgrade requests",
+        pt: "Repetir GET, PUT ou DELETE vale só para requests de upgrade WebSocket",
       },
       {
-        en: "Only WebSocket upgrade requests can be idempotent",
-        pt: "Só requests de upgrade WebSocket podem ser idempotentes",
+        en: "Repeating GET, PUT, or DELETE should have the same intended effect as one request",
+        pt: "Repetir GET, PUT ou DELETE deve ter o mesmo efeito pretendido de uma request",
       },
     ],
-    correctOption: 1,
+    correctOption: 3,
   },
   {
     id: "quiz-http-status-errors",
@@ -305,20 +305,20 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "A function with access to the request, response, and next callback in the request pipeline",
-        pt: "Uma função com acesso a request, response e ao callback next no pipeline da request",
+        en: "A function with access to request, response, and next in the request pipeline",
+        pt: "Uma função com acesso a request, response e next no pipeline da request",
       },
       {
-        en: "A SQL migration that Express runs before listening",
-        pt: "Uma migration SQL que o Express roda antes de escutar",
+        en: "A four-argument function used only for errors, with err before request and response",
+        pt: "Uma função de quatro argumentos usada só para erros, com err antes de request e response",
       },
       {
-        en: "A browser plugin required to call an Express API",
-        pt: "Um plugin de browser necessário para chamar uma API Express",
+        en: "A route handler with request and response only, and no next callback to call",
+        pt: "Um route handler só com request e response, e sem callback next para chamar",
       },
       {
-        en: "A Node.js core module that replaces http.createServer",
-        pt: "Um módulo core do Node.js que substitui http.createServer",
+        en: "A replacement for http.createServer that skips the request pipeline entirely",
+        pt: "Um substituto de http.createServer que ignora o pipeline da request por completo",
       },
     ],
     correctOption: 0,
@@ -332,23 +332,23 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "Swallow them in each route and return 200 with an empty body",
-        pt: "Engolir o erro em cada rota e devolver 200 com body vazio",
+        en: "Swallow them in each route and return 200 without telling the client what failed",
+        pt: "Engoli-los em cada rota e devolver 200 sem dizer ao client o que falhou",
       },
       {
-        en: "Propagate them to centralized error-handling middleware and avoid leaking stack traces to clients",
-        pt: "Propagá-los para um middleware centralizado de error handling e evitar vazar stack traces para os clients",
+        en: "Convert them in each route to a 301 redirect that hides the original error",
+        pt: "Convertê-los em cada rota em um redirect 301 que esconde o erro original",
       },
       {
-        en: "Restart the whole operating system from the route handler",
-        pt: "Reiniciar o sistema operacional inteiro a partir do route handler",
+        en: "Send the full stack trace on every 200 response so clients can debug the failure",
+        pt: "Enviar o stack trace completo em toda response 200 para clients debugarem a falha",
       },
       {
-        en: "Convert every error into a 301 redirect",
-        pt: "Converter todo erro em um redirect 301",
+        en: "Propagate them to centralized error-handling middleware without leaking stack traces",
+        pt: "Propagá-los para um middleware centralizado de error handling sem vazar stack traces",
       },
     ],
-    correctOption: 1,
+    correctOption: 3,
   },
   {
     id: "quiz-stream-types",
@@ -363,16 +363,16 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
         pt: "Readable produz dados, writable consome, duplex faz os dois, e transform modifica dados em trânsito",
       },
       {
-        en: "All streams can only move strings encoded as UTF-32",
-        pt: "Todos os streams só conseguem mover strings em UTF-32",
+        en: "Readable consumes data, writable produces it, duplex only writes, and transform only reads",
+        pt: "Readable consome dados, writable produz, duplex só escreve, e transform só lê",
       },
       {
-        en: "Duplex streams can only write; transform streams can only read",
-        pt: "Duplex streams só escrevem; transform streams só leem",
+        en: "Readable buffers everything first, writable never pauses, duplex only reads, and transform only writes",
+        pt: "Readable bufferiza tudo primeiro, writable nunca pausa, duplex só lê, e transform só escreve",
       },
       {
-        en: "Streams load the entire payload into memory before emitting any data",
-        pt: "Streams carregam o payload inteiro na memória antes de emitir qualquer dado",
+        en: "Readable and writable only move UTF-32 text, duplex only writes, and transform only reads",
+        pt: "Readable e writable só movem texto UTF-32, duplex só escreve, e transform só lê",
       },
     ],
     correctOption: 0,
@@ -386,20 +386,20 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "It disables backpressure so producers never pause",
-        pt: "Ele desativa backpressure para producers nunca pausarem",
+        en: "It disables backpressure, swallows errors, and keeps streams open after a failure",
+        pt: "Ele desativa backpressure, engole erros e mantém streams abertos depois de uma falha",
       },
       {
         en: "It coordinates backpressure, forwards errors, and cleans up streams when one fails",
         pt: "Ele coordena backpressure, encaminha erros e faz cleanup dos streams quando um falha",
       },
       {
-        en: "It converts every stream into a Promise that never settles",
-        pt: "Ele converte todo stream em uma Promise que nunca settled",
+        en: "It ignores backpressure, converts errors into empty chunks, and never destroys streams",
+        pt: "Ele ignora backpressure, converte erros em chunks vazios e nunca destrói streams",
       },
       {
-        en: "It only works for TCP sockets, not files",
-        pt: "Ele só funciona para sockets TCP, não para arquivos",
+        en: "It only works for TCP sockets, skips error forwarding, and leaves failed files open",
+        pt: "Ele só funciona para sockets TCP, pula o encaminhamento de erros e deixa arquivos falhos abertos",
       },
     ],
     correctOption: 1,
@@ -413,20 +413,20 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "Unit tests always hit a production database; integration tests never do",
-        pt: "Testes unitários sempre batem em um banco de produção; testes de integração nunca fazem isso",
+        en: "Unit tests always hit a live production database; integration tests never use real boundaries",
+        pt: "Testes unitários sempre batem em um banco de produção ao vivo; testes de integração nunca usam fronteiras reais",
       },
       {
-        en: "Unit tests exercise a small behavior with controlled dependencies; integration tests check real boundaries working together",
-        pt: "Testes unitários exercitam um comportamento pequeno com dependências controladas; testes de integração verificam fronteiras reais trabalhando juntas",
+        en: "Unit tests cover one behavior with controlled dependencies; integration tests check real boundaries together",
+        pt: "Testes unitários cobrem um comportamento com dependências controladas; testes de integração checam fronteiras reais juntas",
       },
       {
-        en: "Integration tests cannot assert HTTP status codes",
-        pt: "Testes de integração não conseguem fazer assert de HTTP status codes",
+        en: "Unit tests must sleep for a fixed timeout; integration tests cannot assert HTTP status codes",
+        pt: "Testes unitários precisam dormir um timeout fixo; testes de integração não conseguem fazer assert de HTTP status codes",
       },
       {
-        en: "Unit tests must sleep for a fixed number of seconds",
-        pt: "Testes unitários precisam dormir um número fixo de segundos",
+        en: "Unit tests replace the whole process with mocks; integration tests avoid any real boundaries",
+        pt: "Testes unitários substituem o processo inteiro por mocks; testes de integração evitam qualquer fronteira real",
       },
     ],
     correctOption: 1,
@@ -444,16 +444,16 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
         pt: "Retorne ou faça await da promise para o runner saber quando o trabalho termina, e faça assert dos caminhos de sucesso e rejection",
       },
       {
-        en: "Use arbitrary sleeps and ignore rejected promises",
-        pt: "Use sleeps arbitrários e ignore promises rejeitadas",
+        en: "Use arbitrary sleeps instead of awaiting completion, and skip assertions on rejected promises",
+        pt: "Use sleeps arbitrários em vez de await da conclusão, e pule asserts em promises rejeitadas",
       },
       {
-        en: "Never wait for promises; assert immediately after calling the function",
-        pt: "Nunca espere promises; faça assert imediatamente depois de chamar a função",
+        en: "Assert immediately after calling the function, and never wait for the returned promise to settle",
+        pt: "Faça assert imediatamente depois de chamar a função, e nunca espere a promise retornada settled",
       },
       {
-        en: "Mock Date.now in every test even when time is unused",
-        pt: "Mocke Date.now em todo teste mesmo quando o tempo não é usado",
+        en: "Mock Date.now in every async test, and ignore rejected promises that fail after the test returns",
+        pt: "Mocke Date.now em todo teste async, e ignore promises rejeitadas que falham depois do teste retornar",
       },
     ],
     correctOption: 0,
@@ -467,20 +467,20 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "TypeScript types already enforce runtime request bodies",
-        pt: "Tipos do TypeScript já impõem bodies de request em runtime",
+        en: "TypeScript types already enforce request bodies at runtime, so shape and size checks are redundant at trust boundaries",
+        pt: "Tipos do TypeScript já impõem bodies de request em runtime, então checagens de formato e tamanho são redundantes nas fronteiras de confiança",
       },
       {
         en: "Runtime input can be malformed or malicious, so shape, type, size, and allowed values must be checked at trust boundaries",
         pt: "Input em runtime pode vir malformado ou malicioso, então formato, tipo, tamanho e valores permitidos precisam ser checados nas fronteiras de confiança",
       },
       {
-        en: "Validation is only needed for GET query strings, never JSON bodies",
-        pt: "Validação só é necessária para query strings de GET, nunca para bodies JSON",
+        en: "Validation is only needed for GET query strings, so JSON bodies can skip shape, type, and size checks at trust boundaries",
+        pt: "Validação só é necessária para query strings de GET, então bodies JSON podem pular checagens de formato, tipo e tamanho nas fronteiras de confiança",
       },
       {
-        en: "Validating input makes HTTPS unnecessary",
-        pt: "Validar input torna HTTPS desnecessário",
+        en: "Validating input makes HTTPS unnecessary, so type, size, and allowed values can skip checks at trust boundaries",
+        pt: "Validar input torna HTTPS desnecessário, então tipo, tamanho e valores permitidos podem pular checagens nas fronteiras de confiança",
       },
     ],
     correctOption: 1,
@@ -494,20 +494,20 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "They are two names for TLS certificate pinning",
-        pt: "São dois nomes para TLS certificate pinning",
+        en: "Authentication decides what the caller may do; authorization establishes who that identity is",
+        pt: "Authentication decide o que o caller pode fazer; authorization estabelece quem é aquela identidade",
       },
       {
         en: "Authentication establishes who the caller is; authorization decides what that identity may do",
         pt: "Authentication estabelece quem é o caller; authorization decide o que aquela identidade pode fazer",
       },
       {
-        en: "Authorization proves identity; authentication assigns HTTP status codes",
-        pt: "Authorization prova identidade; authentication atribui HTTP status codes",
+        en: "Authentication assigns HTTP status codes; authorization proves identity with a TLS certificate",
+        pt: "Authentication atribui HTTP status codes; authorization prova identidade com um certificado TLS",
       },
       {
-        en: "Neither is needed if the API uses JSON",
-        pt: "Nenhum dos dois é necessário se a API usa JSON",
+        en: "Authentication and authorization both mean encryption, so JSON APIs can skip identity checks",
+        pt: "Authentication e authorization significam criptografia, então APIs JSON podem pular checagens de identidade",
       },
     ],
     correctOption: 1,
@@ -521,20 +521,20 @@ export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
     },
     options: [
       {
-        en: "Plain HTTP only, unlimited request bodies, and secrets committed to git",
-        pt: "Só HTTP puro, bodies de request ilimitados e secrets commitados no git",
+        en: "Plain HTTP, unlimited request bodies, optional authn, and errors that include stack traces",
+        pt: "HTTP puro, bodies de request ilimitados, authn opcional e erros que incluem stack traces",
       },
       {
         en: "TLS, input limits, authn/authz, rate limiting, and errors that omit internal details",
         pt: "TLS, limites de input, authn/authz, rate limiting e erros que omitem detalhes internos",
       },
       {
-        en: "Disable all logging so attackers cannot be observed",
-        pt: "Desligar todo logging para atacantes não serem observados",
+        en: "TLS without authn/authz, unlimited bodies, no rate limiting, and detailed internal errors",
+        pt: "TLS sem authn/authz, bodies ilimitados, sem rate limiting e erros internos detalhados",
       },
       {
-        en: "Trust every Origin header and skip CORS rules",
-        pt: "Confiar em todo header Origin e pular regras de CORS",
+        en: "TLS and input limits only, trusting every Origin header, and errors that include stack traces",
+        pt: "Só TLS e limites de input, confiando em todo header Origin, e erros que incluem stack traces",
       },
     ],
     correctOption: 1,
