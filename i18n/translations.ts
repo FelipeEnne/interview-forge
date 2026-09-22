@@ -12,6 +12,8 @@ const englishMessages = {
   takeProficiencyQuiz: "Take proficiency quiz",
   practiceCodingChallenges: "Practice coding challenges",
   categories: "Categories",
+  progress: "Progress",
+  studyProgressMemorized: "{memorized} / {total} memorized",
   performance: "Performance",
   studyCategory: "Study {label}",
   correctCount: "{correct} / {total} correct",
@@ -55,6 +57,8 @@ const portugueseMessages: Messages = {
   takeProficiencyQuiz: "Fazer quiz de proficiência",
   practiceCodingChallenges: "Praticar desafios de código",
   categories: "Categorias",
+  progress: "Progresso",
+  studyProgressMemorized: "{memorized} / {total} decoradas",
   performance: "Desempenho",
   studyCategory: "Estudar {label}",
   correctCount: "{correct} / {total} corretas",
@@ -167,4 +171,15 @@ export function formatQuestionsReviewed(locale: Locale, count: number): string {
   }
 
   return count === 1 ? "1 question reviewed" : `${count} questions reviewed`;
+}
+
+export function formatStudyQuestionsRemaining(
+  locale: Locale,
+  count: number,
+): string {
+  if (locale === "pt") {
+    return count === 1 ? "1 pergunta faltando" : `${count} perguntas faltando`;
+  }
+
+  return count === 1 ? "1 question remaining" : `${count} questions remaining`;
 }

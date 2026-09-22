@@ -1,0 +1,50 @@
+.progress {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  border-radius: 0.5rem;
+}
+
+.title {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.memorized,
+.percentage,
+.remaining {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.percentage {
+  margin-bottom: 0.625rem;
+}
+
+.bar {
+  display: block;
+  width: 100%;
+  height: 0.5rem;
+  margin-bottom: 0.625rem;
+  border: none;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  appearance: none;
+  background: color-mix(in srgb, var(--foreground) 12%, var(--background));
+}
+
+.bar::-webkit-progress-bar {
+  background: color-mix(in srgb, var(--foreground) 12%, var(--background));
+  border-radius: 0.25rem;
+}
+
+.bar::-webkit-progress-value {
+  background: var(--foreground);
+  border-radius: 0.25rem;
+}
+
+.bar::-moz-progress-bar {
+  background: var(--foreground);
+  border-radius: 0.25rem;
+}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { NodejsCategoryPerformance } from "@/components/NodejsCategoryPerformance";
+import { NodejsStudyProgress } from "@/components/NodejsStudyProgress";
 import { useTranslations } from "@/components/LocaleProvider";
 import {
   NODEJS_TOPIC,
@@ -16,6 +17,7 @@ export function TopicOverview() {
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>{NODEJS_TOPIC.displayName}</h1>
+      <NodejsStudyProgress />
       <Link
         className={`${styles.link} ${styles.primaryLink}`}
         href={`/topics/${NODEJS_TOPIC.slug}/study`}

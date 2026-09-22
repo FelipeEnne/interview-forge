@@ -29,6 +29,7 @@ Story write-ups live under `docs/stories/`.
 | 14 | Internationalization foundation |
 | 15 | Bilingual technical content |
 | 16 | Quiz distractor quality |
+| 17 | Study progress summary |
 
 ## Post-MVP
 

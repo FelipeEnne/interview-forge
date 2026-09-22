@@ -1,6 +1,6 @@
 # Architecture
 
-Architecture as of **Story 16**: one Node.js topic with Study, Test, and Practice, plus English/Portuguese UI chrome and bilingual technical content persisted only as a locale preference in LocalStorage. Persistence remains browser LocalStorage only; no server-side store. Language is a presentation concern: the same question, quiz item, and challenge IDs are shown in English or Portuguese. Quiz options are authored so the correct answer is not identifiable from presentation.
+Architecture as of **Story 17**: one Node.js topic with Study, Test, and Practice, a derived study-progress summary on the topic page, plus English/Portuguese UI chrome and bilingual technical content persisted only as a locale preference in LocalStorage. Persistence remains browser LocalStorage only; no server-side store. Language is a presentation concern: the same question, quiz item, and challenge IDs are shown in English or Portuguese. Quiz options are authored so the correct answer is not identifiable from presentation.
 
 ## Current stack
 
@@ -46,6 +46,7 @@ Components call `localize` (or `getLocalizedText` directly in tests) when render
 - **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration. The current instant is read from an injectable `now` callback (default `() => new Date()`).
 - **Client Component:** `NodejsQuiz` (`"use client"`) holds intro/active/result phases, samples questions after **Start quiz**, and runs the countdown from a deadline. The current instant is read from an injectable `now` callback (default `Date.now`).
 - **Client Component:** `NodejsCategoryPerformance` (`"use client"`) reads quiz performance after hydration and renders category insights when enough evidence exists.
+- **Client Component:** `NodejsStudyProgress` (`"use client"`) snapshots raw study-progress LocalStorage after hydration and derives memorized, remaining, and percentage via `getStudyProgress`.
 - **Client Component:** `NodejsCodingChallenge` and `RevealSolution` (`"use client"`) localize challenge chrome and hide a challenge's reference solution until **Reveal solution**. Challenge pages still validate the URL on the server.
 
 LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`. Quiz pages pass the static quiz bank; the client samples an attempt only after an explicit start. The topic overview remains a thin Server Component that renders a client overview.
@@ -66,6 +67,7 @@ The first HTML after a reload is English. If the stored locale is Portuguese, ch
 | `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
 | `getDueQuestions` (`domain/due-questions.ts`) | **Pure domain rule** — selects unreviewed, legacy, or scheduled questions whose `nextReviewAt` is at or before a supplied instant. |
 | `orderQuestionsForStudy` (`domain/question-order.ts`) | **Pure domain rule** — maps topic questions + progress snapshot → study order. |
+| `getStudyProgress` (`domain/study-progress.ts`) | **Pure domain rule** — counts memorized vs remaining topic questions from `lastRating` only; no separate persisted counters. |
 | `selectQuizQuestions` (`domain/quiz.ts`) | **Pure domain rule** — samples `count` unique questions using an injected `randomSource`. |
 | `calculateQuizResult` (`domain/quiz.ts`) | **Pure domain rule** — scores an attempt; unanswered items are incorrect; aggregates by category. |
 | `QuizPerformance` | **Persistent quiz-only aggregate** — correct and encountered counts keyed by category. |
@@ -130,7 +132,7 @@ Do not pad options to equalize character counts. English and Portuguese must bot
 
 Category filtering stays at the application boundary because it is a single, explicit use of `Array.filter`; no separate domain rule is needed.
 
-The Node.js entry page also composes `NodejsCategoryPerformance`. After hydration, it shows up to three eligible categories and links each one to the existing category practice route.
+The Node.js entry page composes `NodejsStudyProgress` and `NodejsCategoryPerformance`. After hydration, study progress reflects the latest `QuestionProgress` blob. Quiz insights show up to three eligible categories and link each one to the existing category practice route.
 
 ## LocalStorage strategy
 
@@ -202,9 +204,9 @@ The server preserves question-bank order while filtering. The client then applie
 
 ## Testing strategy
 
-- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, `local-storage-quiz-performance`, locale parsing, translations, and `getLocalizedText`). Domain and data tests that do not need the DOM use the Node environment; jsdom is reserved for component, route, and LocalStorage tests.
+- **Domain:** Pure functions tested in isolation (`recall-rating`, `review-schedule`, `question-progress`, `local-storage-progress`, `study-progress`, `due-questions`, `question-order`, `quiz`, `quiz-performance`, `local-storage-quiz-performance`, locale parsing, translations, and `getLocalizedText`). Domain and data tests that do not need the DOM use the Node environment; jsdom is reserved for component, route, and LocalStorage tests.
 - **Data:** Sanity checks on `NODEJS_TOPIC`, `NODEJS_QUIZ_QUESTIONS`, and `NODEJS_CODING_CHALLENGES` content, bilingual `LocalizedText` fields, categories, counts, unique ids, option/correct-index validity, shared challenge source code, quiz `correctOption` distribution, and a length-outlier heuristic that flags only a dramatically longer correct option.
-- **Routes:** topic, category, quiz, and coding-challenge page tests cover available links, category filtering, invalid URLs, category summary totals, and persistence through the composed study UI.
+- **Routes:** topic, category, quiz, and coding-challenge page tests cover available links, category filtering, invalid URLs, derived study progress on the topic page, category summary totals, and persistence through the composed study UI.
 - **UI:** `TopicStudySession.test.tsx` exercises study flows. `NodejsQuiz.test.tsx` exercises intro, linear advance, scoring, persistence, **Try again**, the countdown, and language switching during an attempt. `NodejsCategoryPerformance.test.tsx` covers category insights and study links. `NodejsCodingChallenge.test.tsx` covers prompt, starter code, checklist, delayed reveal of the reference solution, and language switching with code unchanged.
 - No E2E or snapshot tests.
 - Do not mock the global `Date` constructor or call `vi.setSystemTime` in component tests.
@@ -212,7 +214,7 @@ The server preserves question-bank order while filtering. The client then applie
 - Vitest 3.2 records test timeouts with `Date.now()`. Workers preload `vitest.monotonic-now.cjs` so that clock stays monotonic even if the WSL wall clock jumps under parallel jsdom load. That prevents false 5s timeouts without hiding a real hang.
 - `userEvent.setup({ delay: null })` avoids extra `setTimeout(0)` waits between pointer events.
 
-Run: `npm test -- --run` (or `npm run test:run`). The suite currently has 156 tests across domain, data, i18n, routes, and components.
+Run: `npm test -- --run` (or `npm run test:run`).
 
 ## Important technical decisions
 

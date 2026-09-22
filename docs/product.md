@@ -30,10 +30,15 @@ InterviewForge is a personal web app for preparing for technical interviews. It 
 6. On completion, add correct and encountered question counts to persistent per-category quiz performance.
 7. Optionally click **Try again** for a new attempt, or **Back to Node.js**.
 
-The Node.js topic page shows up to three categories with the lowest accumulated
-quiz accuracy once each has at least two encountered questions. Each category
-links directly to its existing study session. Quiz performance is stored
-separately and does not change study progress.
+The Node.js topic page shows a **Progress** summary for the 60 active-recall
+questions: how many are memorized (latest self-rating **Good** or **Easy**),
+how many remain, and a simple progress bar. These numbers are derived from
+stored study progress on each visit; they are not saved as separate counters.
+
+The page also shows up to three categories with the lowest accumulated quiz
+accuracy once each has at least two encountered questions. Each category links
+directly to its existing study session. Quiz performance is stored separately
+and does not change study progress.
 
 ## Node.js coding challenges
 

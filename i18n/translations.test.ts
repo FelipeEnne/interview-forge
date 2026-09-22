@@ -6,6 +6,7 @@ import { QUESTION_CATEGORIES } from "@/data/nodejs-questions";
 import { RECALL_RATING_OPTIONS } from "@/domain/recall-rating";
 import {
   formatQuestionsReviewed,
+  formatStudyQuestionsRemaining,
   getCategoryLabel,
   getRatingLabel,
   translate,
@@ -18,6 +19,33 @@ describe("translate", () => {
 
   it("returns Portuguese for the same UI key", () => {
     expect(translate("pt", "showAnswer")).toBe("Mostrar resposta");
+  });
+
+  it("localizes study progress chrome", () => {
+    expect(translate("en", "progress")).toBe("Progress");
+    expect(translate("pt", "progress")).toBe("Progresso");
+    expect(
+      translate("en", "studyProgressMemorized", { memorized: 34, total: 60 }),
+    ).toBe("34 / 60 memorized");
+    expect(
+      translate("pt", "studyProgressMemorized", { memorized: 34, total: 60 }),
+    ).toBe("34 / 60 decoradas");
+  });
+});
+
+describe("formatStudyQuestionsRemaining", () => {
+  it("pluralizes in English", () => {
+    expect(formatStudyQuestionsRemaining("en", 1)).toBe("1 question remaining");
+    expect(formatStudyQuestionsRemaining("en", 26)).toBe(
+      "26 questions remaining",
+    );
+  });
+
+  it("pluralizes in Portuguese", () => {
+    expect(formatStudyQuestionsRemaining("pt", 1)).toBe("1 pergunta faltando");
+    expect(formatStudyQuestionsRemaining("pt", 26)).toBe(
+      "26 perguntas faltando",
+    );
   });
 });
 
