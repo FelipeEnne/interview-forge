@@ -2,8 +2,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { QuestionProgressState } from "./question-progress";
-import { getStudyProgress } from "./study-progress";
+import type { QuestionProgressState } from "@/domain/question-progress";
+import { getStudyProgress } from "@/domain/study-progress";
 
 const questions = [
   { id: "q1" },
