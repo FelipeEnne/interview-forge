@@ -1,10 +1,10 @@
 # Product
 
-**Status:** Multi-topic foundation with a complete Node.js topic, a React proficiency quiz, Angular coming soon, and English/Portuguese presentation.
+**Status:** Multi-topic foundation with a complete Node.js topic, React and Angular proficiency quizzes, and English/Portuguese presentation.
 
 ## Purpose
 
-InterviewForge is a personal web app for preparing for technical interviews by topic. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. Node.js is currently the complete topic. React offers a short timed proficiency quiz and category performance without an active-recall bank. Angular is recognized as an upcoming topic without content. Node.js also offers a small bank of coding challenges for implementation practice without running candidate code.
+InterviewForge is a personal web app for preparing for technical interviews by topic. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. Node.js is currently the complete topic. React and Angular offer short timed proficiency quizzes and category performance without active-recall banks. Node.js also offers a small bank of coding challenges for implementation practice without running candidate code.
 
 ## Core study loop
 
@@ -40,9 +40,9 @@ study progress on each visit; they are not saved as separate counters.
 
 The page also shows up to three categories with the lowest accumulated quiz
 accuracy once each has at least two encountered questions. Node.js categories
-link directly to their existing study sessions. React has no Study capability,
-so its performance shows category names and accuracy without study links. Quiz
-performance is stored separately and does not change study progress.
+link directly to their existing study sessions. React and Angular have no Study
+capability, so their performance shows category names and accuracy without study
+links. Quiz performance is stored separately and does not change study progress.
 
 ## Node.js coding challenges
 
@@ -59,11 +59,11 @@ challenges do not change study progress or quiz performance.
 
 - **Node.js:** available with Study, Test, and Practice.
 - **React:** available with Test and Category Performance.
-- **Angular:** coming soon; proficiency-quiz content is planned for Story 021.
+- **Angular:** available with Test and Category Performance.
 
-The current usable flow is a single user studying a curated bank of **60 Node.js questions across 9 categories** in the browser, on their own device, without signing in. Study progress survives page reloads via browser LocalStorage. Node.js and React each offer a timed multiple-choice quiz from a separate bank of **20 questions**; each attempt samples 10.
+The current usable flow is a single user studying a curated bank of **60 Node.js questions across 9 categories** in the browser, on their own device, without signing in. Study progress survives page reloads via browser LocalStorage. Node.js, React, and Angular each offer a timed multiple-choice quiz from a separate bank of **20 questions**; each attempt samples 10.
 
-The home page lists all known topics. Node.js and React link to their topic pages; Angular is visibly marked **Coming soon**. The Node.js topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, coding challenges at `/topics/nodejs/challenges`, manual practice for each category, and category practice from accumulated quiz performance. The React topic page links to `/topics/react/quiz` and shows category performance without study links.
+The home page lists all known topics and each links to its topic page. The Node.js topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, coding challenges at `/topics/nodejs/challenges`, manual practice for each category, and category practice from accumulated quiz performance. The React and Angular topic pages link to their proficiency quizzes and show category performance without study links.
 
 ## Language
 
@@ -92,7 +92,7 @@ The product does **not** currently provide:
 - Visual quiz history or performance over time
 - Adaptive spaced repetition algorithms beyond the current fixed schedule
 - React active-recall content or coding challenges
-- Angular content banks, quizzes, or coding challenges
+- Angular active-recall content or coding challenges
 - Mock interviews or coding execution environments
 - AI evaluation of answers
 - Analytics or gamification

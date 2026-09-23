@@ -56,6 +56,18 @@ describe("local-storage-quiz-performance", () => {
     ).toBe(JSON.stringify({ hooks: { correct: 1, total: 2 } }));
   });
 
+  it("uses Angular's topic-specific key for its performance", () => {
+    expect(getQuizPerformanceStorageKey("angular")).toBe(
+      "interview-forge:quiz-attempts:angular",
+    );
+
+    saveQuizPerformance("angular", { observables: { correct: 1, total: 2 } });
+
+    expect(
+      localStorage.getItem("interview-forge:quiz-attempts:angular"),
+    ).toBe(JSON.stringify({ observables: { correct: 1, total: 2 } }));
+  });
+
   it("keeps matching category ids isolated between topics", () => {
     saveQuizPerformance("nodejs", { async: { correct: 3, total: 5 } });
     saveQuizPerformance("react", { async: { correct: 1, total: 2 } });

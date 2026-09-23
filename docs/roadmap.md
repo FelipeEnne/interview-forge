@@ -8,6 +8,7 @@
 | **v0.2.0** | English/Portuguese UI and bilingual technical content (Stories 14–15) | Shipped |
 | **v0.3.0** | Multi-topic foundation (Story 19) | Shipped |
 | **v0.4.0** | React Proficiency Quiz (Story 20) | Shipped |
+| **v0.5.0** | Angular Proficiency Quiz (Story 21) | Shipped |
 
 Story write-ups live under `docs/stories/`.
 
@@ -35,9 +36,4 @@ Story write-ups live under `docs/stories/`.
 | 18 | Study progress breakdown |
 | 19 | Multi-topic foundation |
 | 20 | React Proficiency Quiz |
-
-## Next stories
-
-| Story | Title |
-| --- | --- |
 | 21 | Angular Proficiency Quiz |

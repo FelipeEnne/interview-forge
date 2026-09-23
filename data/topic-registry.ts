@@ -24,7 +24,7 @@ export const TOPICS: readonly TopicDefinition[] = [
   {
     id: "angular",
     displayName: { en: "Angular", pt: "Angular" },
-    status: "coming-soon",
+    status: "available",
   },
 ];
 

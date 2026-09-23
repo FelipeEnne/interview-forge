@@ -8,7 +8,7 @@ describe("topic registry", () => {
   it.each([
     ["nodejs", "available"],
     ["react", "available"],
-    ["angular", "coming-soon"],
+    ["angular", "available"],
   ] as const)("resolves %s with its status", (id, status) => {
     expect(getTopicById(id)).toMatchObject({ id, status });
   });

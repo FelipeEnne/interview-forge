@@ -47,11 +47,21 @@ describe("TopicQuizPage", () => {
     );
   });
 
-  it("returns not found because Angular has no quiz", async () => {
-    await expect(
-      TopicQuizPage({
+  it("renders the Angular proficiency quiz intro", async () => {
+    render(
+      await TopicQuizPage({
         params: Promise.resolve({ topic: "angular" }),
       }),
-    ).rejects.toThrow();
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Angular Proficiency Quiz" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("10 questions")).toBeInTheDocument();
+    expect(screen.getByText("8 minutes")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to Angular" })).toHaveAttribute(
+      "href",
+      "/topics/angular",
+    );
   });
 });

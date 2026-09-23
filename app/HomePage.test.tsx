@@ -25,11 +25,11 @@ describe("HomePage", () => {
       "href",
       "/topics/react",
     );
-    expect(screen.getByText("Angular")).toBeInTheDocument();
-    expect(screen.getAllByText("Coming soon")).toHaveLength(1);
-    expect(
-      screen.queryByRole("link", { name: "Angular" }),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Angular" })).toHaveAttribute(
+      "href",
+      "/topics/angular",
+    );
+    expect(screen.queryByText("Coming soon")).not.toBeInTheDocument();
   });
 
   it("translates the home chrome in Portuguese", async () => {
@@ -44,6 +44,6 @@ describe("HomePage", () => {
       "href",
       "/topics/nodejs",
     );
-    expect(screen.getAllByText("Em breve")).toHaveLength(1);
+    expect(screen.queryByText("Em breve")).not.toBeInTheDocument();
   });
 });

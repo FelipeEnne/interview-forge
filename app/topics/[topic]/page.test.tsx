@@ -231,7 +231,11 @@ describe("TopicPage", () => {
     ).toHaveAttribute("href", "/topics/nodejs/categories/production");
   });
 
-  it("shows a coming-soon page for Angular", async () => {
+  it("shows Angular quiz and performance without Study or challenge capabilities", async () => {
+    saveQuizPerformance("angular", {
+      observables: { correct: 1, total: 2 },
+    });
+
     render(
       await TopicPage({
         params: Promise.resolve({ topic: "angular" }),
@@ -239,18 +243,26 @@ describe("TopicPage", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Angular" })).toBeInTheDocument();
-    expect(screen.getByText("Coming soon")).toBeInTheDocument();
-  });
+    expect(
+      screen.getByRole("link", { name: "Take proficiency quiz" }),
+    ).toHaveAttribute("href", "/topics/angular/quiz");
+    expect(
+      screen.queryByRole("link", { name: "Study due questions" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Practice coding challenges" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Progress" })).not.toBeInTheDocument();
 
-  it("translates the coming-soon page in Portuguese", async () => {
-    renderWithLocale(
-      await TopicPage({
-        params: Promise.resolve({ topic: "angular" }),
-      }),
-      "pt",
-    );
-
-    expect(await screen.findByText("Em breve")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Performance" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Observables & RxJS", level: 3 }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /Study Observables/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("returns not found for an unknown topic", async () => {
