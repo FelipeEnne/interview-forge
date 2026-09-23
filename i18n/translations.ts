@@ -1,13 +1,19 @@
-import type { QuestionCategory } from "@/data/nodejs-questions";
+import {
+  getNodejsCategory,
+  type QuestionCategory,
+} from "@/data/nodejs-categories";
 import type { RecallRating } from "@/domain/recall-rating";
 
 import type { Locale } from "./locale";
+import { getLocalizedText } from "./localized-text";
 
 const englishMessages = {
   appName: "InterviewForge",
   languageSelector: "Language",
   homeTagline: "Practice technical interview questions one topic at a time.",
   studyNodejsQuestions: "Study Node.js questions",
+  technicalInterviewPreparation: "Technical Interview Preparation",
+  comingSoon: "Coming soon",
   studyDueQuestions: "Study due questions",
   takeProficiencyQuiz: "Take proficiency quiz",
   practiceCodingChallenges: "Practice coding challenges",
@@ -56,6 +62,8 @@ const portugueseMessages: Messages = {
   languageSelector: "Idioma",
   homeTagline: "Pratique perguntas de entrevista técnica um tópico de cada vez.",
   studyNodejsQuestions: "Estudar perguntas de Node.js",
+  technicalInterviewPreparation: "Preparação para Entrevistas Técnicas",
+  comingSoon: "Em breve",
   studyDueQuestions: "Estudar perguntas pendentes",
   takeProficiencyQuiz: "Fazer quiz de proficiência",
   practiceCodingChallenges: "Praticar desafios de código",
@@ -101,31 +109,6 @@ const messages: Record<Locale, Messages> = {
   pt: portugueseMessages,
 };
 
-const categoryLabels: Record<Locale, Record<QuestionCategory, string>> = {
-  en: {
-    fundamentals: "Fundamentals",
-    async: "Event Loop & Async",
-    modules: "Modules",
-    http: "HTTP & APIs",
-    express: "Express",
-    streams: "Streams & Buffers",
-    testing: "Testing",
-    security: "Security",
-    production: "Production & Architecture",
-  },
-  pt: {
-    fundamentals: "Fundamentos",
-    async: "Event Loop e Assincronismo",
-    modules: "Módulos",
-    http: "HTTP e APIs",
-    express: "Express",
-    streams: "Streams e Buffers",
-    testing: "Testes",
-    security: "Segurança",
-    production: "Produção e Arquitetura",
-  },
-};
-
 const ratingLabels: Record<Locale, Record<RecallRating, string>> = {
   en: {
     again: "Again",
@@ -164,7 +147,7 @@ export function getCategoryLabel(
   locale: Locale,
   category: QuestionCategory,
 ): string {
-  return categoryLabels[locale][category];
+  return getLocalizedText(getNodejsCategory(category).displayName, locale);
 }
 
 export function getRatingLabel(locale: Locale, rating: RecallRating): string {

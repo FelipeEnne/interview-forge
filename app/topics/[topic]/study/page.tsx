@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { TopicStudySession } from "@/components/TopicStudySession";
-import { NODEJS_TOPIC } from "@/data/nodejs-questions";
+import { getStudyTopicById } from "@/data/study-topics";
 
 type TopicStudyPageProps = {
   params: Promise<{ topic: string }>;
@@ -9,17 +9,19 @@ type TopicStudyPageProps = {
 
 export default async function TopicStudyPage({ params }: TopicStudyPageProps) {
   const { topic } = await params;
+  const studyTopic = getStudyTopicById(topic);
 
-  if (topic !== NODEJS_TOPIC.slug) {
+  if (!studyTopic) {
     notFound();
   }
 
   return (
     <TopicStudySession
-      topicName={NODEJS_TOPIC.displayName}
-      questions={NODEJS_TOPIC.questions}
+      topicName={studyTopic.displayName.en}
+      categories={studyTopic.categories}
+      questions={studyTopic.questions}
       backLink={{
-        href: `/topics/${NODEJS_TOPIC.slug}`,
+        href: `/topics/${studyTopic.id}`,
       }}
     />
   );

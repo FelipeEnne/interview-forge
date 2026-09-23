@@ -2,7 +2,6 @@
 
 import { useSyncExternalStore } from "react";
 
-import { NODEJS_TOPIC } from "@/data/nodejs-questions";
 import {
   QUESTION_PROGRESS_STORAGE_KEY,
   readQuestionProgress,
@@ -11,7 +10,7 @@ import { getStudyProgress } from "@/domain/study-progress";
 import { formatStudyQuestionsRemaining } from "@/i18n/translations";
 import { useTranslations } from "./LocaleProvider";
 
-import styles from "./NodejsStudyProgress.module.css";
+import styles from "./StudyProgress.module.css";
 
 function subscribeToProgress() {
   return () => {};
@@ -39,7 +38,11 @@ function RatingRow({ label, count }: RatingRowProps) {
   );
 }
 
-export function NodejsStudyProgress() {
+type StudyProgressProps = {
+  questions: readonly { id: string }[];
+};
+
+export function StudyProgress({ questions }: StudyProgressProps) {
   const { locale, t, ratingLabel } = useTranslations();
   const storedProgressRaw = useSyncExternalStore(
     subscribeToProgress,
@@ -49,7 +52,7 @@ export function NodejsStudyProgress() {
   const progress =
     storedProgressRaw === null ? {} : readQuestionProgress();
   const { total, memorized, remaining, percentage, ratings } = getStudyProgress(
-    NODEJS_TOPIC.questions,
+    questions,
     progress,
   );
 

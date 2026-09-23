@@ -2,7 +2,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type { InterviewQuestion } from "@/data/nodejs-questions";
+import type {
+  InterviewQuestion,
+  StudyCategoryDefinition,
+} from "@/data/study-types";
 import {
   QUESTION_PROGRESS_STORAGE_KEY,
   readQuestionProgress,
@@ -49,6 +52,24 @@ const sampleQuestions: InterviewQuestion[] = [
       en: "Third answer text.",
       pt: "Texto da terceira resposta.",
     },
+  },
+];
+
+const sampleCategories: readonly StudyCategoryDefinition[] = [
+  {
+    id: "fundamentals",
+    displayName: { en: "Fundamentals", pt: "Fundamentos" },
+  },
+  {
+    id: "async",
+    displayName: {
+      en: "Event Loop & Async",
+      pt: "Event Loop e Assincronismo",
+    },
+  },
+  {
+    id: "modules",
+    displayName: { en: "Modules", pt: "Módulos" },
   },
 ];
 
@@ -107,6 +128,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -115,10 +137,60 @@ describe("TopicStudySession", () => {
     expect(screen.getByRole("heading", { name: "Node.js" })).toBeInTheDocument();
   });
 
+  it("runs and schedules active recall for a non-Node.js question bank", async () => {
+    const user = createUser();
+    const reactQuestions: InterviewQuestion[] = [
+      {
+        id: "react-use-state",
+        category: "hooks",
+        question: {
+          en: "What does useState return?",
+          pt: "O que useState retorna?",
+        },
+        answer: {
+          en: "The current state and a setter function.",
+          pt: "O estado atual e uma função setter.",
+        },
+      },
+    ];
+    const reactCategories: StudyCategoryDefinition[] = [
+      {
+        id: "hooks",
+        displayName: { en: "Hooks", pt: "Hooks" },
+      },
+    ];
+
+    render(
+      <TopicStudySession
+        topicName="React"
+        categories={reactCategories}
+        questions={reactQuestions}
+        now={clock.now}
+      />,
+    );
+
+    expect(screen.getByText("Hooks")).toBeInTheDocument();
+    expect(screen.getByText("What does useState return?")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Show answer" }));
+    expect(
+      screen.getByText("The current state and a setter function."),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Good" }));
+
+    expect(readQuestionProgress()["react-use-state"]).toEqual({
+      lastRating: "good",
+      reviewCount: 1,
+      lastReviewedAt: "2026-09-18T03:15:00.000Z",
+      nextReviewAt: "2026-09-21T03:15:00.000Z",
+    });
+  });
+
   it("shows the first question and hides its answer initially", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -134,6 +206,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -160,6 +233,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -197,6 +271,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -245,6 +320,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         sessionMode="practice"
         now={clock.now}
@@ -263,6 +339,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         sessionMode="practice"
         now={clock.now}
@@ -300,6 +377,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -338,6 +416,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -373,6 +452,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -419,6 +499,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -449,6 +530,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -467,6 +549,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -483,6 +566,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -504,6 +588,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -522,6 +607,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={[sampleQuestions[0]]}
         now={clock.now}
       />,
@@ -541,6 +627,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -566,6 +653,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -585,6 +673,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -608,6 +697,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -628,6 +718,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -647,6 +738,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -679,6 +771,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -704,6 +797,7 @@ describe("TopicStudySession", () => {
     render(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
       />,
@@ -729,6 +823,7 @@ describe("TopicStudySession", () => {
     renderWithLocale(
       <TopicStudySession
         topicName="Node.js"
+        categories={sampleCategories}
         questions={[sampleQuestions[0]!]}
         now={clock.now}
       />,
@@ -762,6 +857,7 @@ describe("TopicStudySession", () => {
         <LanguageSelector />
         <TopicStudySession
           topicName="Node.js"
+        categories={sampleCategories}
           questions={sampleQuestions}
           now={clock.now}
         />

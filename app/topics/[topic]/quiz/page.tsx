@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { NodejsQuiz } from "@/components/NodejsQuiz";
 import { NODEJS_QUIZ_QUESTIONS } from "@/data/nodejs-quiz-questions";
 import { NODEJS_TOPIC } from "@/data/nodejs-questions";
+import { getTopicById } from "@/data/topic-registry";
 
 type TopicQuizPageProps = {
   params: Promise<{ topic: string }>;
@@ -10,8 +11,9 @@ type TopicQuizPageProps = {
 
 export default async function TopicQuizPage({ params }: TopicQuizPageProps) {
   const { topic } = await params;
+  const topicDefinition = getTopicById(topic);
 
-  if (topic !== NODEJS_TOPIC.slug) {
+  if (!topicDefinition || topicDefinition.id !== "nodejs") {
     notFound();
   }
 

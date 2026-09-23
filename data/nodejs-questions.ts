@@ -1,39 +1,28 @@
-import type { LocalizedText } from "@/i18n/localized-text";
+import {
+  NODEJS_CATEGORIES,
+  type QuestionCategory,
+} from "./nodejs-categories";
+import type { InterviewQuestion } from "./study-types";
 
-export const QUESTION_CATEGORIES = [
-  "fundamentals",
-  "async",
-  "modules",
-  "http",
-  "express",
-  "streams",
-  "testing",
-  "security",
-  "production",
-] as const;
-
-export type QuestionCategory = (typeof QUESTION_CATEGORIES)[number];
-
-export function isQuestionCategory(value: string): value is QuestionCategory {
-  return (QUESTION_CATEGORIES as readonly string[]).includes(value);
-}
-
-export type InterviewQuestion = {
-  id: string;
-  category: QuestionCategory;
-  question: LocalizedText;
-  answer: LocalizedText;
-};
+export {
+  isQuestionCategory,
+  NODEJS_CATEGORIES,
+  QUESTION_CATEGORIES,
+  type QuestionCategory,
+} from "./nodejs-categories";
+export type { InterviewQuestion } from "./study-types";
 
 export type TopicData = {
   slug: string;
   displayName: string;
-  questions: InterviewQuestion[];
+  categories: typeof NODEJS_CATEGORIES;
+  questions: InterviewQuestion<QuestionCategory>[];
 };
 
 export const NODEJS_TOPIC: TopicData = {
   slug: "nodejs",
   displayName: "Node.js",
+  categories: NODEJS_CATEGORIES,
   questions: [
     {
       id: "nodejs-fundamentals",

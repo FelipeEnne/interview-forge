@@ -1,10 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { TopicStudySession } from "@/components/TopicStudySession";
-import {
-  isQuestionCategory,
-  NODEJS_TOPIC,
-} from "@/data/nodejs-questions";
+import { getStudyTopicById } from "@/data/study-topics";
 
 type CategoryStudyPageProps = {
   params: Promise<{ topic: string; category: string }>;
@@ -14,23 +11,28 @@ export default async function CategoryStudyPage({
   params,
 }: CategoryStudyPageProps) {
   const { topic, category } = await params;
+  const studyTopic = getStudyTopicById(topic);
+  const categoryDefinition = studyTopic?.categories.find(
+    ({ id }) => id === category,
+  );
 
-  if (topic !== NODEJS_TOPIC.slug || !isQuestionCategory(category)) {
+  if (!studyTopic || !categoryDefinition) {
     notFound();
   }
 
-  const questions = NODEJS_TOPIC.questions.filter(
+  const questions = studyTopic.questions.filter(
     (question) => question.category === category,
   );
 
   return (
     <TopicStudySession
-      topicName={NODEJS_TOPIC.displayName}
+      topicName={studyTopic.displayName.en}
       category={category}
+      categories={studyTopic.categories}
       questions={questions}
       sessionMode="practice"
       backLink={{
-        href: `/topics/${NODEJS_TOPIC.slug}`,
+        href: `/topics/${studyTopic.id}`,
       }}
     />
   );

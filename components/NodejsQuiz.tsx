@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { QuestionCategory } from "@/data/nodejs-questions";
+import type { QuestionCategory } from "@/data/nodejs-categories";
 import type { QuizQuestion } from "@/data/nodejs-quiz-questions";
 import {
   readQuizPerformance,

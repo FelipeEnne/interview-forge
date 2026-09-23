@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-import type { QuestionCategory } from "@/data/nodejs-questions";
+import type { QuestionCategory } from "@/data/nodejs-categories";
 import type { RecallRating } from "@/domain/recall-rating";
 import { DEFAULT_LOCALE, type Locale } from "@/i18n/locale";
 import { getLocalizedText, type LocalizedTextSource } from "@/i18n/localized-text";

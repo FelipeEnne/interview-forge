@@ -28,4 +28,15 @@ describe("TopicQuizPage", () => {
       }),
     ).rejects.toThrow();
   });
+
+  it.each(["react", "angular"])(
+    "returns not found because %s has no quiz",
+    async (topic) => {
+      await expect(
+        TopicQuizPage({
+          params: Promise.resolve({ topic }),
+        }),
+      ).rejects.toThrow();
+    },
+  );
 });

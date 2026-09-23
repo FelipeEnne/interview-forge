@@ -13,23 +13,35 @@ describe("HomePage", () => {
     render(<HomePage />);
 
     expect(
-      screen.getByText("Practice technical interview questions one topic at a time."),
+      screen.getByRole("heading", {
+        name: "Technical Interview Preparation",
+      }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Node.js" })).toHaveAttribute(
+      "href",
+      "/topics/nodejs",
+    );
+    expect(screen.getByText("React")).toBeInTheDocument();
+    expect(screen.getByText("Angular")).toBeInTheDocument();
+    expect(screen.getAllByText("Coming soon")).toHaveLength(2);
+    expect(screen.queryByRole("link", { name: "React" })).not.toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Study Node.js questions" }),
-    ).toHaveAttribute("href", "/topics/nodejs");
+      screen.queryByRole("link", { name: "Angular" }),
+    ).not.toBeInTheDocument();
   });
 
   it("translates the home chrome in Portuguese", async () => {
     renderWithLocale(<HomePage />, "pt");
 
     expect(
-      await screen.findByText(
-        "Pratique perguntas de entrevista técnica um tópico de cada vez.",
-      ),
+      await screen.findByRole("heading", {
+        name: "Preparação para Entrevistas Técnicas",
+      }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "Estudar perguntas de Node.js" }),
-    ).toHaveAttribute("href", "/topics/nodejs");
+    expect(screen.getByRole("link", { name: "Node.js" })).toHaveAttribute(
+      "href",
+      "/topics/nodejs",
+    );
+    expect(screen.getAllByText("Em breve")).toHaveLength(2);
   });
 });

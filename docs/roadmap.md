@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | **v0.1.0** | MVP — Node.js Study, Test, Practice (Stories 1–13) | Shipped |
 | **v0.2.0** | English/Portuguese UI and bilingual technical content (Stories 14–15) | Shipped |
+| **v0.3.0** | Multi-topic foundation (Story 19) | Shipped |
 
 Story write-ups live under `docs/stories/`.
 
@@ -31,9 +32,11 @@ Story write-ups live under `docs/stories/`.
 | 16 | Quiz distractor quality |
 | 17 | Study progress summary |
 | 18 | Study progress breakdown |
+| 19 | Multi-topic foundation |
 
-## Post-MVP
+## Next stories
 
-- Use the application in real interview preparation.
-- Collect friction and missing-content observations.
-- Prioritize future work based on actual usage.
+| Story | Title |
+| --- | --- |
+| 20 | React Active Recall Question Bank |
+| 21 | Angular Active Recall Question Bank |

@@ -1,6 +1,6 @@
 # Architecture
 
-Architecture as of **Story 17**: one Node.js topic with Study, Test, and Practice, a derived study-progress summary on the topic page, plus English/Portuguese UI chrome and bilingual technical content persisted only as a locale preference in LocalStorage. Persistence remains browser LocalStorage only; no server-side store. Language is a presentation concern: the same question, quiz item, and challenge IDs are shown in English or Portuguese. Quiz options are authored so the correct answer is not identifiable from presentation.
+Architecture as of **Story 19**: a small registry recognizes Node.js, React, and Angular, while only Node.js currently has Study, Test, and Practice content. React and Angular render localized coming-soon pages. Active recall and study progress accept topic-owned questions and categories; Node.js quiz, category performance, and coding challenges remain specific. Persistence remains browser LocalStorage only; no server-side store.
 
 ## Current stack
 
@@ -21,7 +21,7 @@ Runtime dependencies are intentionally minimal: Next.js, React, and React DOM on
 | `Locale` (`"en" \| "pt"`) | Canonical locale type; `parseLocale` and `readLocale` fall back to `en` for SSR, missing keys, or invalid stored values. |
 | `LocalizedText` | `{ en: string; pt?: string }` on static content records; TypeScript expects both locales on authored banks. |
 | `getLocalizedText` | Resolves a string at **render time**: `value[locale] ?? value.en`. Empty strings are not treated as missing. |
-| `i18n/translations.ts` | UI string catalog keyed by locale; category display names and rating labels live here, not in data modules. |
+| `i18n/translations.ts` | UI string catalog keyed by locale plus Node.js-compatible category and rating label helpers. |
 | `LocaleProvider` / `useTranslations` | Client context for active locale and a `localize` helper that wraps `getLocalizedText` for components. |
 | `interview-forge:locale` | Persists preference only; study and quiz storage keys are independent. |
 
@@ -33,7 +33,7 @@ Components call `localize` (or `getLocalizedText` directly in tests) when render
 | --- | --- |
 | `app/` | Routes and layouts. Home, topic overview, due study, category study, quiz, and coding challenge pages. Localized chrome is rendered by client views composed from the server pages. |
 | `components/` | Interactive UI plus the shared header, language selector, and locale provider. |
-| `data/` | Static in-repo banks: `nodejs-questions.ts` (study), `nodejs-quiz-questions.ts` (quiz), and `nodejs-coding-challenges.ts` (practice problems). Translatable fields use `LocalizedText`. |
+| `data/` | Topic metadata registry, active-recall topic resolver, topic-owned categories, and separate static Node.js study, quiz, and challenge banks. Translatable fields use `LocalizedText`. |
 | `domain/` | Pure TypeScript logic: ratings, progress, due selection, ordering, LocalStorage I/O, quiz selection and scoring. |
 | `i18n/` | Locale type, LocalStorage locale I/O, the UI translation catalog, and `LocalizedText` resolution. |
 | `docs/` | Product and technical documentation. |
@@ -46,7 +46,7 @@ Components call `localize` (or `getLocalizedText` directly in tests) when render
 - **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration. The current instant is read from an injectable `now` callback (default `() => new Date()`).
 - **Client Component:** `NodejsQuiz` (`"use client"`) holds intro/active/result phases, samples questions after **Start quiz**, and runs the countdown from a deadline. The current instant is read from an injectable `now` callback (default `Date.now`).
 - **Client Component:** `NodejsCategoryPerformance` (`"use client"`) reads quiz performance after hydration and renders category insights when enough evidence exists.
-- **Client Component:** `NodejsStudyProgress` (`"use client"`) snapshots raw study-progress LocalStorage after hydration and derives memorized, remaining, percentage, and per-rating counts via `getStudyProgress`.
+- **Client Component:** `StudyProgress` (`"use client"`) receives a topic's canonical questions, snapshots raw study-progress LocalStorage after hydration, and derives memorized, remaining, percentage, and per-rating counts via `getStudyProgress`.
 - **Client Component:** `NodejsCodingChallenge` and `RevealSolution` (`"use client"`) localize challenge chrome and hide a challenge's reference solution until **Reveal solution**. Challenge pages still validate the URL on the server.
 
 LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`. Quiz pages pass the static quiz bank; the client samples an attempt only after an explicit start. The topic overview remains a thin Server Component that renders a client overview.
@@ -57,11 +57,13 @@ The first HTML after a reload is English. If the stored locale is Portuguese, ch
 
 | Concept | Responsibility |
 | --- | --- |
+| `TopicDefinition` / topic registry | Stable `nodejs`, `react`, and `angular` ids, localized display name, and availability status for catalog, navigation, and slug validation. It contains no content banks. |
+| `StudyTopicData` / study-topic resolver | Active-recall questions and that topic's category definitions. Only Node.js resolves in Story 19. |
 | `InterviewQuestion` | Study/active-recall item: stable `id`, typed `category`, and bilingual `question`/`answer` (`LocalizedText`). |
 | `QuizQuestion` | Assessment item: stable `id`, typed `category`, bilingual `question`, four bilingual `options`, and `correctOption`. |
 | `CodingChallenge` | Implementation practice item: stable `id`, typed `category`, bilingual `title`/`prompt`/`requirements`/`reviewChecklist`, plus shared `starterCode` and `referenceSolution` strings. |
 | `LocalizedText` | `{ en: string; pt: string }` value used by technical content. `getLocalizedText` selects the active locale and falls back to English if that locale is missing at runtime. |
-| `QuestionCategory` / `QUESTION_CATEGORIES` | Nine allowed Node.js category slugs in canonical order, shared by study, quiz, and challenges. Display names are localized in `i18n/translations.ts`. |
+| `QuestionCategory` / `QUESTION_CATEGORIES` | Nine allowed Node.js category slugs in canonical order, shared by its study, quiz, and challenges. Localized definitions live in `data/nodejs-categories.ts`; other topics own separate taxonomies. |
 | `RecallRating` | `"again" \| "hard" \| "good" \| "easy"`. |
 | `QuestionProgress` / `QuestionProgressState` | **Persistent** per-question rating, count, and review timestamps (LocalStorage). |
 | `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
@@ -122,17 +124,19 @@ Do not pad options to equalize character counts. English and Portuguese must bot
 
 ## Topic and study routes
 
+- `/topics/[topic]` first resolves the slug through `data/topic-registry.ts`.
 - `/topics/nodejs` is the Node.js entry page. It links to due review, the proficiency quiz, and all categories from `QUESTION_CATEGORIES`.
+- `/topics/react` and `/topics/angular` are valid topic pages with localized coming-soon content.
 - `/topics/nodejs/study` starts the normal due-review session.
-- `/topics/nodejs/categories/[category]` validates the category slug, filters the static bank on the server, and starts a manual practice session.
+- `/topics/nodejs/categories/[category]` validates the category against the resolved study topic, filters the static bank on the server, and starts a manual practice session.
 - `/topics/nodejs/quiz` hosts the full quiz flow (intro, attempt, result) in one client component.
 - `/topics/nodejs/challenges` lists the six coding challenges.
 - `/topics/nodejs/challenges/[challenge]` shows one challenge and reveals its reference solution on demand.
-- Unknown topic, category, or challenge slugs return not found.
+- React/Angular study, category, quiz, and challenge routes return not found until those capabilities have content. Unknown topic, category, or challenge slugs also return not found.
 
 Category filtering stays at the application boundary because it is a single, explicit use of `Array.filter`; no separate domain rule is needed.
 
-The Node.js entry page composes `NodejsStudyProgress` and `NodejsCategoryPerformance`. After hydration, study progress reflects the latest `QuestionProgress` blob. Quiz insights show up to three eligible categories and link each one to the existing category practice route.
+The Node.js entry page composes shared `StudyProgress` with Node.js-specific `NodejsCategoryPerformance`. After hydration, study progress reflects the latest `QuestionProgress` blob. Quiz insights show up to three eligible categories and link each one to the existing category practice route.
 
 ## LocalStorage strategy
 
@@ -140,6 +144,7 @@ The Node.js entry page composes `NodejsStudyProgress` and `NodejsCategoryPerform
 
 - **Key:** `interview-forge:question-progress`
 - **Format:** JSON object keyed by question id; each value has valid `lastRating`, integer `reviewCount >= 1`, and either both review timestamps or neither for legacy records.
+- **Topic strategy:** the format remains flat for backward compatibility. Question ids are globally unique; all current Node.js ids are preserved, and future banks use `react-*` or `angular-*`.
 - **Read:** `readQuestionProgress()` returns `{}` on SSR, missing key, invalid JSON, or any invalid entry (fail whole blob).
 - **Write:** `saveQuestionProgress()` serializes the full state (no partial merge in storage layer).
 
@@ -224,10 +229,13 @@ Run: `npm test -- --run` (or `npm run test:run`).
 - Derive remaining quiz time from a deadline so tests can fake the clock without a real wait.
 - Static question data in TypeScript modules rather than a CMS or DB for now.
 - Keep study questions, quiz questions, and coding challenges in separate data modules because they are different shapes.
-- Keep all 60 Node.js study questions and their category taxonomy in one readable data module; `QUESTION_CATEGORIES` is the single source of truth for the category union and canonical order.
+- Keep all 60 Node.js study questions in one readable data module. `data/nodejs-categories.ts` is the single source of truth for the Node.js category union, canonical order, and localized display names.
 - Preserve study question ids when content gains metadata because LocalStorage progress is keyed by question id. Category is not persisted.
-- Single topic route validates slug against `NODEJS_TOPIC`; unknown topics → `notFound()`.
-- Category slugs are validated against `QUESTION_CATEGORIES`; unknown categories → `notFound()`.
+- Keep the topic registry limited to catalog metadata. Content resolution remains separate so the registry does not become a mega-object.
+- Resolve active-recall content through `data/study-topics.ts`; a known topic can exist without a study bank.
+- Preserve the flat question-progress format and require globally unique ids for future banks. Existing Node.js ids do not migrate.
+- Validate topic slugs against the registry; known coming-soon topics render a placeholder and unknown topics call `notFound()`.
+- Validate category slugs against the categories owned by the resolved study topic.
 - Strict LocalStorage validation to avoid corrupt partial state.
 - Client-only queue initialization to avoid SSR/hydration mismatch with stored progress.
 - Separate **fixed session queue** from **mutable persisted progress** so in-session ratings never reshuffle the current pass.
@@ -240,5 +248,5 @@ Run: `npm test -- --run` (or `npm run test:run`).
 
 ## Known technical debt
 
-- Topic lookup is repeated in the small route set rather than extracted into a registry.
 - `reviewCount` is persisted but not used in ordering or UI yet.
+- Quiz performance remains keyed only by Node.js category. It needs a compatible topic strategy before another topic receives a quiz.

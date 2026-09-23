@@ -1,7 +1,7 @@
 import {
   QUESTION_CATEGORIES,
   type QuestionCategory,
-} from "@/data/nodejs-questions";
+} from "@/data/nodejs-categories";
 import type { CategoryScore } from "./quiz";
 import type { QuizPerformance } from "./quiz-performance";
 

@@ -65,4 +65,18 @@ describe("CategoryStudyPage", () => {
       }),
     ).rejects.toThrow();
   });
+
+  it.each(["react", "angular"])(
+    "returns not found when %s has no category bank",
+    async (topic) => {
+      await expect(
+        CategoryStudyPage({
+          params: Promise.resolve({
+            topic,
+            category: "fundamentals",
+          }),
+        }),
+      ).rejects.toThrow();
+    },
+  );
 });

@@ -41,4 +41,15 @@ describe("TopicChallengesPage", () => {
       }),
     ).rejects.toThrow();
   });
+
+  it.each(["react", "angular"])(
+    "returns not found because %s has no coding challenges",
+    async (topic) => {
+      await expect(
+        TopicChallengesPage({
+          params: Promise.resolve({ topic }),
+        }),
+      ).rejects.toThrow();
+    },
+  );
 });

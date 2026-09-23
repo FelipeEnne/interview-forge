@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 
-import { NODEJS_TOPIC } from "@/data/nodejs-questions";
+import { getStudyTopicById } from "@/data/study-topics";
+import { getTopicById } from "@/data/topic-registry";
+import { TopicComingSoon } from "./TopicComingSoon";
 import { TopicOverview } from "./TopicOverview";
 
 type TopicPageProps = {
@@ -9,10 +11,21 @@ type TopicPageProps = {
 
 export default async function TopicPage({ params }: TopicPageProps) {
   const { topic } = await params;
+  const topicDefinition = getTopicById(topic);
 
-  if (topic !== NODEJS_TOPIC.slug) {
+  if (!topicDefinition) {
     notFound();
   }
 
-  return <TopicOverview />;
+  if (topicDefinition.status === "coming-soon") {
+    return <TopicComingSoon topic={topicDefinition} />;
+  }
+
+  const studyTopic = getStudyTopicById(topicDefinition.id);
+
+  if (!studyTopic) {
+    notFound();
+  }
+
+  return <TopicOverview topic={studyTopic} />;
 }

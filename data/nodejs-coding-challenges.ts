@@ -1,6 +1,6 @@
 import type { LocalizedText } from "@/i18n/localized-text";
 
-import type { QuestionCategory } from "./nodejs-questions";
+import type { QuestionCategory } from "./nodejs-categories";
 
 export type CodingChallenge = {
   id: string;

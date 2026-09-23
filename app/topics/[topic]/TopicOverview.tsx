@@ -3,36 +3,37 @@
 import Link from "next/link";
 
 import { NodejsCategoryPerformance } from "@/components/NodejsCategoryPerformance";
-import { NodejsStudyProgress } from "@/components/NodejsStudyProgress";
+import { StudyProgress } from "@/components/StudyProgress";
 import { useTranslations } from "@/components/LocaleProvider";
-import {
-  NODEJS_TOPIC,
-  QUESTION_CATEGORIES,
-} from "@/data/nodejs-questions";
+import type { StudyTopicData } from "@/data/study-types";
 import styles from "./page.module.css";
 
-export function TopicOverview() {
-  const { t, categoryLabel } = useTranslations();
+type TopicOverviewProps = {
+  topic: StudyTopicData;
+};
+
+export function TopicOverview({ topic }: TopicOverviewProps) {
+  const { t, localize } = useTranslations();
 
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>{NODEJS_TOPIC.displayName}</h1>
-      <NodejsStudyProgress />
+      <h1 className={styles.title}>{localize(topic.displayName)}</h1>
+      <StudyProgress questions={topic.questions} />
       <Link
         className={`${styles.link} ${styles.primaryLink}`}
-        href={`/topics/${NODEJS_TOPIC.slug}/study`}
+        href={`/topics/${topic.id}/study`}
       >
         {t("studyDueQuestions")}
       </Link>
       <Link
         className={styles.link}
-        href={`/topics/${NODEJS_TOPIC.slug}/quiz`}
+        href={`/topics/${topic.id}/quiz`}
       >
         {t("takeProficiencyQuiz")}
       </Link>
       <Link
         className={styles.link}
-        href={`/topics/${NODEJS_TOPIC.slug}/challenges`}
+        href={`/topics/${topic.id}/challenges`}
       >
         {t("practiceCodingChallenges")}
       </Link>
@@ -41,13 +42,13 @@ export function TopicOverview() {
           {t("categories")}
         </h2>
         <ul className={styles.categoryList}>
-          {QUESTION_CATEGORIES.map((category) => (
-            <li key={category}>
+          {topic.categories.map((category) => (
+            <li key={category.id}>
               <Link
                 className={styles.link}
-                href={`/topics/${NODEJS_TOPIC.slug}/categories/${category}`}
+                href={`/topics/${topic.id}/categories/${category.id}`}
               >
-                {categoryLabel(category)}
+                {localize(category.displayName)}
               </Link>
             </li>
           ))}

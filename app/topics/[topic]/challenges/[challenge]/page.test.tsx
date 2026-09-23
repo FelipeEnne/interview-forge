@@ -40,6 +40,20 @@ describe("TopicChallengePage", () => {
     ).rejects.toThrow();
   });
 
+  it.each(["react", "angular"])(
+    "returns not found because %s has no coding challenges",
+    async (topic) => {
+      await expect(
+        TopicChallengePage({
+          params: Promise.resolve({
+            topic,
+            challenge: NODEJS_CODING_CHALLENGES[0].id,
+          }),
+        }),
+      ).rejects.toThrow();
+    },
+  );
+
   it("returns not found for an unknown challenge", async () => {
     await expect(
       TopicChallengePage({

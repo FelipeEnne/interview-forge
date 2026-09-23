@@ -2,20 +2,35 @@
 
 import Link from "next/link";
 
-import { NODEJS_TOPIC } from "@/data/nodejs-questions";
 import { useTranslations } from "@/components/LocaleProvider";
+import { TOPICS } from "@/data/topic-registry";
 import styles from "./page.module.css";
 
 export function HomePage() {
-  const { t } = useTranslations();
+  const { t, localize } = useTranslations();
 
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>{t("appName")}</h1>
+      <h1 className={styles.title}>{t("technicalInterviewPreparation")}</h1>
       <p className={styles.lead}>{t("homeTagline")}</p>
-      <Link className={styles.link} href={`/topics/${NODEJS_TOPIC.slug}`}>
-        {t("studyNodejsQuestions")}
-      </Link>
+      <ul className={styles.topicList}>
+        {TOPICS.map((topic) => (
+          <li className={styles.topic} key={topic.id}>
+            {topic.status === "available" ? (
+              <Link className={styles.link} href={`/topics/${topic.id}`}>
+                {localize(topic.displayName)}
+              </Link>
+            ) : (
+              <>
+                <span className={styles.topicName}>
+                  {localize(topic.displayName)}
+                </span>
+                <span className={styles.status}>{t("comingSoon")}</span>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }

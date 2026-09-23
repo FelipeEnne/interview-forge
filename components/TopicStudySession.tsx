@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 
 import type {
   InterviewQuestion,
-  QuestionCategory,
-} from "@/data/nodejs-questions";
+  StudyCategoryDefinition,
+} from "@/data/study-types";
 import {
   readQuestionProgress,
   saveQuestionProgress,
@@ -29,9 +29,10 @@ type SessionMode = "due-review" | "practice";
 
 type TopicStudySessionProps = {
   topicName: string;
-  questions: InterviewQuestion[];
+  questions: readonly InterviewQuestion[];
+  categories: readonly StudyCategoryDefinition[];
   sessionMode?: SessionMode;
-  category?: QuestionCategory;
+  category?: string;
   now?: () => Date;
   backLink?: {
     href: string;
@@ -45,12 +46,13 @@ function currentTime() {
 export function TopicStudySession({
   topicName,
   questions,
+  categories,
   sessionMode = "due-review",
   category,
   now = currentTime,
   backLink,
 }: TopicStudySessionProps) {
-  const { t, localize, categoryLabel, ratingLabel, questionsReviewed } =
+  const { t, localize, ratingLabel, questionsReviewed } =
     useTranslations();
   const [sessionQuestions, setSessionQuestions] = useState<
     InterviewQuestion[] | null
@@ -77,6 +79,12 @@ export function TopicStudySession({
     sessionQuestions !== null && currentIndex >= sessionQuestions.length - 1;
   const showRatings = isAnswerVisible && !isSessionComplete;
   const ratingCounts = countSessionRatings(sessionRatings);
+  function categoryLabel(categoryId: string): string {
+    const definition = categories.find(({ id }) => id === categoryId);
+
+    return definition ? localize(definition.displayName) : categoryId;
+  }
+
   const title = category
     ? t("topicCategoryTitle", {
         topic: topicName,

@@ -1,7 +1,7 @@
 import {
   QUESTION_CATEGORIES,
   type QuestionCategory,
-} from "@/data/nodejs-questions";
+} from "@/data/nodejs-categories";
 import type { CategoryScore } from "./quiz";
 
 export const MIN_CATEGORY_QUESTIONS = 2;

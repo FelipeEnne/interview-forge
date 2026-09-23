@@ -198,6 +198,35 @@ describe("TopicPage", () => {
     ).toHaveAttribute("href", "/topics/nodejs/categories/production");
   });
 
+  it.each(["react", "angular"])(
+    "shows a coming-soon page for the known %s topic",
+    async (topic) => {
+      render(
+        await TopicPage({
+          params: Promise.resolve({ topic }),
+        }),
+      );
+
+      expect(
+        screen.getByRole("heading", {
+          name: topic === "react" ? "React" : "Angular",
+        }),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Coming soon")).toBeInTheDocument();
+    },
+  );
+
+  it("translates the coming-soon page in Portuguese", async () => {
+    renderWithLocale(
+      await TopicPage({
+        params: Promise.resolve({ topic: "react" }),
+      }),
+      "pt",
+    );
+
+    expect(await screen.findByText("Em breve")).toBeInTheDocument();
+  });
+
   it("returns not found for an unknown topic", async () => {
     await expect(
       TopicPage({

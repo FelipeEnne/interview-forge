@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { NODEJS_TOPIC } from "@/data/nodejs-questions";
+import { getTopicById } from "@/data/topic-registry";
 import { ChallengesList } from "./ChallengesList";
 
 type TopicChallengesPageProps = {
@@ -11,8 +11,9 @@ export default async function TopicChallengesPage({
   params,
 }: TopicChallengesPageProps) {
   const { topic } = await params;
+  const topicDefinition = getTopicById(topic);
 
-  if (topic !== NODEJS_TOPIC.slug) {
+  if (!topicDefinition || topicDefinition.id !== "nodejs") {
     notFound();
   }
 
