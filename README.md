@@ -1,13 +1,13 @@
 # InterviewForge
 
-Personal web app for technical interview preparation: active recall study, a timed proficiency quiz, and coding challenges—starting with Node.js.
+Personal web app for technical interview preparation: active recall study, timed proficiency quizzes, and coding challenges—starting with Node.js and React.
 
-**Status:** v0.2.0 (MVP v0.1.0 + bilingual English/Portuguese)
+**Status:** v0.4.0 (React Proficiency Quiz)
 
 ## Features
 
 - **Study** — 60 Node.js questions in 9 categories; reveal answers and rate recall (Again / Hard / Good / Easy); session summary; LocalStorage progress; review scheduling; due questions; weaker questions first; study by category.
-- **Test** — Node.js Proficiency Quiz (20-question bank, 10 per attempt, 8-minute timer); score and per-category breakdown; accumulated performance and top weak categories for study links.
+- **Test** — Node.js and React Proficiency Quizzes (20-question banks, 10 per attempt, 8-minute timers); score and per-category breakdown; accumulated category performance. Node.js weak categories link to Study; React has no Study capability.
 - **Practice** — 6 Node.js coding challenges with prompts, starter code, review checklists, and on-demand reference solutions (no in-app code execution).
 - **Language (EN / PT)** — Bilingual UI chrome and bilingual technical content (study Q&A, quiz prompts and options, challenge titles and checklists). Use the header selector to switch anytime; your choice is saved in the browser. Study progress, quiz aggregates, review scheduling, and question IDs are **shared across languages**—only presentation changes. Coding-challenge starter code and reference solutions stay the same in both languages.
 
@@ -30,7 +30,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Start from **Study Node.js questions**, then use Study (due or category), **Take proficiency quiz**, or **Practice coding challenges** on the Node.js topic page. The header language selector switches the interface and technical content between English and Portuguese; coding-challenge starter code and reference solutions stay the same.
+Open [http://localhost:3000](http://localhost:3000). Start from **Study Node.js questions**, use **Take proficiency quiz** on Node.js or React, or practice Node.js coding challenges. The header language selector switches the interface and technical content between English and Portuguese; coding-challenge starter code and reference solutions stay the same.
 
 Production build:
 

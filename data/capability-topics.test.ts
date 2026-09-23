@@ -16,9 +16,19 @@ describe("topic capability resolvers", () => {
     expect(getChallengeTopicById("nodejs")?.challenges).toHaveLength(6);
   });
 
-  it.each(["react", "angular"])("does not resolve unavailable %s content", (topicId) => {
-    expect(getStudyTopicById(topicId)).toBeUndefined();
-    expect(getQuizTopicById(topicId)).toBeUndefined();
-    expect(getChallengeTopicById(topicId)).toBeUndefined();
+  it("resolves React quiz content without study or challenge content", () => {
+    expect(getStudyTopicById("react")).toBeUndefined();
+    expect(getQuizTopicById("react")).toMatchObject({
+      id: "react",
+      questionsPerAttempt: 10,
+      durationMinutes: 8,
+    });
+    expect(getChallengeTopicById("react")).toBeUndefined();
+  });
+
+  it("does not resolve unavailable Angular content", () => {
+    expect(getStudyTopicById("angular")).toBeUndefined();
+    expect(getQuizTopicById("angular")).toBeUndefined();
+    expect(getChallengeTopicById("angular")).toBeUndefined();
   });
 });

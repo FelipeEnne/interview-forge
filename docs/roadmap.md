@@ -7,6 +7,7 @@
 | **v0.1.0** | MVP — Node.js Study, Test, Practice (Stories 1–13) | Shipped |
 | **v0.2.0** | English/Portuguese UI and bilingual technical content (Stories 14–15) | Shipped |
 | **v0.3.0** | Multi-topic foundation (Story 19) | Shipped |
+| **v0.4.0** | React Proficiency Quiz (Story 20) | Shipped |
 
 Story write-ups live under `docs/stories/`.
 
@@ -33,10 +34,10 @@ Story write-ups live under `docs/stories/`.
 | 17 | Study progress summary |
 | 18 | Study progress breakdown |
 | 19 | Multi-topic foundation |
+| 20 | React Proficiency Quiz |
 
 ## Next stories
 
 | Story | Title |
 | --- | --- |
-| 20 | React Active Recall Question Bank |
-| 21 | Angular Active Recall Question Bank |
+| 21 | Angular Proficiency Quiz |

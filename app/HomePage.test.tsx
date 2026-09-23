@@ -21,10 +21,12 @@ describe("HomePage", () => {
       "href",
       "/topics/nodejs",
     );
-    expect(screen.getByText("React")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "React" })).toHaveAttribute(
+      "href",
+      "/topics/react",
+    );
     expect(screen.getByText("Angular")).toBeInTheDocument();
-    expect(screen.getAllByText("Coming soon")).toHaveLength(2);
-    expect(screen.queryByRole("link", { name: "React" })).not.toBeInTheDocument();
+    expect(screen.getAllByText("Coming soon")).toHaveLength(1);
     expect(
       screen.queryByRole("link", { name: "Angular" }),
     ).not.toBeInTheDocument();
@@ -42,6 +44,6 @@ describe("HomePage", () => {
       "href",
       "/topics/nodejs",
     );
-    expect(screen.getAllByText("Em breve")).toHaveLength(2);
+    expect(screen.getAllByText("Em breve")).toHaveLength(1);
   });
 });

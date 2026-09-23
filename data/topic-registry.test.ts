@@ -7,7 +7,7 @@ import { TOPICS, getTopicById } from "@/data/topic-registry";
 describe("topic registry", () => {
   it.each([
     ["nodejs", "available"],
-    ["react", "coming-soon"],
+    ["react", "available"],
     ["angular", "coming-soon"],
   ] as const)("resolves %s with its status", (id, status) => {
     expect(getTopicById(id)).toMatchObject({ id, status });

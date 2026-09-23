@@ -1,10 +1,10 @@
 # Product
 
-**Status:** Multi-topic foundation with a complete Node.js topic, React and Angular coming soon, and English/Portuguese presentation.
+**Status:** Multi-topic foundation with a complete Node.js topic, a React proficiency quiz, Angular coming soon, and English/Portuguese presentation.
 
 ## Purpose
 
-InterviewForge is a personal web app for preparing for technical interviews by topic. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. Node.js is currently the complete topic. React and Angular are recognized as upcoming topics but do not have content banks yet. Node.js also offers a short timed proficiency quiz and a small bank of coding challenges for implementation practice without running candidate code.
+InterviewForge is a personal web app for preparing for technical interviews by topic. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. Node.js is currently the complete topic. React offers a short timed proficiency quiz and category performance without an active-recall bank. Angular is recognized as an upcoming topic without content. Node.js also offers a small bank of coding challenges for implementation practice without running candidate code.
 
 ## Core study loop
 
@@ -20,15 +20,15 @@ InterviewForge is a personal web app for preparing for technical interviews by t
 10. View a session summary with rating counts for the questions studied.
 11. Optionally click **Study again** to rebuild the same kind of session (due review or category practice) from current progress.
 
-## Node.js proficiency quiz
+## Proficiency quizzes
 
-1. From the Node.js topic page, choose **Take proficiency quiz**.
+1. From a topic page with a quiz, choose **Take proficiency quiz**.
 2. Read that the attempt has 10 questions and 8 minutes, then click **Start quiz**.
 3. Select one of four answers and click **Next**. The last question uses **Finish quiz**.
 4. If time reaches 00:00, the attempt ends with answers given so far. Unanswered questions count as incorrect.
 5. View the score, percentage, and per-category breakdown for that attempt.
 6. On completion, add correct and encountered question counts to persistent per-category quiz performance.
-7. Optionally click **Try again** for a new attempt, or **Back to Node.js**.
+7. Optionally click **Try again** for a new attempt, or return to the topic.
 
 The Node.js topic page shows a **Progress** summary for the 60 active-recall
 questions: how many are memorized (latest self-rating **Good** or **Easy**),
@@ -39,9 +39,10 @@ only—not a full history of past ratings. These numbers are derived from stored
 study progress on each visit; they are not saved as separate counters.
 
 The page also shows up to three categories with the lowest accumulated quiz
-accuracy once each has at least two encountered questions. Each category links
-directly to its existing study session. Quiz performance is stored separately
-and does not change study progress.
+accuracy once each has at least two encountered questions. Node.js categories
+link directly to their existing study sessions. React has no Study capability,
+so its performance shows category names and accuracy without study links. Quiz
+performance is stored separately and does not change study progress.
 
 ## Node.js coding challenges
 
@@ -57,12 +58,12 @@ challenges do not change study progress or quiz performance.
 ## Current topic catalog
 
 - **Node.js:** available with Study, Test, and Practice.
-- **React:** coming soon; active-recall content is planned for Story 020.
-- **Angular:** coming soon; active-recall content is planned for Story 021.
+- **React:** available with Test and Category Performance.
+- **Angular:** coming soon; proficiency-quiz content is planned for Story 021.
 
-The current usable flow is a single user studying a curated bank of **60 Node.js questions across 9 categories** in the browser, on their own device, without signing in. Study progress survives page reloads via browser LocalStorage. Node.js also offers a timed multiple-choice quiz from a separate bank of **20 questions**; each attempt samples 10.
+The current usable flow is a single user studying a curated bank of **60 Node.js questions across 9 categories** in the browser, on their own device, without signing in. Study progress survives page reloads via browser LocalStorage. Node.js and React each offer a timed multiple-choice quiz from a separate bank of **20 questions**; each attempt samples 10.
 
-The home page lists all known topics. Node.js links to `/topics/nodejs`; React and Angular are visibly marked **Coming soon**. The Node.js topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, coding challenges at `/topics/nodejs/challenges`, manual practice for each category, and category practice from accumulated quiz performance.
+The home page lists all known topics. Node.js and React link to their topic pages; Angular is visibly marked **Coming soon**. The Node.js topic page links to due review at `/topics/nodejs/study`, the proficiency quiz at `/topics/nodejs/quiz`, coding challenges at `/topics/nodejs/challenges`, manual practice for each category, and category practice from accumulated quiz performance. The React topic page links to `/topics/react/quiz` and shows category performance without study links.
 
 ## Language
 
@@ -90,7 +91,8 @@ The product does **not** currently provide:
 - Server-side or database persistence
 - Visual quiz history or performance over time
 - Adaptive spaced repetition algorithms beyond the current fixed schedule
-- React or Angular content banks, quizzes, or coding challenges
+- React active-recall content or coding challenges
+- Angular content banks, quizzes, or coding challenges
 - Mock interviews or coding execution environments
 - AI evaluation of answers
 - Analytics or gamification

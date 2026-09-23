@@ -144,6 +144,38 @@ describe("TopicPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows React quiz and performance without Study or challenge capabilities", async () => {
+    saveQuizPerformance("react", {
+      hooks: { correct: 1, total: 2 },
+    });
+
+    render(
+      await TopicPage({
+        params: Promise.resolve({ topic: "react" }),
+      }),
+    );
+
+    expect(screen.getByRole("heading", { name: "React" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Take proficiency quiz" }),
+    ).toHaveAttribute("href", "/topics/react/quiz");
+    expect(
+      screen.queryByRole("link", { name: "Study due questions" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Practice coding challenges" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Progress" })).not.toBeInTheDocument();
+
+    expect(
+      await screen.findByRole("heading", { name: "Performance" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Hooks & Effects", level: 3 }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Study Hooks/ })).not.toBeInTheDocument();
+  });
+
   it("translates study progress labels and breakdown in Portuguese", async () => {
     saveBreakdownFixtureProgress();
 
@@ -199,28 +231,21 @@ describe("TopicPage", () => {
     ).toHaveAttribute("href", "/topics/nodejs/categories/production");
   });
 
-  it.each(["react", "angular"])(
-    "shows a coming-soon page for the known %s topic",
-    async (topic) => {
-      render(
-        await TopicPage({
-          params: Promise.resolve({ topic }),
-        }),
-      );
+  it("shows a coming-soon page for Angular", async () => {
+    render(
+      await TopicPage({
+        params: Promise.resolve({ topic: "angular" }),
+      }),
+    );
 
-      expect(
-        screen.getByRole("heading", {
-          name: topic === "react" ? "React" : "Angular",
-        }),
-      ).toBeInTheDocument();
-      expect(screen.getByText("Coming soon")).toBeInTheDocument();
-    },
-  );
+    expect(screen.getByRole("heading", { name: "Angular" })).toBeInTheDocument();
+    expect(screen.getByText("Coming soon")).toBeInTheDocument();
+  });
 
   it("translates the coming-soon page in Portuguese", async () => {
     renderWithLocale(
       await TopicPage({
-        params: Promise.resolve({ topic: "react" }),
+        params: Promise.resolve({ topic: "angular" }),
       }),
       "pt",
     );

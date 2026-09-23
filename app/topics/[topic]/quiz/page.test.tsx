@@ -29,14 +29,29 @@ describe("TopicQuizPage", () => {
     ).rejects.toThrow();
   });
 
-  it.each(["react", "angular"])(
-    "returns not found because %s has no quiz",
-    async (topic) => {
-      await expect(
-        TopicQuizPage({
-          params: Promise.resolve({ topic }),
-        }),
-      ).rejects.toThrow();
-    },
-  );
+  it("renders the React proficiency quiz intro", async () => {
+    render(
+      await TopicQuizPage({
+        params: Promise.resolve({ topic: "react" }),
+      }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "React Proficiency Quiz" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("10 questions")).toBeInTheDocument();
+    expect(screen.getByText("8 minutes")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to React" })).toHaveAttribute(
+      "href",
+      "/topics/react",
+    );
+  });
+
+  it("returns not found because Angular has no quiz", async () => {
+    await expect(
+      TopicQuizPage({
+        params: Promise.resolve({ topic: "angular" }),
+      }),
+    ).rejects.toThrow();
+  });
 });

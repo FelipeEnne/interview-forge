@@ -44,10 +44,16 @@ describe("local-storage-quiz-performance", () => {
     );
   });
 
-  it("uses a topic-specific key for another topic", () => {
+  it("uses React's topic-specific key for its performance", () => {
     expect(getQuizPerformanceStorageKey("react")).toBe(
       "interview-forge:quiz-attempts:react",
     );
+
+    saveQuizPerformance("react", { hooks: { correct: 1, total: 2 } });
+
+    expect(
+      localStorage.getItem("interview-forge:quiz-attempts:react"),
+    ).toBe(JSON.stringify({ hooks: { correct: 1, total: 2 } }));
   });
 
   it("keeps matching category ids isolated between topics", () => {
