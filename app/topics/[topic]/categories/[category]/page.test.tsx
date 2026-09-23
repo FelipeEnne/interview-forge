@@ -66,17 +66,51 @@ describe("CategoryStudyPage", () => {
     ).rejects.toThrow();
   });
 
-  it.each(["react", "angular"])(
-    "returns not found when %s has no category bank",
-    async (topic) => {
-      await expect(
-        CategoryStudyPage({
-          params: Promise.resolve({
-            topic,
-            category: "fundamentals",
-          }),
+  it("studies React fundamentals without mixing other categories", async () => {
+    const { REACT_QUESTIONS } = await import("@/data/topics/react/questions");
+    const fundamentalsQuestions = REACT_QUESTIONS.filter(
+      (question) => question.category === "fundamentals",
+    );
+
+    render(
+      await CategoryStudyPage({
+        params: Promise.resolve({
+          topic: "react",
+          category: "fundamentals",
         }),
-      ).rejects.toThrow();
-    },
-  );
+      }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "React — Fundamentals & Composition" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(fundamentalsQuestions[0]!.question.en),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(REACT_QUESTIONS.find((q) => q.category === "hooks")!.question.en),
+    ).not.toBeInTheDocument();
+  });
+
+  it("returns not found for an invalid React category", async () => {
+    await expect(
+      CategoryStudyPage({
+        params: Promise.resolve({
+          topic: "react",
+          category: "unknown",
+        }),
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("returns not found when angular has no category bank", async () => {
+    await expect(
+      CategoryStudyPage({
+        params: Promise.resolve({
+          topic: "angular",
+          category: "components",
+        }),
+      }),
+    ).rejects.toThrow();
+  });
 });

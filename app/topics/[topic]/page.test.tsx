@@ -3,6 +3,11 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { NODEJS_CATEGORIES, QUESTION_CATEGORIES } from "@/data/topics/nodejs/categories";
 import { NODEJS_QUESTIONS } from "@/data/topics/nodejs/questions";
+import {
+  REACT_CATEGORIES,
+  REACT_QUESTION_CATEGORIES,
+} from "@/data/topics/react/categories";
+import { REACT_QUESTIONS } from "@/data/topics/react/questions";
 import { saveQuestionProgress } from "@/domain/local-storage-progress";
 import type { QuestionProgressState } from "@/domain/question-progress";
 import { getLocalizedText } from "@/i18n/localized-text";
@@ -144,7 +149,7 @@ describe("TopicPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows React quiz and performance without Study or challenge capabilities", async () => {
+  it("shows React study, quiz, and performance with category study links", async () => {
     saveQuizPerformance("react", {
       hooks: { correct: 1, total: 2 },
     });
@@ -157,15 +162,29 @@ describe("TopicPage", () => {
 
     expect(screen.getByRole("heading", { name: "React" })).toBeInTheDocument();
     expect(
+      screen.getByRole("link", { name: "Study due questions" }),
+    ).toHaveAttribute("href", "/topics/react/study");
+    expect(
       screen.getByRole("link", { name: "Take proficiency quiz" }),
     ).toHaveAttribute("href", "/topics/react/quiz");
     expect(
-      screen.queryByRole("link", { name: "Study due questions" }),
-    ).not.toBeInTheDocument();
-    expect(
       screen.queryByRole("link", { name: "Practice coding challenges" }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Progress" })).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Progress" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("0 / 40 memorized")).toBeInTheDocument();
+
+    for (const category of REACT_QUESTION_CATEGORIES) {
+      expect(
+        screen.getByRole("link", {
+          name: getLocalizedText(
+            REACT_CATEGORIES.find(({ id }) => id === category)!.displayName,
+            "en",
+          ),
+        }),
+      ).toHaveAttribute("href", `/topics/react/categories/${category}`);
+    }
 
     expect(
       await screen.findByRole("heading", { name: "Performance" }),
@@ -173,7 +192,30 @@ describe("TopicPage", () => {
     expect(
       screen.getByRole("heading", { name: "Hooks & Effects", level: 3 }),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Study Hooks/ })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /Study Hooks/ }),
+    ).toHaveAttribute("href", "/topics/react/categories/hooks");
+  });
+
+  it("derives React study progress only from React question ids", async () => {
+    const progress: QuestionProgressState = {
+      [NODEJS_QUESTIONS[0].id]: { lastRating: "good", reviewCount: 1 },
+      [REACT_QUESTIONS[0].id]: { lastRating: "easy", reviewCount: 1 },
+      [REACT_QUESTIONS[1].id]: { lastRating: "good", reviewCount: 1 },
+    };
+    saveQuestionProgress(progress);
+
+    render(
+      await TopicPage({
+        params: Promise.resolve({ topic: "react" }),
+      }),
+    );
+
+    expect(
+      await screen.findByRole("heading", { name: "Progress" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("2 / 40 memorized")).toBeInTheDocument();
+    expect(screen.getByText("38 questions remaining")).toBeInTheDocument();
   });
 
   it("translates study progress labels and breakdown in Portuguese", async () => {

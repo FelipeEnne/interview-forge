@@ -22,7 +22,22 @@ describe("TopicStudyPage", () => {
     ).toBeInTheDocument();
   });
 
-  it.each(["react", "angular", "unknown"])(
+  it("starts the React study flow", async () => {
+    const { REACT_QUESTIONS } = await import("@/data/topics/react/questions");
+
+    render(
+      await TopicStudyPage({
+        params: Promise.resolve({ topic: "react" }),
+      }),
+    );
+
+    expect(screen.getByRole("heading", { name: "React" })).toBeInTheDocument();
+    expect(
+      await screen.findByText(REACT_QUESTIONS[0]!.question.en),
+    ).toBeInTheDocument();
+  });
+
+  it.each(["angular", "unknown"])(
     "returns not found when %s has no study bank",
     async (topic) => {
       await expect(

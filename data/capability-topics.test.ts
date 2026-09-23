@@ -16,8 +16,12 @@ describe("topic capability resolvers", () => {
     expect(getChallengeTopicById("nodejs")?.challenges).toHaveLength(6);
   });
 
-  it("resolves React quiz content without study or challenge content", () => {
-    expect(getStudyTopicById("react")).toBeUndefined();
+  it("resolves React study and quiz content without challenge content", () => {
+    expect(getStudyTopicById("react")).toMatchObject({
+      id: "react",
+      questions: expect.any(Array),
+    });
+    expect(getStudyTopicById("react")?.questions).toHaveLength(40);
     expect(getQuizTopicById("react")).toMatchObject({
       id: "react",
       questionsPerAttempt: 10,
