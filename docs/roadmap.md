@@ -10,6 +10,7 @@
 | **v0.4.0** | React Proficiency Quiz (Story 20) | Shipped |
 | **v0.5.0** | Angular Proficiency Quiz (Story 21) | Shipped |
 | **v0.6.0** | React Active Recall (Story 22) | Shipped |
+| **v0.7.0** | Angular Active Recall (Story 23) | Shipped |
 
 Story write-ups live under `docs/stories/`.
 
@@ -39,3 +40,4 @@ Story write-ups live under `docs/stories/`.
 | 20 | React Proficiency Quiz |
 | 21 | Angular Proficiency Quiz |
 | 22 | React Active Recall |
+| 23 | Angular Active Recall |

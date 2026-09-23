@@ -4,7 +4,7 @@
 
 ## Purpose
 
-InterviewForge is a personal web app for preparing for technical interviews by topic. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. Node.js and React offer full study flows plus proficiency quizzes. Angular offers a short timed proficiency quiz and category performance without an active-recall bank. Node.js also offers a small bank of coding challenges for implementation practice without running candidate code.
+InterviewForge is a personal web app for preparing for technical interviews by topic. It focuses on active recall: reading a question, trying to answer mentally, revealing the reference answer, and self-rating how well you remembered it. Node.js, React, and Angular each offer full study flows plus proficiency quizzes. Node.js also offers a small bank of coding challenges for implementation practice without running candidate code.
 
 ## Core study loop
 
@@ -37,14 +37,12 @@ are currently **Again**, **Hard**, **Good**, **Easy**, or **Unreviewed** (never
 studied), based on each question’s **last** recall rating only—not a full
 history of past ratings. These numbers are derived from stored study progress on
 each visit; they are not saved as separate counters. Node.js has 60 study
-questions; React has 40.
+questions; React and Angular each have 40.
 
 The page also shows up to three categories with the lowest accumulated quiz
 accuracy once each has at least two encountered questions. When Study exists for
-that topic, those categories link to category study sessions. Angular has no
-Study capability, so its performance shows category names and accuracy without
-study links. Quiz performance is stored separately and does not change study
-progress.
+that topic, those categories link to category study sessions. Quiz performance
+is stored separately and does not change study progress.
 
 ## Node.js coding challenges
 
@@ -61,19 +59,18 @@ challenges do not change study progress or quiz performance.
 
 - **Node.js:** available with Study, Test, and Practice.
 - **React:** available with Study, Test, and Category Performance.
-- **Angular:** available with Test and Category Performance.
+- **Angular:** available with Study, Test, and Category Performance.
 
 Users study curated active-recall banks in the browser on their own device,
 without signing in. Study progress survives page reloads via browser
-LocalStorage. Node.js has **60** study questions across 9 categories; React has
-**40** across 8 categories. Node.js, React, and Angular each offer a timed
-multiple-choice quiz from a separate bank of **20 questions**; each attempt
-samples 10.
+LocalStorage. Node.js has **60** study questions across 9 categories; React and
+Angular each have **40** across 8 categories. Node.js, React, and Angular each
+offer a timed multiple-choice quiz from a separate bank of **20 questions**;
+each attempt samples 10.
 
 The home page lists all known topics and each links to its topic page. Node.js
-links to due review, quiz, challenges, and per-category study. React links to
-due review, quiz, per-category study, and quiz-driven category study links.
-Angular links to its proficiency quiz and shows category performance without
+links to due review, quiz, challenges, and per-category study. React and
+Angular link to due review, quiz, per-category study, and quiz-driven category
 study links.
 
 ## Language
@@ -102,8 +99,7 @@ The product does **not** currently provide:
 - Server-side or database persistence
 - Visual quiz history or performance over time
 - Adaptive spaced repetition algorithms beyond the current fixed schedule
-- React coding challenges
-- Angular active-recall content or coding challenges
+- React or Angular coding challenges
 - Mock interviews or coding execution environments
 - AI evaluation of answers
 - Analytics or gamification

@@ -103,12 +103,40 @@ describe("CategoryStudyPage", () => {
     ).rejects.toThrow();
   });
 
-  it("returns not found when angular has no category bank", async () => {
+  it("studies Angular components without mixing other categories", async () => {
+    const { ANGULAR_QUESTIONS } = await import("@/data/topics/angular/questions");
+    const componentQuestions = ANGULAR_QUESTIONS.filter(
+      (question) => question.category === "components",
+    );
+
+    render(
+      await CategoryStudyPage({
+        params: Promise.resolve({
+          topic: "angular",
+          category: "components",
+        }),
+      }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Angular — Components & Rendering" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(componentQuestions[0]!.question.en),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        ANGULAR_QUESTIONS.find((q) => q.category === "templates")!.question.en,
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  it("returns not found for an invalid Angular category", async () => {
     await expect(
       CategoryStudyPage({
         params: Promise.resolve({
           topic: "angular",
-          category: "components",
+          category: "unknown",
         }),
       }),
     ).rejects.toThrow();

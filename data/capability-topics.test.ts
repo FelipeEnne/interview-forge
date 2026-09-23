@@ -30,8 +30,12 @@ describe("topic capability resolvers", () => {
     expect(getChallengeTopicById("react")).toBeUndefined();
   });
 
-  it("resolves Angular quiz content without study or challenge content", () => {
-    expect(getStudyTopicById("angular")).toBeUndefined();
+  it("resolves Angular study and quiz content without challenge content", () => {
+    expect(getStudyTopicById("angular")).toMatchObject({
+      id: "angular",
+      questions: expect.any(Array),
+    });
+    expect(getStudyTopicById("angular")?.questions).toHaveLength(40);
     expect(getQuizTopicById("angular")).toMatchObject({
       id: "angular",
       questionsPerAttempt: 10,

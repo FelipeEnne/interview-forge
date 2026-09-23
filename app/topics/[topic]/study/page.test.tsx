@@ -37,14 +37,26 @@ describe("TopicStudyPage", () => {
     ).toBeInTheDocument();
   });
 
-  it.each(["angular", "unknown"])(
-    "returns not found when %s has no study bank",
-    async (topic) => {
-      await expect(
-        TopicStudyPage({
-          params: Promise.resolve({ topic }),
-        }),
-      ).rejects.toThrow();
-    },
-  );
+  it("starts the Angular study flow", async () => {
+    const { ANGULAR_QUESTIONS } = await import("@/data/topics/angular/questions");
+
+    render(
+      await TopicStudyPage({
+        params: Promise.resolve({ topic: "angular" }),
+      }),
+    );
+
+    expect(screen.getByRole("heading", { name: "Angular" })).toBeInTheDocument();
+    expect(
+      await screen.findByText(ANGULAR_QUESTIONS[0]!.question.en),
+    ).toBeInTheDocument();
+  });
+
+  it("returns not found when the topic has no study bank", async () => {
+    await expect(
+      TopicStudyPage({
+        params: Promise.resolve({ topic: "unknown" }),
+      }),
+    ).rejects.toThrow();
+  });
 });
