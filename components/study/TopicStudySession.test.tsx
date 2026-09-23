@@ -11,8 +11,8 @@ import {
   readQuestionProgress,
 } from "@/domain/local-storage-progress";
 import type { RecallRating } from "@/domain/recall-rating";
-import { LanguageSelector } from "./LanguageSelector";
-import { LocaleProvider } from "./LocaleProvider";
+import { LanguageSelector } from "../LanguageSelector";
+import { LocaleProvider } from "../LocaleProvider";
 import { TopicStudySession } from "./TopicStudySession";
 import { renderWithLocale } from "@/i18n/render-with-locale";
 

@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 
 import { getStudyTopicById } from "@/data/study-topics";
+import { getQuizTopicById } from "@/data/quiz-topics";
+import { getChallengeTopicById } from "@/data/challenge-topics";
 import { getTopicById } from "@/data/topic-registry";
 import { TopicComingSoon } from "./TopicComingSoon";
 import { TopicOverview } from "./TopicOverview";
@@ -21,11 +23,12 @@ export default async function TopicPage({ params }: TopicPageProps) {
     return <TopicComingSoon topic={topicDefinition} />;
   }
 
-  const studyTopic = getStudyTopicById(topicDefinition.id);
-
-  if (!studyTopic) {
-    notFound();
-  }
-
-  return <TopicOverview topic={studyTopic} />;
+  return (
+    <TopicOverview
+      topic={topicDefinition}
+      studyTopic={getStudyTopicById(topicDefinition.id)}
+      quizTopic={getQuizTopicById(topicDefinition.id)}
+      challengeTopic={getChallengeTopicById(topicDefinition.id)}
+    />
+  );
 }

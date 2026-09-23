@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 
-import { NodejsCodingChallenge } from "@/components/NodejsCodingChallenge";
-import { NODEJS_CODING_CHALLENGES } from "@/data/nodejs-coding-challenges";
-import { NODEJS_TOPIC } from "@/data/nodejs-questions";
-import { getTopicById } from "@/data/topic-registry";
+import { CodingChallenge } from "@/components/challenges/CodingChallenge";
+import { getChallengeTopicById } from "@/data/challenge-topics";
 
 type TopicChallengePageProps = {
   params: Promise<{ topic: string; challenge: string }>;
@@ -13,25 +11,24 @@ export default async function TopicChallengePage({
   params,
 }: TopicChallengePageProps) {
   const { topic, challenge: challengeId } = await params;
-  const topicDefinition = getTopicById(topic);
-
-  const challenge = NODEJS_CODING_CHALLENGES.find(
+  const challengeTopic = getChallengeTopicById(topic);
+  const challenge = challengeTopic?.challenges.find(
     (item) => item.id === challengeId,
   );
+  const category = challengeTopic?.categories.find(
+    (item) => item.id === challenge?.category,
+  );
 
-  if (
-    !topicDefinition ||
-    topicDefinition.id !== "nodejs" ||
-    challenge === undefined
-  ) {
+  if (!challengeTopic || !challenge || !category) {
     notFound();
   }
 
   return (
-    <NodejsCodingChallenge
+    <CodingChallenge
       challenge={challenge}
+      category={category}
       backLink={{
-        href: `/topics/${NODEJS_TOPIC.slug}/challenges`,
+        href: `/topics/${challengeTopic.id}/challenges`,
       }}
     />
   );

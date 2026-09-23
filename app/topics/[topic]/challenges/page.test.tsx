@@ -1,8 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { NODEJS_CODING_CHALLENGES } from "@/data/nodejs-coding-challenges";
-import { getCategoryLabel } from "@/i18n/translations";
+import { NODEJS_CODING_CHALLENGES } from "@/data/topics/nodejs/coding-challenges";
+import { getLocalizedText } from "@/i18n/localized-text";
+import { NODEJS_CATEGORIES } from "@/data/topics/nodejs/categories";
 import TopicChallengesPage from "./page";
 
 describe("TopicChallengesPage", () => {
@@ -29,7 +30,7 @@ describe("TopicChallengesPage", () => {
         `/topics/nodejs/challenges/${challenge.id}`,
       );
       expect(link.parentElement).toHaveTextContent(
-        getCategoryLabel("en", challenge.category),
+        getLocalizedText(NODEJS_CATEGORIES.find(({ id }) => id === challenge.category)!.displayName, "en"),
       );
     }
   });

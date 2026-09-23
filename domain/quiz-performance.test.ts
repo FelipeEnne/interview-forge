@@ -11,77 +11,67 @@ import {
 describe("recordQuizPerformance", () => {
   it("records a first result and accumulates later category results", () => {
     const initial: QuizPerformance = {
-      async: { correct: 1, total: 2 },
-      modules: { correct: 1, total: 1 },
+      hooks: { correct: 1, total: 2 },
+      state: { correct: 1, total: 1 },
     };
 
     const updated = recordQuizPerformance(initial, {
-      async: { correct: 2, total: 3 },
-      streams: { correct: 0, total: 2 },
+      hooks: { correct: 2, total: 3 },
+      effects: { correct: 0, total: 2 },
     });
 
     expect(updated).toEqual({
-      async: { correct: 3, total: 5 },
-      modules: { correct: 1, total: 1 },
-      streams: { correct: 0, total: 2 },
+      hooks: { correct: 3, total: 5 },
+      state: { correct: 1, total: 1 },
+      effects: { correct: 0, total: 2 },
     });
     expect(initial).toEqual({
-      async: { correct: 1, total: 2 },
-      modules: { correct: 1, total: 1 },
+      hooks: { correct: 1, total: 2 },
+      state: { correct: 1, total: 1 },
     });
   });
 });
 
 describe("getLowestCategoryPerformance", () => {
+  const categories = ["hooks", "state", "effects", "context", "refs"] as const;
+
   it("returns up to three eligible categories ordered by exact accuracy", () => {
     const performance: QuizPerformance = {
-      fundamentals: { correct: 1, total: 2 },
-      async: { correct: 2, total: 3 },
-      modules: { correct: 1, total: 3 },
-      http: { correct: 3, total: 4 },
-      streams: { correct: 0, total: 1 },
+      hooks: { correct: 1, total: 2 },
+      state: { correct: 2, total: 3 },
+      effects: { correct: 1, total: 3 },
+      context: { correct: 3, total: 4 },
+      refs: { correct: 0, total: 1 },
     };
 
-    expect(getLowestCategoryPerformance(performance)).toEqual([
-      {
-        category: "modules",
-        correct: 1,
-        total: 3,
-        percentage: 33,
-      },
-      {
-        category: "fundamentals",
-        correct: 1,
-        total: 2,
-        percentage: 50,
-      },
-      {
-        category: "async",
-        correct: 2,
-        total: 3,
-        percentage: 67,
-      },
+    expect(getLowestCategoryPerformance(performance, categories)).toEqual([
+      { category: "effects", correct: 1, total: 3, percentage: 33 },
+      { category: "hooks", correct: 1, total: 2, percentage: 50 },
+      { category: "state", correct: 2, total: 3, percentage: 67 },
     ]);
   });
 
   it("excludes categories with fewer than two encountered questions", () => {
     expect(
-      getLowestCategoryPerformance({
-        async: { correct: 0, total: 1 },
-      }),
+      getLowestCategoryPerformance(
+        { hooks: { correct: 0, total: 1 } },
+        categories,
+      ),
     ).toEqual([]);
   });
 
-  it("uses canonical category order to break exact ties", () => {
+  it("uses supplied category order to break exact ties", () => {
     const performance: QuizPerformance = {
-      security: { correct: 1, total: 2 },
-      streams: { correct: 2, total: 4 },
-      async: { correct: 3, total: 6 },
-      fundamentals: { correct: 1, total: 2 },
+      refs: { correct: 1, total: 2 },
+      effects: { correct: 2, total: 4 },
+      state: { correct: 3, total: 6 },
+      hooks: { correct: 1, total: 2 },
     };
 
     expect(
-      getLowestCategoryPerformance(performance).map(({ category }) => category),
-    ).toEqual(["fundamentals", "async", "streams"]);
+      getLowestCategoryPerformance(performance, categories).map(
+        ({ category }) => category,
+      ),
+    ).toEqual(["hooks", "state", "effects"]);
   });
 });

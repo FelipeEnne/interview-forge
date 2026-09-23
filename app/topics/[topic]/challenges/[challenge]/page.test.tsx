@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { NODEJS_CODING_CHALLENGES } from "@/data/nodejs-coding-challenges";
+import { NODEJS_CODING_CHALLENGES } from "@/data/topics/nodejs/coding-challenges";
 import TopicChallengePage from "./page";
 
 describe("TopicChallengePage", () => {

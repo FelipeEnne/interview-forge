@@ -1,19 +1,8 @@
-import type { LocalizedText } from "@/i18n/localized-text";
+import type { CodingChallenge } from "@/data/challenge-types";
 
-import type { QuestionCategory } from "./nodejs-categories";
+import type { QuestionCategory } from "./categories";
 
-export type CodingChallenge = {
-  id: string;
-  title: LocalizedText;
-  category: QuestionCategory;
-  prompt: LocalizedText;
-  requirements: readonly LocalizedText[];
-  starterCode: string;
-  referenceSolution: string;
-  reviewChecklist: readonly LocalizedText[];
-};
-
-export const NODEJS_CODING_CHALLENGES: readonly CodingChallenge[] = [
+export const NODEJS_CODING_CHALLENGES: readonly CodingChallenge<QuestionCategory>[] = [
   {
     id: "retry-async-operation",
     title: {

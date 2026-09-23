@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { TopicStudySession } from "@/components/TopicStudySession";
+import { TopicStudySession } from "@/components/study/TopicStudySession";
 import { getStudyTopicById } from "@/data/study-topics";
 
 type TopicStudyPageProps = {

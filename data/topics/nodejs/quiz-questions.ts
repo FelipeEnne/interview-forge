@@ -1,16 +1,8 @@
-import type { LocalizedText } from "@/i18n/localized-text";
+import type { QuizQuestion } from "@/data/quiz-types";
 
-import type { QuestionCategory } from "./nodejs-categories";
+import type { QuestionCategory } from "./categories";
 
-export type QuizQuestion = {
-  id: string;
-  category: QuestionCategory;
-  question: LocalizedText;
-  options: readonly [LocalizedText, LocalizedText, LocalizedText, LocalizedText];
-  correctOption: 0 | 1 | 2 | 3;
-};
-
-export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion[] = [
+export const NODEJS_QUIZ_QUESTIONS: readonly QuizQuestion<QuestionCategory>[] = [
   {
     id: "quiz-nodejs-runtime",
     category: "fundamentals",

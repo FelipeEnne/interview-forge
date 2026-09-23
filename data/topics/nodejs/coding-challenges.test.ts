@@ -2,8 +2,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import { NODEJS_CODING_CHALLENGES } from "@/data/nodejs-coding-challenges";
-import { QUESTION_CATEGORIES } from "@/data/nodejs-questions";
+import { QUESTION_CATEGORIES } from "./categories";
+import { NODEJS_CODING_CHALLENGES } from "./coding-challenges";
 
 function expectNonEmptyLocalizedText(value: { en: string; pt: string }) {
   expect(value.en.trim()).not.toBe("");

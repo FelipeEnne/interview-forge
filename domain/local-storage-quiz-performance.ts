@@ -1,17 +1,12 @@
-import {
-  QUESTION_CATEGORIES,
-  type QuestionCategory,
-} from "@/data/nodejs-categories";
 import type { CategoryScore } from "./quiz";
 import type { QuizPerformance } from "./quiz-performance";
 
-export const QUIZ_PERFORMANCE_STORAGE_KEY =
-  "interview-forge:quiz-attempts";
+export const QUIZ_PERFORMANCE_STORAGE_KEY = "interview-forge:quiz-attempts";
 
-const VALID_CATEGORIES = new Set<string>(QUESTION_CATEGORIES);
-
-function isQuestionCategory(value: string): value is QuestionCategory {
-  return VALID_CATEGORIES.has(value);
+export function getQuizPerformanceStorageKey(topicId: string): string {
+  return topicId === "nodejs"
+    ? QUIZ_PERFORMANCE_STORAGE_KEY
+    : `${QUIZ_PERFORMANCE_STORAGE_KEY}:${topicId}`;
 }
 
 function isValidCategoryScore(value: unknown): value is CategoryScore {
@@ -32,7 +27,10 @@ function isValidCategoryScore(value: unknown): value is CategoryScore {
   );
 }
 
-function parseQuizPerformance(raw: string): QuizPerformance {
+function parseQuizPerformance<CategoryId extends string>(
+  raw: string,
+  categoryIds: readonly CategoryId[],
+): QuizPerformance<CategoryId> {
   let parsed: unknown;
 
   try {
@@ -45,16 +43,17 @@ function parseQuizPerformance(raw: string): QuizPerformance {
     return {};
   }
 
-  const performance: QuizPerformance = {};
+  const validCategories = new Set<string>(categoryIds);
+  const performance: QuizPerformance<CategoryId> = {};
 
   for (const [category, score] of Object.entries(
     parsed as Record<string, unknown>,
   )) {
-    if (!isQuestionCategory(category) || !isValidCategoryScore(score)) {
+    if (!validCategories.has(category) || !isValidCategoryScore(score)) {
       return {};
     }
 
-    performance[category] = {
+    performance[category as CategoryId] = {
       correct: score.correct,
       total: score.total,
     };
@@ -71,28 +70,34 @@ function getStorage(): Storage | null {
   return window.localStorage;
 }
 
-export function readQuizPerformance(): QuizPerformance {
+export function readQuizPerformance<CategoryId extends string>(
+  topicId: string,
+  categoryIds: readonly CategoryId[],
+): QuizPerformance<CategoryId> {
   const storage = getStorage();
   if (!storage) {
     return {};
   }
 
-  const raw = storage.getItem(QUIZ_PERFORMANCE_STORAGE_KEY);
+  const raw = storage.getItem(getQuizPerformanceStorageKey(topicId));
   if (raw === null) {
     return {};
   }
 
-  return parseQuizPerformance(raw);
+  return parseQuizPerformance(raw, categoryIds);
 }
 
-export function saveQuizPerformance(performance: QuizPerformance): void {
+export function saveQuizPerformance<CategoryId extends string>(
+  topicId: string,
+  performance: QuizPerformance<CategoryId>,
+): void {
   const storage = getStorage();
   if (!storage) {
     return;
   }
 
   storage.setItem(
-    QUIZ_PERFORMANCE_STORAGE_KEY,
+    getQuizPerformanceStorageKey(topicId),
     JSON.stringify(performance),
   );
 }

@@ -2,7 +2,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import { NODEJS_TOPIC, QUESTION_CATEGORIES } from "./nodejs-questions";
+import { QUESTION_CATEGORIES } from "./categories";
+import { NODEJS_QUESTIONS } from "./questions";
 
 const ORIGINAL_QUESTION_IDS = [
   "nodejs-fundamentals",
@@ -72,23 +73,15 @@ function expectNonEmptyLocalizedText(value: { en: string; pt: string }) {
   expect(value.pt.trim()).not.toBe("");
 }
 
-describe("NODEJS_TOPIC", () => {
-  it("has slug nodejs", () => {
-    expect(NODEJS_TOPIC.slug).toBe("nodejs");
-  });
-
-  it("has display name Node.js", () => {
-    expect(NODEJS_TOPIC.displayName).toBe("Node.js");
-  });
-
+describe("NODEJS_QUESTIONS", () => {
   it("has exactly 60 questions", () => {
-    expect(NODEJS_TOPIC.questions).toHaveLength(60);
+    expect(NODEJS_QUESTIONS).toHaveLength(60);
   });
 
   it("each question has a valid category and bilingual content", () => {
     const validCategories = QUESTION_CATEGORIES;
 
-    for (const item of NODEJS_TOPIC.questions) {
+    for (const item of NODEJS_QUESTIONS) {
       expect(item.id.trim()).not.toBe("");
       expect(validCategories).toContain(item.category);
       expectNonEmptyLocalizedText(item.question);
@@ -97,13 +90,13 @@ describe("NODEJS_TOPIC", () => {
   });
 
   it("has unique question ids", () => {
-    const ids = NODEJS_TOPIC.questions.map(({ id }) => id);
+    const ids = NODEJS_QUESTIONS.map(({ id }) => id);
 
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it("preserves the original question ids", () => {
-    expect(NODEJS_TOPIC.questions.map(({ id }) => id)).toEqual([
+    expect(NODEJS_QUESTIONS.map(({ id }) => id)).toEqual([
       ...ORIGINAL_QUESTION_IDS,
     ]);
   });

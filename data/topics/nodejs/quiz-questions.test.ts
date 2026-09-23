@@ -2,8 +2,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import { QUESTION_CATEGORIES } from "./nodejs-questions";
-import { NODEJS_QUIZ_QUESTIONS } from "./nodejs-quiz-questions";
+import { QUESTION_CATEGORIES } from "./categories";
+import { NODEJS_QUIZ_QUESTIONS } from "./quiz-questions";
 
 const ORIGINAL_QUIZ_QUESTION_IDS = [
   "quiz-nodejs-runtime",

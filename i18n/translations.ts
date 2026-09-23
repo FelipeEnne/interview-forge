@@ -1,11 +1,6 @@
-import {
-  getNodejsCategory,
-  type QuestionCategory,
-} from "@/data/nodejs-categories";
 import type { RecallRating } from "@/domain/recall-rating";
 
 import type { Locale } from "./locale";
-import { getLocalizedText } from "./localized-text";
 
 const englishMessages = {
   appName: "InterviewForge",
@@ -36,7 +31,7 @@ const englishMessages = {
   topicCategoryTitle: "{topic} — {category}",
   backToTopic: "Back to {topic}",
   backToChallenges: "Back to challenges",
-  quizTitle: "Node.js Proficiency Quiz",
+  quizTitle: "{topic} Proficiency Quiz",
   quizQuestionCount: "{count} questions",
   quizDuration: "{minutes} minutes",
   startQuiz: "Start quiz",
@@ -46,7 +41,7 @@ const englishMessages = {
   next: "Next",
   finishQuiz: "Finish quiz",
   tryAgain: "Try again",
-  challengesTitle: "Node.js Coding Challenges",
+  challengesTitle: "{topic} Coding Challenges",
   requirements: "Requirements",
   starterCode: "Starter code",
   reviewChecklist: "Review checklist",
@@ -86,7 +81,7 @@ const portugueseMessages: Messages = {
   topicCategoryTitle: "{topic} — {category}",
   backToTopic: "Voltar para {topic}",
   backToChallenges: "Voltar para os desafios",
-  quizTitle: "Quiz de Proficiência em Node.js",
+  quizTitle: "Quiz de Proficiência em {topic}",
   quizQuestionCount: "{count} perguntas",
   quizDuration: "{minutes} minutos",
   startQuiz: "Começar quiz",
@@ -96,7 +91,7 @@ const portugueseMessages: Messages = {
   next: "Próxima",
   finishQuiz: "Finalizar quiz",
   tryAgain: "Tentar novamente",
-  challengesTitle: "Desafios de Código em Node.js",
+  challengesTitle: "Desafios de Código em {topic}",
   requirements: "Requisitos",
   starterCode: "Código inicial",
   reviewChecklist: "Checklist de revisão",
@@ -141,13 +136,6 @@ export function translate(
     const value = vars[name];
     return value === undefined ? placeholder : String(value);
   });
-}
-
-export function getCategoryLabel(
-  locale: Locale,
-  category: QuestionCategory,
-): string {
-  return getLocalizedText(getNodejsCategory(category).displayName, locale);
 }
 
 export function getRatingLabel(locale: Locale, rating: RecallRating): string {

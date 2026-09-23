@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useTranslations } from "./LocaleProvider";
+import { useTranslations } from "../LocaleProvider";
 import styles from "./RevealSolution.module.css";
 
 type RevealSolutionProps = {

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { NODEJS_TOPIC } from "@/data/nodejs-questions";
+import { NODEJS_QUESTIONS } from "@/data/topics/nodejs/questions";
 import TopicStudyPage from "./page";
 
 describe("TopicStudyPage", () => {
@@ -18,7 +18,7 @@ describe("TopicStudyPage", () => {
 
     expect(screen.getByRole("heading", { name: "Node.js" })).toBeInTheDocument();
     expect(
-      await screen.findByText(NODEJS_TOPIC.questions[0]!.question.en),
+      await screen.findByText(NODEJS_QUESTIONS[0]!.question.en),
     ).toBeInTheDocument();
   });
 

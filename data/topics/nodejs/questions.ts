@@ -1,29 +1,15 @@
-import {
-  NODEJS_CATEGORIES,
-  type QuestionCategory,
-} from "./nodejs-categories";
-import type { InterviewQuestion } from "./study-types";
+import type { QuestionCategory } from "./categories";
+import type { InterviewQuestion } from "@/data/study-types";
 
 export {
   isQuestionCategory,
   NODEJS_CATEGORIES,
   QUESTION_CATEGORIES,
   type QuestionCategory,
-} from "./nodejs-categories";
-export type { InterviewQuestion } from "./study-types";
+} from "./categories";
+export type { InterviewQuestion } from "@/data/study-types";
 
-export type TopicData = {
-  slug: string;
-  displayName: string;
-  categories: typeof NODEJS_CATEGORIES;
-  questions: InterviewQuestion<QuestionCategory>[];
-};
-
-export const NODEJS_TOPIC: TopicData = {
-  slug: "nodejs",
-  displayName: "Node.js",
-  categories: NODEJS_CATEGORIES,
-  questions: [
+export const NODEJS_QUESTIONS: readonly InterviewQuestion<QuestionCategory>[] = [
     {
       id: "nodejs-fundamentals",
       category: "fundamentals",
@@ -744,5 +730,4 @@ export const NODEJS_TOPIC: TopicData = {
         pt: "Um modular monolith mantém um único deployable e ainda impõe fronteiras de módulo, o que em geral é mais rápido de construir, debugar e operar para um time pequeno. Microservices ajudam quando times e escala precisam de deploys independentes, mas acrescentam falha de rede, consistência de dados e custo operacional. Separe um serviço quando aparecer um gargalo concreto ou uma fronteira de ownership, não porque o Node.js é event-driven.",
       },
     },
-  ],
-};
+];

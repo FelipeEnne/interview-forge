@@ -1,4 +1,4 @@
-import type { StudyCategoryDefinition } from "./study-types";
+import type { CategoryDefinition } from "@/data/category-types";
 
 export const QUESTION_CATEGORIES = [
   "fundamentals",
@@ -14,7 +14,7 @@ export const QUESTION_CATEGORIES = [
 
 export type QuestionCategory = (typeof QUESTION_CATEGORIES)[number];
 
-export const NODEJS_CATEGORIES: readonly StudyCategoryDefinition<QuestionCategory>[] =
+export const NODEJS_CATEGORIES: readonly CategoryDefinition<QuestionCategory>[] =
   [
     {
       id: "fundamentals",
@@ -53,6 +53,6 @@ export function isQuestionCategory(
 
 export function getNodejsCategory(
   id: QuestionCategory,
-): StudyCategoryDefinition<QuestionCategory> {
+): CategoryDefinition<QuestionCategory> {
   return NODEJS_CATEGORIES.find((category) => category.id === id)!;
 }

@@ -8,7 +8,7 @@ import {
 } from "@/domain/local-storage-progress";
 import { getStudyProgress } from "@/domain/study-progress";
 import { formatStudyQuestionsRemaining } from "@/i18n/translations";
-import { useTranslations } from "./LocaleProvider";
+import { useTranslations } from "../LocaleProvider";
 
 import styles from "./StudyProgress.module.css";
 

@@ -1,50 +1,44 @@
-import {
-  QUESTION_CATEGORIES,
-  type QuestionCategory,
-} from "@/data/nodejs-categories";
 import type { CategoryScore } from "./quiz";
 
 export const MIN_CATEGORY_QUESTIONS = 2;
 export const LOWEST_CATEGORY_LIMIT = 3;
 
-export type QuizPerformance = Partial<
-  Record<QuestionCategory, CategoryScore>
+export type QuizPerformance<CategoryId extends string = string> = Partial<
+  Record<CategoryId, CategoryScore>
 >;
 
-export type CategoryPerformance = CategoryScore & {
-  category: QuestionCategory;
-  percentage: number;
-};
+export type CategoryPerformanceEntry<CategoryId extends string = string> =
+  CategoryScore & {
+    category: CategoryId;
+    percentage: number;
+  };
 
-const CATEGORY_ORDER = QUESTION_CATEGORIES;
+export function recordQuizPerformance<CategoryId extends string>(
+  current: QuizPerformance<CategoryId>,
+  attemptByCategory: QuizPerformance<CategoryId>,
+): QuizPerformance<CategoryId> {
+  const updated: QuizPerformance<CategoryId> = { ...current };
 
-export function recordQuizPerformance(
-  current: QuizPerformance,
-  attemptByCategory: QuizPerformance,
-): QuizPerformance {
-  const updated: QuizPerformance = {};
-
-  for (const category of CATEGORY_ORDER) {
-    const storedScore = current[category];
-    const attemptScore = attemptByCategory[category];
-
-    if (!storedScore && !attemptScore) {
-      continue;
-    }
+  for (const [category, attemptScore] of Object.entries(attemptByCategory) as [
+    CategoryId,
+    CategoryScore,
+  ][]) {
+    const storedScore = updated[category] ?? { correct: 0, total: 0 };
 
     updated[category] = {
-      correct: (storedScore?.correct ?? 0) + (attemptScore?.correct ?? 0),
-      total: (storedScore?.total ?? 0) + (attemptScore?.total ?? 0),
+      correct: storedScore.correct + attemptScore.correct,
+      total: storedScore.total + attemptScore.total,
     };
   }
 
   return updated;
 }
 
-export function getLowestCategoryPerformance(
-  performance: QuizPerformance,
-): CategoryPerformance[] {
-  return CATEGORY_ORDER.flatMap((category) => {
+export function getLowestCategoryPerformance<CategoryId extends string>(
+  performance: QuizPerformance<CategoryId>,
+  categoryOrder: readonly CategoryId[],
+): CategoryPerformanceEntry<CategoryId>[] {
+  return categoryOrder.flatMap((category) => {
     const score = performance[category];
 
     if (!score || score.total < MIN_CATEGORY_QUESTIONS) {
@@ -68,8 +62,8 @@ export function getLowestCategoryPerformance(
       }
 
       return (
-        CATEGORY_ORDER.indexOf(first.category) -
-        CATEGORY_ORDER.indexOf(second.category)
+        categoryOrder.indexOf(first.category) -
+        categoryOrder.indexOf(second.category)
       );
     })
     .slice(0, LOWEST_CATEGORY_LIMIT);

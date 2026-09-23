@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
-import { getTopicById } from "@/data/topic-registry";
-import { ChallengesList } from "./ChallengesList";
+import { ChallengesList } from "@/components/challenges/ChallengesList";
+import { getChallengeTopicById } from "@/data/challenge-topics";
 
 type TopicChallengesPageProps = {
   params: Promise<{ topic: string }>;
@@ -11,11 +11,11 @@ export default async function TopicChallengesPage({
   params,
 }: TopicChallengesPageProps) {
   const { topic } = await params;
-  const topicDefinition = getTopicById(topic);
+  const challengeTopic = getChallengeTopicById(topic);
 
-  if (!topicDefinition || topicDefinition.id !== "nodejs") {
+  if (!challengeTopic) {
     notFound();
   }
 
-  return <ChallengesList />;
+  return <ChallengesList topic={challengeTopic} />;
 }

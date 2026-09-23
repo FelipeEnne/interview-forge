@@ -1,8 +1,4 @@
-import type { QuestionCategory } from "@/data/nodejs-categories";
-import type { QuizQuestion } from "@/data/nodejs-quiz-questions";
-
-export const QUIZ_QUESTION_COUNT = 10;
-export const QUIZ_DURATION_MS = 8 * 60 * 1000;
+import type { QuizQuestion } from "@/data/quiz-types";
 
 export type QuizAnswers = Readonly<Record<string, number>>;
 
@@ -11,18 +7,18 @@ export type CategoryScore = {
   total: number;
 };
 
-export type QuizResult = {
+export type QuizResult<CategoryId extends string = string> = {
   correct: number;
   total: number;
   percentage: number;
-  byCategory: Partial<Record<QuestionCategory, CategoryScore>>;
+  byCategory: Partial<Record<CategoryId, CategoryScore>>;
 };
 
-export function selectQuizQuestions(
-  questionBank: readonly QuizQuestion[],
+export function selectQuizQuestions<Question>(
+  questionBank: readonly Question[],
   count: number,
   randomSource: () => number = Math.random,
-): QuizQuestion[] {
+): Question[] {
   const shuffled = [...questionBank];
 
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
@@ -35,11 +31,11 @@ export function selectQuizQuestions(
   return shuffled.slice(0, count);
 }
 
-export function calculateQuizResult(
-  attemptQuestions: readonly QuizQuestion[],
+export function calculateQuizResult<CategoryId extends string>(
+  attemptQuestions: readonly QuizQuestion<CategoryId>[],
   answers: QuizAnswers,
-): QuizResult {
-  const byCategory: Partial<Record<QuestionCategory, CategoryScore>> = {};
+): QuizResult<CategoryId> {
+  const byCategory: Partial<Record<CategoryId, CategoryScore>> = {};
   let correct = 0;
 
   for (const item of attemptQuestions) {

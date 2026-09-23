@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 
-import { NodejsQuiz } from "@/components/NodejsQuiz";
-import { NODEJS_QUIZ_QUESTIONS } from "@/data/nodejs-quiz-questions";
-import { NODEJS_TOPIC } from "@/data/nodejs-questions";
-import { getTopicById } from "@/data/topic-registry";
+import { TopicQuiz } from "@/components/quiz/TopicQuiz";
+import { getQuizTopicById } from "@/data/quiz-topics";
 
 type TopicQuizPageProps = {
   params: Promise<{ topic: string }>;
@@ -11,19 +9,11 @@ type TopicQuizPageProps = {
 
 export default async function TopicQuizPage({ params }: TopicQuizPageProps) {
   const { topic } = await params;
-  const topicDefinition = getTopicById(topic);
+  const quizTopic = getQuizTopicById(topic);
 
-  if (!topicDefinition || topicDefinition.id !== "nodejs") {
+  if (!quizTopic) {
     notFound();
   }
 
-  return (
-    <NodejsQuiz
-      questions={NODEJS_QUIZ_QUESTIONS}
-      topicName={NODEJS_TOPIC.displayName}
-      backLink={{
-        href: `/topics/${NODEJS_TOPIC.slug}`,
-      }}
-    />
-  );
+  return <TopicQuiz topic={quizTopic} />;
 }

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { NODEJS_TOPIC } from "@/data/nodejs-questions";
+import { NODEJS_QUESTIONS } from "@/data/topics/nodejs/questions";
 import { readQuestionProgress } from "@/domain/local-storage-progress";
 import CategoryStudyPage from "./page";
 
@@ -13,7 +13,7 @@ describe("CategoryStudyPage", () => {
 
   it("studies and persists only questions from the selected category", async () => {
     const user = userEvent.setup();
-    const fundamentalsQuestions = NODEJS_TOPIC.questions.filter(
+    const fundamentalsQuestions = NODEJS_QUESTIONS.filter(
       (question) => question.category === "fundamentals",
     );
 

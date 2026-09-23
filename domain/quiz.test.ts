@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { QuizQuestion } from "@/data/nodejs-quiz-questions";
+import type { QuizQuestion } from "@/data/quiz-types";
 import { calculateQuizResult, selectQuizQuestions } from "./quiz";
 
 function question(
@@ -26,16 +26,16 @@ function question(
 }
 
 const bank: QuizQuestion[] = [
-  question({ id: "q1", category: "fundamentals" }),
-  question({ id: "q2", category: "async" }),
-  question({ id: "q3", category: "modules" }),
-  question({ id: "q4", category: "http" }),
-  question({ id: "q5", category: "express" }),
-  question({ id: "q6", category: "streams" }),
-  question({ id: "q7", category: "testing" }),
-  question({ id: "q8", category: "security" }),
-  question({ id: "q9", category: "fundamentals" }),
-  question({ id: "q10", category: "async" }),
+  question({ id: "q1", category: "hooks" }),
+  question({ id: "q2", category: "hooks" }),
+  question({ id: "q3", category: "state" }),
+  question({ id: "q4", category: "state" }),
+  question({ id: "q5", category: "effects" }),
+  question({ id: "q6", category: "effects" }),
+  question({ id: "q7", category: "context" }),
+  question({ id: "q8", category: "context" }),
+  question({ id: "q9", category: "hooks" }),
+  question({ id: "q10", category: "state" }),
   question({ id: "q11", category: "http" }),
   question({ id: "q12", category: "security" }),
 ];
@@ -66,10 +66,10 @@ describe("selectQuizQuestions", () => {
 
 describe("calculateQuizResult", () => {
   const attempt = [
-    question({ id: "a", category: "async", correctOption: 1 }),
-    question({ id: "b", category: "async", correctOption: 2 }),
-    question({ id: "c", category: "modules", correctOption: 0 }),
-    question({ id: "d", category: "http", correctOption: 3 }),
+    question({ id: "a", category: "hooks", correctOption: 1 }),
+    question({ id: "b", category: "hooks", correctOption: 2 }),
+    question({ id: "c", category: "state", correctOption: 0 }),
+    question({ id: "d", category: "effects", correctOption: 3 }),
   ];
 
   it("counts matching answers as correct", () => {
@@ -105,9 +105,9 @@ describe("calculateQuizResult", () => {
     });
 
     expect(result.byCategory).toEqual({
-      async: { correct: 1, total: 2 },
-      modules: { correct: 1, total: 1 },
-      http: { correct: 1, total: 1 },
+      hooks: { correct: 1, total: 2 },
+      state: { correct: 1, total: 1 },
+      effects: { correct: 1, total: 1 },
     });
   });
 

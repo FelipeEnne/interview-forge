@@ -1,10 +1,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { NODEJS_TOPIC, QUESTION_CATEGORIES } from "@/data/nodejs-questions";
+import { NODEJS_CATEGORIES, QUESTION_CATEGORIES } from "@/data/topics/nodejs/categories";
+import { NODEJS_QUESTIONS } from "@/data/topics/nodejs/questions";
 import { saveQuestionProgress } from "@/domain/local-storage-progress";
 import type { QuestionProgressState } from "@/domain/question-progress";
-import { getCategoryLabel } from "@/i18n/translations";
+import { getLocalizedText } from "@/i18n/localized-text";
 import { saveQuizPerformance } from "@/domain/local-storage-quiz-performance";
 import { renderWithLocale } from "@/i18n/render-with-locale";
 import TopicPage from "./page";
@@ -31,11 +32,11 @@ function expectRatingCountInSection(
 
 function saveBreakdownFixtureProgress(): void {
   const progress: QuestionProgressState = {
-    [NODEJS_TOPIC.questions[0].id]: { lastRating: "good", reviewCount: 1 },
-    [NODEJS_TOPIC.questions[1].id]: { lastRating: "good", reviewCount: 1 },
-    [NODEJS_TOPIC.questions[2].id]: { lastRating: "easy", reviewCount: 1 },
-    [NODEJS_TOPIC.questions[3].id]: { lastRating: "hard", reviewCount: 1 },
-    [NODEJS_TOPIC.questions[4].id]: { lastRating: "again", reviewCount: 1 },
+    [NODEJS_QUESTIONS[0].id]: { lastRating: "good", reviewCount: 1 },
+    [NODEJS_QUESTIONS[1].id]: { lastRating: "good", reviewCount: 1 },
+    [NODEJS_QUESTIONS[2].id]: { lastRating: "easy", reviewCount: 1 },
+    [NODEJS_QUESTIONS[3].id]: { lastRating: "hard", reviewCount: 1 },
+    [NODEJS_QUESTIONS[4].id]: { lastRating: "again", reviewCount: 1 },
   };
   saveQuestionProgress(progress);
 }
@@ -66,7 +67,7 @@ describe("TopicPage", () => {
     for (const category of QUESTION_CATEGORIES) {
       expect(
         screen.getByRole("link", {
-          name: getCategoryLabel("en", category),
+          name: getLocalizedText(NODEJS_CATEGORIES.find(({ id }) => id === category)!.displayName, "en"),
         }),
       ).toHaveAttribute("href", `/topics/nodejs/categories/${category}`);
     }
@@ -75,7 +76,7 @@ describe("TopicPage", () => {
   it("shows derived study progress from persisted question progress", async () => {
     const progress: QuestionProgressState = {};
     for (let index = 0; index < 34; index += 1) {
-      progress[NODEJS_TOPIC.questions[index].id] = {
+      progress[NODEJS_QUESTIONS[index].id] = {
         lastRating: "good",
         reviewCount: 1,
       };
@@ -125,7 +126,7 @@ describe("TopicPage", () => {
   });
 
   it("includes persisted quiz performance on the Node.js page", async () => {
-    saveQuizPerformance({
+    saveQuizPerformance("nodejs", {
       streams: { correct: 1, total: 3 },
     });
 

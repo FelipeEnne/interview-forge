@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 
 import type {
   InterviewQuestion,
-  StudyCategoryDefinition,
 } from "@/data/study-types";
+import type { CategoryDefinition } from "@/data/category-types";
 import {
   readQuestionProgress,
   saveQuestionProgress,
@@ -21,7 +21,7 @@ import {
   type RecallRating,
   type SessionRatings,
 } from "@/domain/recall-rating";
-import { useTranslations } from "./LocaleProvider";
+import { useTranslations } from "../LocaleProvider";
 
 import styles from "./TopicStudySession.module.css";
 
@@ -30,7 +30,7 @@ type SessionMode = "due-review" | "practice";
 type TopicStudySessionProps = {
   topicName: string;
   questions: readonly InterviewQuestion[];
-  categories: readonly StudyCategoryDefinition[];
+  categories: readonly CategoryDefinition[];
   sessionMode?: SessionMode;
   category?: string;
   now?: () => Date;

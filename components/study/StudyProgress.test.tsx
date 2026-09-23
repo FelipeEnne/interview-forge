@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { StudyProgress } from "@/components/StudyProgress";
+import { StudyProgress } from "@/components/study/StudyProgress";
 import { saveQuestionProgress } from "@/domain/local-storage-progress";
 
 describe("StudyProgress", () => {

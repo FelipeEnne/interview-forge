@@ -2,12 +2,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { QUESTION_CATEGORIES } from "@/data/nodejs-questions";
 import { RECALL_RATING_OPTIONS } from "@/domain/recall-rating";
 import {
   formatQuestionsReviewed,
   formatStudyQuestionsRemaining,
-  getCategoryLabel,
   getRatingLabel,
   translate,
 } from "./translations";
@@ -68,30 +66,6 @@ describe("formatQuestionsReviewed", () => {
   it("pluralizes in Portuguese", () => {
     expect(formatQuestionsReviewed("pt", 1)).toBe("1 pergunta revisada");
     expect(formatQuestionsReviewed("pt", 2)).toBe("2 perguntas revisadas");
-  });
-});
-
-describe("getCategoryLabel", () => {
-  it.each([
-    ["fundamentals", "Fundamentals", "Fundamentos"],
-    ["async", "Event Loop & Async", "Event Loop e Assincronismo"],
-    ["modules", "Modules", "Módulos"],
-    ["http", "HTTP & APIs", "HTTP e APIs"],
-    ["express", "Express", "Express"],
-    ["streams", "Streams & Buffers", "Streams e Buffers"],
-    ["testing", "Testing", "Testes"],
-    ["security", "Security", "Segurança"],
-    ["production", "Production & Architecture", "Produção e Arquitetura"],
-  ] as const)(
-    "localizes the %s category",
-    (category, englishLabel, portugueseLabel) => {
-      expect(getCategoryLabel("en", category)).toBe(englishLabel);
-      expect(getCategoryLabel("pt", category)).toBe(portugueseLabel);
-    },
-  );
-
-  it("covers every canonical category", () => {
-    expect(QUESTION_CATEGORIES).toHaveLength(9);
   });
 });
 
