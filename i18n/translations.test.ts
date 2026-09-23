@@ -30,6 +30,16 @@ describe("translate", () => {
     expect(
       translate("pt", "studyProgressMemorized", { memorized: 34, total: 60 }),
     ).toBe("34 / 60 decoradas");
+    expect(translate("en", "studyProgressNeedsAttention")).toBe(
+      "Needs attention",
+    );
+    expect(translate("pt", "studyProgressNeedsAttention")).toBe(
+      "Precisa de atenção",
+    );
+    expect(translate("en", "studyProgressMemorizedGroup")).toBe("Memorized");
+    expect(translate("pt", "studyProgressMemorizedGroup")).toBe("Decoradas");
+    expect(translate("en", "studyProgressUnreviewed")).toBe("Unreviewed");
+    expect(translate("pt", "studyProgressUnreviewed")).toBe("Não estudadas");
   });
 });
 

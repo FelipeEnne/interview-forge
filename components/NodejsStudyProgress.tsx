@@ -25,8 +25,22 @@ function getServerProgressSnapshot(): null {
   return null;
 }
 
+type RatingRowProps = {
+  label: string;
+  count: number;
+};
+
+function RatingRow({ label, count }: RatingRowProps) {
+  return (
+    <li className={styles.ratingRow}>
+      <span>{label}</span>
+      <span>{count}</span>
+    </li>
+  );
+}
+
 export function NodejsStudyProgress() {
-  const { locale, t } = useTranslations();
+  const { locale, t, ratingLabel } = useTranslations();
   const storedProgressRaw = useSyncExternalStore(
     subscribeToProgress,
     getStoredProgressSnapshot,
@@ -34,7 +48,7 @@ export function NodejsStudyProgress() {
   );
   const progress =
     storedProgressRaw === null ? {} : readQuestionProgress();
-  const { total, memorized, remaining, percentage } = getStudyProgress(
+  const { total, memorized, remaining, percentage, ratings } = getStudyProgress(
     NODEJS_TOPIC.questions,
     progress,
   );
@@ -59,6 +73,32 @@ export function NodejsStudyProgress() {
       <p className={styles.remaining}>
         {formatStudyQuestionsRemaining(locale, remaining)}
       </p>
+
+      <div className={styles.breakdown}>
+        <section aria-labelledby="study-progress-needs-attention">
+          <h3 id="study-progress-needs-attention" className={styles.groupTitle}>
+            {t("studyProgressNeedsAttention")}
+          </h3>
+          <ul className={styles.ratingList}>
+            <RatingRow label={ratingLabel("again")} count={ratings.again} />
+            <RatingRow label={ratingLabel("hard")} count={ratings.hard} />
+            <RatingRow
+              label={t("studyProgressUnreviewed")}
+              count={ratings.unreviewed}
+            />
+          </ul>
+        </section>
+
+        <section aria-labelledby="study-progress-memorized-group">
+          <h3 id="study-progress-memorized-group" className={styles.groupTitle}>
+            {t("studyProgressMemorizedGroup")}
+          </h3>
+          <ul className={styles.ratingList}>
+            <RatingRow label={ratingLabel("good")} count={ratings.good} />
+            <RatingRow label={ratingLabel("easy")} count={ratings.easy} />
+          </ul>
+        </section>
+      </div>
     </section>
   );
 }

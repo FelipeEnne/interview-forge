@@ -32,8 +32,11 @@ InterviewForge is a personal web app for preparing for technical interviews. It 
 
 The Node.js topic page shows a **Progress** summary for the 60 active-recall
 questions: how many are memorized (latest self-rating **Good** or **Easy**),
-how many remain, and a simple progress bar. These numbers are derived from
-stored study progress on each visit; they are not saved as separate counters.
+how many remain, and a simple progress bar. A compact breakdown lists how many
+questions are currently **Again**, **Hard**, **Good**, **Easy**, or
+**Unreviewed** (never studied), based on each question’s **last** recall rating
+only—not a full history of past ratings. These numbers are derived from stored
+study progress on each visit; they are not saved as separate counters.
 
 The page also shows up to three categories with the lowest accumulated quiz
 accuracy once each has at least two encountered questions. Each category links

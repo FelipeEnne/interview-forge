@@ -46,7 +46,7 @@ Components call `localize` (or `getLocalizedText` directly in tests) when render
 - **Client Component:** `TopicStudySession` (`"use client"`) holds session UI state, reads/writes LocalStorage, and builds the study queue after hydration. The current instant is read from an injectable `now` callback (default `() => new Date()`).
 - **Client Component:** `NodejsQuiz` (`"use client"`) holds intro/active/result phases, samples questions after **Start quiz**, and runs the countdown from a deadline. The current instant is read from an injectable `now` callback (default `Date.now`).
 - **Client Component:** `NodejsCategoryPerformance` (`"use client"`) reads quiz performance after hydration and renders category insights when enough evidence exists.
-- **Client Component:** `NodejsStudyProgress` (`"use client"`) snapshots raw study-progress LocalStorage after hydration and derives memorized, remaining, and percentage via `getStudyProgress`.
+- **Client Component:** `NodejsStudyProgress` (`"use client"`) snapshots raw study-progress LocalStorage after hydration and derives memorized, remaining, percentage, and per-rating counts via `getStudyProgress`.
 - **Client Component:** `NodejsCodingChallenge` and `RevealSolution` (`"use client"`) localize challenge chrome and hide a challenge's reference solution until **Reveal solution**. Challenge pages still validate the URL on the server.
 
 LocalStorage is unavailable on the server; study pages pass questions and a session mode as props, and the client initializes the ordered queue in `useEffect`. Quiz pages pass the static quiz bank; the client samples an attempt only after an explicit start. The topic overview remains a thin Server Component that renders a client overview.
@@ -67,7 +67,7 @@ The first HTML after a reload is English. If the stored locale is Portuguese, ch
 | `calculateNextReviewAt` (`domain/review-schedule.ts`) | **Pure domain rule** — maps a rating and review instant to the next review timestamp. |
 | `getDueQuestions` (`domain/due-questions.ts`) | **Pure domain rule** — selects unreviewed, legacy, or scheduled questions whose `nextReviewAt` is at or before a supplied instant. |
 | `orderQuestionsForStudy` (`domain/question-order.ts`) | **Pure domain rule** — maps topic questions + progress snapshot → study order. |
-| `getStudyProgress` (`domain/study-progress.ts`) | **Pure domain rule** — counts memorized vs remaining topic questions from `lastRating` only; no separate persisted counters. |
+| `getStudyProgress` (`domain/study-progress.ts`) | **Pure domain rule** — counts memorized vs remaining and per-bucket ratings (`again`, `hard`, `good`, `easy`, `unreviewed`) from each question’s current `lastRating` only; no separate persisted counters or rating history. |
 | `selectQuizQuestions` (`domain/quiz.ts`) | **Pure domain rule** — samples `count` unique questions using an injected `randomSource`. |
 | `calculateQuizResult` (`domain/quiz.ts`) | **Pure domain rule** — scores an attempt; unanswered items are incorrect; aggregates by category. |
 | `QuizPerformance` | **Persistent quiz-only aggregate** — correct and encountered counts keyed by category. |

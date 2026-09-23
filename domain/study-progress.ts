@@ -1,31 +1,48 @@
 import type { QuestionProgressState } from "./question-progress";
 
+export type StudyProgressRatings = {
+  again: number;
+  hard: number;
+  good: number;
+  easy: number;
+  unreviewed: number;
+};
+
 export type StudyProgress = {
   total: number;
   memorized: number;
   remaining: number;
   percentage: number;
+  ratings: StudyProgressRatings;
 };
 
-function isMemorizedRating(lastRating: string): boolean {
-  return lastRating === "good" || lastRating === "easy";
-}
+const emptyRatings = (): StudyProgressRatings => ({
+  again: 0,
+  hard: 0,
+  good: 0,
+  easy: 0,
+  unreviewed: 0,
+});
 
 export function getStudyProgress<Question extends { id: string }>(
   questions: readonly Question[],
   questionProgress: QuestionProgressState,
 ): StudyProgress {
-  const total = questions.length;
-  let memorized = 0;
+  const ratings = emptyRatings();
 
   for (const question of questions) {
     const progress = questionProgress[question.id];
-    if (progress !== undefined && isMemorizedRating(progress.lastRating)) {
-      memorized += 1;
+    if (progress === undefined) {
+      ratings.unreviewed += 1;
+      continue;
     }
+
+    ratings[progress.lastRating] += 1;
   }
 
-  const remaining = total - memorized;
+  const total = questions.length;
+  const memorized = ratings.good + ratings.easy;
+  const remaining = ratings.again + ratings.hard + ratings.unreviewed;
   const percentage =
     total === 0 ? 0 : Math.round((memorized / total) * 100);
 
@@ -34,5 +51,6 @@ export function getStudyProgress<Question extends { id: string }>(
     memorized,
     remaining,
     percentage,
+    ratings,
   };
 }
