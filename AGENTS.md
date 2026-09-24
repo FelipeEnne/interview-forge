@@ -127,6 +127,22 @@ Do not introduce end-to-end testing unless explicitly required by the current ta
 
 Every bug fix should include a regression test when practical.
 
+### Topic data imports
+
+The Next.js TypeScript language service can report `Cannot find module` for
+relative imports whose path contains `/react/` or `/angular/` (for example
+`./topics/react/questions` from `data/`). The target file usually exists;
+`tsc` and Vitest may still pass. Do not create a duplicate module or treat
+the file as missing.
+
+- From outside a topic folder, import topic modules with the `@/` alias
+  (`@/data/topics/react/questions`), not a relative path that includes the
+  topic id as a folder segment (`./topics/react/questions`).
+- Colocated files inside `data/topics/<topic>/` may keep relative imports
+  such as `./questions`.
+- Tests that assert behavior across study banks must use `getStudyTopicById`
+  from `data/study-topics.ts` instead of importing each bank's `questions.ts`.
+
 ---
 
 ## Dependencies

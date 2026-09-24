@@ -2,17 +2,15 @@
 
 import { describe, expect, it } from "vitest";
 
-import { ANGULAR_QUESTIONS } from "./topics/angular/questions";
-import { NODEJS_QUESTIONS } from "./topics/nodejs/questions";
-import { REACT_QUESTIONS } from "./topics/react/questions";
+import { getStudyTopicById } from "./study-topics";
 
 describe("active recall question ids", () => {
   it("are globally unique across Node.js, React, and Angular study banks", () => {
-    const ids = [
-      ...NODEJS_QUESTIONS.map(({ id }) => id),
-      ...REACT_QUESTIONS.map(({ id }) => id),
-      ...ANGULAR_QUESTIONS.map(({ id }) => id),
-    ];
+    const ids = ["nodejs", "react", "angular"].flatMap((topicId) => {
+      const topic = getStudyTopicById(topicId);
+      expect(topic).toBeDefined();
+      return topic!.questions.map(({ id }) => id);
+    });
 
     expect(new Set(ids).size).toBe(ids.length);
   });
