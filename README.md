@@ -39,6 +39,20 @@ npm run build
 npm start
 ```
 
+## Development commands
+
+With [Make](https://www.gnu.org/software/make/) installed:
+
+```bash
+make dev
+make test
+make quick-check
+make check
+make format
+```
+
+`make check` runs format-check, lint, typecheck, tests, and build. `make quick-check` skips the build.
+
 ## Tests
 
 ```bash

@@ -168,11 +168,21 @@ Before installing a new package:
 
 After modifying application code, run the relevant checks.
 
-When available, the final validation should include:
+When Make is available, prefer the full validation pipeline:
 
 ```bash
-npm test -- --run
+make check
+```
+
+Individual commands remain valid during TDD (for example `npm test -- --run`).
+
+If Make is not available, run the equivalent checks from `package.json`:
+
+```bash
+npm run format:check
 npm run lint
+npx tsc --noEmit
+npm test -- --run
 npm run build
 ```
 
