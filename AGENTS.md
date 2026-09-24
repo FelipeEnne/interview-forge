@@ -116,6 +116,25 @@ Use Client Components only where browser-side interactivity or local state is re
 
 ---
 
+## Project Structure
+
+Follow Next.js, React, and TypeScript conventions.
+
+Respect the existing capability-oriented layout:
+
+- `components/study/`
+- `components/quiz/`
+- `components/challenges/`
+- `data/topics/<topic>/`
+
+Shared engines belong in shared capability modules. Topic-specific files should primarily contain content and configuration.
+
+Prefer small, focused modules over large god files. Do not create empty directories or abstractions for hypothetical future features.
+
+Preserve the dynamic `app/topics/[topic]/` routing model instead of duplicating route trees per technology.
+
+---
+
 ## Testing Guidelines
 
 Tests should describe observable behavior rather than implementation details.
@@ -133,6 +152,22 @@ Do not introduce snapshots unless they provide clear value.
 Do not introduce end-to-end testing unless explicitly required by the current task.
 
 Every bug fix should include a regression test when practical.
+
+New behavior requires tests. Pure domain logic should have focused unit tests. Test behavior and contracts; do not require a separate test for every function.
+
+Mock external boundaries when necessary. Prefer explicit, reusable fakes over opaque inline mocks when the fake has meaningful behavior.
+
+Tests should be fast, independent, repeatable, self-validating, and timely.
+
+Do not duplicate engine-level tests for every topic when integration coverage is sufficient.
+
+Run tests through:
+
+```bash
+make test
+```
+
+During development, prefer `make quick-check` (see Validation).
 
 ### Topic data imports
 
@@ -162,17 +197,53 @@ Before installing a new package:
 2. prefer an existing dependency when appropriate;
 3. avoid packages introduced only to solve trivial problems.
 
+Prefer dependency injection at boundaries that need substitution in tests, such as clocks, randomness, storage adapters, network clients, and external services.
+
+Pure modules may import other pure project modules normally. Do not introduce dependency injection only for architectural symmetry.
+
+Wrap third-party libraries when doing so isolates important external behavior or protects the domain from vendor-specific APIs. Do not create wrappers that merely rename a stable third-party API.
+
+---
+
+## Formatting
+
+Prettier is the formatting authority. Do not manually debate or enforce formatting conventions already handled by Prettier.
+
+```bash
+make format        # apply formatting
+make format-check  # verify formatting
+```
+
+---
+
+## Logging
+
+Prefer structured logs for diagnostic or observability output when logging is introduced.
+
+Do not log secrets, credentials, tokens, or sensitive persisted data. Keep user-facing messages human-readable.
+
+Do not add logging unless it provides diagnostic value.
+
 ---
 
 ## Validation
 
 After modifying application code, run the relevant checks.
 
-When Make is available, prefer the full validation pipeline:
+Use focused tests during Red → Green → Refactor. During iterative development, prefer:
+
+```bash
+make quick-check
+```
+
+When Make is available, run the full validation pipeline before completing a task:
 
 ```bash
 make check
+git diff --check
 ```
+
+A task is not complete while required validation is failing. If a validation failure is known to be environment-specific, reproduce and document it separately rather than modifying application code to hide it.
 
 Individual commands remain valid during TDD (for example `npm test -- --run`).
 
@@ -239,17 +310,23 @@ When executing an approved plan:
 
 Prefer code that another developer can understand without additional explanation.
 
-Functions and components should have one clear responsibility.
+### Code style
 
-Use meaningful domain names.
+- Keep functions small and focused. Roughly 4–20 lines is a practical preference, not a hard limit; split when a function carries multiple responsibilities.
+- Keep files focused. Around 500 lines is a signal to review responsibility and split if readability suffers—not an automatic failure.
+- One responsibility per function and module.
+- Use specific, domain-oriented names. Avoid vague names such as `data`, `handler`, `utils`, or `Manager` when a more precise name exists.
+- Keep types explicit at important boundaries and where they improve understanding; avoid redundant typing. Do not use `any` unless there is a concrete reason and no reasonable alternative.
+- Avoid duplication, but do not introduce abstractions until a genuine shared responsibility exists (including abstractions added only to remove minor duplication).
+- Prefer early returns over deeply nested conditionals; keep nesting shallow.
+- Error messages should include enough context to diagnose the problem, but must not expose secrets, tokens, credentials, or sensitive values.
 
-Avoid comments that merely restate the code.
+### Comments
 
-Comments should explain reasoning, constraints, or non-obvious behavior.
-
-Keep TypeScript types explicit where they improve understanding, but avoid redundant typing.
-
-Do not use `any` unless there is a concrete reason and no reasonable alternative.
+- Preserve comments that explain intent, constraints, or non-obvious decisions during refactors.
+- Write WHY, not WHAT; do not add comments that merely restate the code.
+- Add documentation to public or shared APIs when their contract is not obvious from types and naming.
+- Reference issue numbers or commit SHAs when code exists because of a specific bug, compatibility constraint, or upstream behavior.
 
 ---
 
