@@ -17,10 +17,9 @@ describe("TopicChallengesPage", () => {
     expect(
       screen.getByRole("heading", { name: "Node.js Coding Challenges" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Back to Node.js" })).toHaveAttribute(
-      "href",
-      "/topics/nodejs",
-    );
+    expect(
+      screen.getByRole("link", { name: "Back to Node.js" }),
+    ).toHaveAttribute("href", "/topics/nodejs");
 
     for (const challenge of NODEJS_CODING_CHALLENGES) {
       const link = screen.getByRole("link", { name: challenge.title.en });
@@ -30,7 +29,11 @@ describe("TopicChallengesPage", () => {
         `/topics/nodejs/challenges/${challenge.id}`,
       );
       expect(link.parentElement).toHaveTextContent(
-        getLocalizedText(NODEJS_CATEGORIES.find(({ id }) => id === challenge.category)!.displayName, "en"),
+        getLocalizedText(
+          NODEJS_CATEGORIES.find(({ id }) => id === challenge.category)!
+            .displayName,
+          "en",
+        ),
       );
     }
   });

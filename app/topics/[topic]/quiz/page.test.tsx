@@ -14,11 +14,12 @@ describe("TopicQuizPage", () => {
     expect(
       screen.getByRole("heading", { name: "Node.js Proficiency Quiz" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Start quiz" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Back to Node.js" })).toHaveAttribute(
-      "href",
-      "/topics/nodejs",
-    );
+    expect(
+      screen.getByRole("button", { name: "Start quiz" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Back to Node.js" }),
+    ).toHaveAttribute("href", "/topics/nodejs");
   });
 
   it("returns not found for an unknown topic", async () => {
@@ -59,9 +60,8 @@ describe("TopicQuizPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("10 questions")).toBeInTheDocument();
     expect(screen.getByText("8 minutes")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Back to Angular" })).toHaveAttribute(
-      "href",
-      "/topics/angular",
-    );
+    expect(
+      screen.getByRole("link", { name: "Back to Angular" }),
+    ).toHaveAttribute("href", "/topics/angular");
   });
 });

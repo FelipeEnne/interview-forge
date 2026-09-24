@@ -4,13 +4,13 @@ Architecture after the multi-topic capability refactor: the topic registry recog
 
 ## Current stack
 
-| Layer | Choice |
-| --- | --- |
-| Framework | Next.js 16 (App Router) |
-| UI | React 19, TypeScript |
-| Styling | CSS Modules |
-| Tests | Vitest, Testing Library, jsdom |
-| Lint | ESLint (`eslint-config-next`) |
+| Layer     | Choice                         |
+| --------- | ------------------------------ |
+| Framework | Next.js 16 (App Router)        |
+| UI        | React 19, TypeScript           |
+| Styling   | CSS Modules                    |
+| Tests     | Vitest, Testing Library, jsdom |
+| Lint      | ESLint (`eslint-config-next`)  |
 
 ## Topic data and capabilities
 
@@ -18,11 +18,11 @@ Architecture after the multi-topic capability refactor: the topic registry recog
 
 Each capability has a separate resolver:
 
-| Resolver | Content |
-| --- | --- |
-| `getStudyTopicById` | Categories and active-recall questions |
-| `getQuizTopicById` | Categories, quiz questions, attempt size, and duration |
-| `getChallengeTopicById` | Categories and coding challenges |
+| Resolver                | Content                                                |
+| ----------------------- | ------------------------------------------------------ |
+| `getStudyTopicById`     | Categories and active-recall questions                 |
+| `getQuizTopicById`      | Categories, quiz questions, attempt size, and duration |
+| `getChallengeTopicById` | Categories and coding challenges                       |
 
 A missing resolver result means that capability is unavailable. No capability flags, factories, repositories, or aggregate topic object are needed.
 

@@ -16,7 +16,11 @@ export function LanguageSelector() {
     >
       {LOCALES.map((option, index) => (
         <span key={option} className={styles.option}>
-          {index > 0 ? <span className={styles.separator} aria-hidden="true">|</span> : null}
+          {index > 0 ? (
+            <span className={styles.separator} aria-hidden="true">
+              |
+            </span>
+          ) : null}
           <button
             type="button"
             className={styles.button}

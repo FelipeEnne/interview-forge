@@ -14,26 +14,45 @@ describe("CategoryPerformance", () => {
     render(
       <CategoryPerformance
         categories={categories}
-        performance={{ hooks: { correct: 2, total: 5 }, state: { correct: 3, total: 5 } }}
+        performance={{
+          hooks: { correct: 2, total: 5 },
+          state: { correct: 3, total: 5 },
+        }}
         studyCategoryBasePath="/topics/react/categories"
       />,
     );
     const items = screen.getAllByRole("listitem");
     expect(items[0]).toHaveTextContent("Hooks");
-    expect(within(items[0]).getByRole("link", { name: "Study Hooks" })).toHaveAttribute("href", "/topics/react/categories/hooks");
+    expect(
+      within(items[0]).getByRole("link", { name: "Study Hooks" }),
+    ).toHaveAttribute("href", "/topics/react/categories/hooks");
   });
 
   it("localizes supplied category definitions", async () => {
     renderWithLocale(
-      <CategoryPerformance categories={categories} performance={{ state: { correct: 1, total: 2 } }} />,
+      <CategoryPerformance
+        categories={categories}
+        performance={{ state: { correct: 1, total: 2 } }}
+      />,
       "pt",
     );
-    expect(await screen.findByRole("heading", { name: "Desempenho" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Estado", level: 3 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Desempenho" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Estado", level: 3 }),
+    ).toBeInTheDocument();
   });
 
   it("renders nothing without enough evidence", () => {
-    render(<CategoryPerformance categories={categories} performance={{ hooks: { correct: 0, total: 1 } }} />);
-    expect(screen.queryByRole("heading", { name: "Performance" })).not.toBeInTheDocument();
+    render(
+      <CategoryPerformance
+        categories={categories}
+        performance={{ hooks: { correct: 0, total: 1 } }}
+      />,
+    );
+    expect(
+      screen.queryByRole("heading", { name: "Performance" }),
+    ).not.toBeInTheDocument();
   });
 });

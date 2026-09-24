@@ -5,7 +5,12 @@ export type QuizQuestion<CategoryId extends string = string> = {
   id: string;
   category: CategoryId;
   question: LocalizedText;
-  options: readonly [LocalizedText, LocalizedText, LocalizedText, LocalizedText];
+  options: readonly [
+    LocalizedText,
+    LocalizedText,
+    LocalizedText,
+    LocalizedText,
+  ];
   correctOption: 0 | 1 | 2 | 3;
 };
 

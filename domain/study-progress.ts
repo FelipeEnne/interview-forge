@@ -43,8 +43,7 @@ export function getStudyProgress<Question extends { id: string }>(
   const total = questions.length;
   const memorized = ratings.good + ratings.easy;
   const remaining = ratings.again + ratings.hard + ratings.unreviewed;
-  const percentage =
-    total === 0 ? 0 : Math.round((memorized / total) * 100);
+  const percentage = total === 0 ? 0 : Math.round((memorized / total) * 100);
 
   return {
     total,

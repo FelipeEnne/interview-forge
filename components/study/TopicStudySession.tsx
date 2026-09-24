@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import type {
-  InterviewQuestion,
-} from "@/data/study-types";
+import type { InterviewQuestion } from "@/data/study-types";
 import type { CategoryDefinition } from "@/data/category-types";
 import {
   readQuestionProgress,
@@ -52,8 +50,7 @@ export function TopicStudySession({
   now = currentTime,
   backLink,
 }: TopicStudySessionProps) {
-  const { t, localize, ratingLabel, questionsReviewed } =
-    useTranslations();
+  const { t, localize, ratingLabel, questionsReviewed } = useTranslations();
   const [sessionQuestions, setSessionQuestions] = useState<
     InterviewQuestion[] | null
   >(null);
@@ -178,8 +175,7 @@ export function TopicStudySession({
               {t("studyAgain")}
             </button>
           </div>
-        ) : sessionMode === "due-review" &&
-          sessionQuestions.length === 0 ? (
+        ) : sessionMode === "due-review" && sessionQuestions.length === 0 ? (
           <div className={styles.summary}>
             <p className={styles.sessionComplete}>{t("allCaughtUp")}</p>
             <p className={styles.summaryTotal}>{t("noQuestionsDue")}</p>

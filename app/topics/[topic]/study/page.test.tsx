@@ -16,7 +16,9 @@ describe("TopicStudyPage", () => {
       }),
     );
 
-    expect(screen.getByRole("heading", { name: "Node.js" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Node.js" }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByText(NODEJS_QUESTIONS[0]!.question.en),
     ).toBeInTheDocument();
@@ -38,7 +40,8 @@ describe("TopicStudyPage", () => {
   });
 
   it("starts the Angular study flow", async () => {
-    const { ANGULAR_QUESTIONS } = await import("@/data/topics/angular/questions");
+    const { ANGULAR_QUESTIONS } =
+      await import("@/data/topics/angular/questions");
 
     render(
       await TopicStudyPage({
@@ -46,7 +49,9 @@ describe("TopicStudyPage", () => {
       }),
     );
 
-    expect(screen.getByRole("heading", { name: "Angular" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Angular" }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByText(ANGULAR_QUESTIONS[0]!.question.en),
     ).toBeInTheDocument();

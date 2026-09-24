@@ -29,10 +29,9 @@ describe("CategoryStudyPage", () => {
     expect(
       screen.getByRole("heading", { name: "Node.js — Fundamentals" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Back to Node.js" })).toHaveAttribute(
-      "href",
-      "/topics/nodejs",
-    );
+    expect(
+      screen.getByRole("link", { name: "Back to Node.js" }),
+    ).toHaveAttribute("href", "/topics/nodejs");
     expect(
       screen.getByText(fundamentalsQuestions[0]!.question.en),
     ).toBeInTheDocument();
@@ -82,13 +81,17 @@ describe("CategoryStudyPage", () => {
     );
 
     expect(
-      screen.getByRole("heading", { name: "React — Fundamentals & Composition" }),
+      screen.getByRole("heading", {
+        name: "React — Fundamentals & Composition",
+      }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(fundamentalsQuestions[0]!.question.en),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText(REACT_QUESTIONS.find((q) => q.category === "hooks")!.question.en),
+      screen.queryByText(
+        REACT_QUESTIONS.find((q) => q.category === "hooks")!.question.en,
+      ),
     ).not.toBeInTheDocument();
   });
 
@@ -104,7 +107,8 @@ describe("CategoryStudyPage", () => {
   });
 
   it("studies Angular components without mixing other categories", async () => {
-    const { ANGULAR_QUESTIONS } = await import("@/data/topics/angular/questions");
+    const { ANGULAR_QUESTIONS } =
+      await import("@/data/topics/angular/questions");
     const componentQuestions = ANGULAR_QUESTIONS.filter(
       (question) => question.category === "components",
     );

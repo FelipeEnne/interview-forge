@@ -6,12 +6,12 @@ InterviewForge is a personal application for preparing for technical interviews.
 
 The product will help candidates:
 
-* study technical questions;
-* practice active recall;
-* review weak topics;
-* take quizzes;
-* simulate technical interviews;
-* practice coding challenges.
+- study technical questions;
+- practice active recall;
+- review weak topics;
+- take quizzes;
+- simulate technical interviews;
+- practice coding challenges.
 
 The product should evolve incrementally.
 
@@ -25,17 +25,17 @@ Communication with the user must be in Portuguese.
 
 All project artifacts must be written in English, including:
 
-* source code;
-* tests;
-* comments;
-* variable names;
-* function names;
-* class names;
-* type names;
-* file names;
-* documentation;
-* commit messages;
-* UI text, unless a future requirement explicitly introduces localization.
+- source code;
+- tests;
+- comments;
+- variable names;
+- function names;
+- class names;
+- type names;
+- file names;
+- documentation;
+- commit messages;
+- UI text, unless a future requirement explicitly introduces localization.
 
 ---
 
@@ -70,21 +70,21 @@ A design is simple, in Kent Beck's priority order, when it:
 
 Prefer:
 
-* small modules;
-* explicit code;
-* clear naming;
-* simple data structures;
-* composition;
-* behavior-focused tests.
+- small modules;
+- explicit code;
+- clear naming;
+- simple data structures;
+- composition;
+- behavior-focused tests.
 
 Avoid:
 
-* speculative abstractions;
-* unnecessary factories;
-* unnecessary repositories;
-* unnecessary global state;
-* generic helpers used only once;
-* architecture created only for possible future requirements.
+- speculative abstractions;
+- unnecessary factories;
+- unnecessary repositories;
+- unnecessary global state;
+- generic helpers used only once;
+- architecture created only for possible future requirements.
 
 Create abstractions when duplication or a concrete use case justifies them.
 
@@ -102,13 +102,13 @@ If an improvement is useful but outside the current scope, mention it after comp
 
 Unless a story explicitly changes the architecture, use:
 
-* Next.js
-* React
-* TypeScript
-* App Router
-* Vitest
-* Testing Library
-* jsdom
+- Next.js
+- React
+- TypeScript
+- App Router
+- Vitest
+- Testing Library
+- jsdom
 
 Prefer Server Components by default.
 
@@ -124,9 +124,9 @@ Prefer Testing Library queries based on how a user interacts with the interface.
 
 Do not test:
 
-* internal React state;
-* private implementation details;
-* framework behavior already guaranteed by Next.js or React.
+- internal React state;
+- private implementation details;
+- framework behavior already guaranteed by Next.js or React.
 
 Do not introduce snapshots unless they provide clear value.
 
@@ -188,11 +188,11 @@ If a check cannot be executed, clearly explain why.
 
 Do not:
 
-* create branches unless explicitly requested;
-* push to a remote repository unless explicitly requested;
-* rewrite Git history;
-* amend existing commits unless explicitly requested;
-* delete unrelated user changes.
+- create branches unless explicitly requested;
+- push to a remote repository unless explicitly requested;
+- rewrite Git history;
+- amend existing commits unless explicitly requested;
+- delete unrelated user changes.
 
 Do not create a commit unless the current task explicitly asks for one.
 
@@ -218,10 +218,10 @@ For architectural changes, domain changes, large refactors, or work affecting se
 
 When executing an approved plan:
 
-* follow the plan;
-* keep changes focused;
-* stop before starting the next story;
-* report any necessary deviation from the plan.
+- follow the plan;
+- keep changes focused;
+- stop before starting the next story;
+- report any necessary deviation from the plan.
 
 ---
 
@@ -251,16 +251,16 @@ A future feature is not a current requirement.
 
 Examples of features that should only be introduced when required by a story include:
 
-* authentication;
-* database persistence;
-* AI evaluation;
-* spaced repetition algorithms;
-* coding execution environments;
-* global state management;
-* analytics;
-* gamification;
-* internationalization;
-* complex design systems.
+- authentication;
+- database persistence;
+- AI evaluation;
+- spaced repetition algorithms;
+- coding execution environments;
+- global state management;
+- analytics;
+- gamification;
+- internationalization;
+- complex design systems.
 
 The current story always takes precedence over anticipated future architecture.
 
@@ -270,14 +270,14 @@ The current story always takes precedence over anticipated future architecture.
 
 After completing an implementation task, summarize in Portuguese:
 
-* what was implemented;
-* files created or changed;
-* tests added or changed;
-* test result;
-* lint result;
-* build result;
-* relevant technical decisions;
-* anything intentionally left outside the scope.
+- what was implemented;
+- files created or changed;
+- tests added or changed;
+- test result;
+- lint result;
+- build result;
+- relevant technical decisions;
+- anything intentionally left outside the scope.
 
 Do not start another story automatically.
 

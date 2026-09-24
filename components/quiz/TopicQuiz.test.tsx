@@ -52,7 +52,9 @@ describe("TopicQuiz", () => {
     const user = userEvent.setup({ delay: null });
     render(<TopicQuiz topic={topic} randomSource={stableRandom} />);
 
-    expect(screen.getByRole("heading", { name: "React fixture Proficiency Quiz" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "React fixture Proficiency Quiz" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("10 questions")).toBeInTheDocument();
     expect(screen.getByText("8 minutes")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Start quiz" }));
@@ -94,11 +96,23 @@ describe("TopicQuiz", () => {
   it("ends automatically at the deadline and counts selected answers", () => {
     const startedAt = new Date("2026-09-18T00:00:00.000Z").getTime();
     let currentTime = startedAt;
-    const { rerender } = render(<TopicQuiz topic={topic} randomSource={stableRandom} now={() => currentTime} />);
+    const { rerender } = render(
+      <TopicQuiz
+        topic={topic}
+        randomSource={stableRandom}
+        now={() => currentTime}
+      />,
+    );
     fireEvent.click(screen.getByRole("button", { name: "Start quiz" }));
     fireEvent.click(screen.getByRole("radio", { name: "q1 A" }));
     currentTime += 8 * 60 * 1000;
-    rerender(<TopicQuiz topic={topic} randomSource={stableRandom} now={() => currentTime} />);
+    rerender(
+      <TopicQuiz
+        topic={topic}
+        randomSource={stableRandom}
+        now={() => currentTime}
+      />,
+    );
     expect(screen.getByText("1 / 10")).toBeInTheDocument();
   });
 
@@ -131,7 +145,14 @@ describe("TopicQuiz", () => {
   });
 
   it("renders Portuguese topic chrome", async () => {
-    renderWithLocale(<TopicQuiz topic={topic} randomSource={stableRandom} />, "pt");
-    expect(await screen.findByRole("heading", { name: "Quiz de Proficiência em Fixture React" })).toBeInTheDocument();
+    renderWithLocale(
+      <TopicQuiz topic={topic} randomSource={stableRandom} />,
+      "pt",
+    );
+    expect(
+      await screen.findByRole("heading", {
+        name: "Quiz de Proficiência em Fixture React",
+      }),
+    ).toBeInTheDocument();
   });
 });

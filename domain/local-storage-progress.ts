@@ -4,7 +4,8 @@ import type {
 } from "./question-progress";
 import { RECALL_RATING_OPTIONS, type RecallRating } from "./recall-rating";
 
-export const QUESTION_PROGRESS_STORAGE_KEY = "interview-forge:question-progress";
+export const QUESTION_PROGRESS_STORAGE_KEY =
+  "interview-forge:question-progress";
 
 const VALID_RATINGS = new Set<string>(RECALL_RATING_OPTIONS);
 

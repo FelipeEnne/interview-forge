@@ -49,10 +49,10 @@ Also: `npm run lint`, `npm run build`.
 
 ## Study / Test / Practice
 
-| Mode | Purpose | Persistence |
-| --- | --- | --- |
-| **Study** | Active recall and spaced-style review scheduling | Question progress in LocalStorage |
-| **Test** | Timed multiple-choice assessment separate from recall ratings | Per-category quiz aggregates in LocalStorage |
-| **Practice** | Implementation exercises compared to reference solutions | None (client-only reveal) |
+| Mode         | Purpose                                                       | Persistence                                  |
+| ------------ | ------------------------------------------------------------- | -------------------------------------------- |
+| **Study**    | Active recall and spaced-style review scheduling              | Question progress in LocalStorage            |
+| **Test**     | Timed multiple-choice assessment separate from recall ratings | Per-category quiz aggregates in LocalStorage |
+| **Practice** | Implementation exercises compared to reference solutions      | None (client-only reveal)                    |
 
 More detail: `docs/product.md`, `docs/architecture.md`, `docs/roadmap.md`.

@@ -18,10 +18,6 @@ describe("topic registry", () => {
   });
 
   it("keeps the catalog in presentation order", () => {
-    expect(TOPICS.map(({ id }) => id)).toEqual([
-      "nodejs",
-      "react",
-      "angular",
-    ]);
+    expect(TOPICS.map(({ id }) => id)).toEqual(["nodejs", "react", "angular"]);
   });
 });

@@ -50,9 +50,9 @@ export function TopicQuiz({
     [topic.categories],
   );
   const [phase, setPhase] = useState<QuizPhase>("intro");
-  const [attemptQuestions, setAttemptQuestions] = useState<typeof topic.questions>(
-    [],
-  );
+  const [attemptQuestions, setAttemptQuestions] = useState<
+    typeof topic.questions
+  >([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>({});
   const [deadline, setDeadline] = useState<number | null>(null);
@@ -112,7 +112,11 @@ export function TopicQuiz({
   function startAttempt() {
     isAttemptRecorded.current = false;
     setAttemptQuestions(
-      selectQuizQuestions(topic.questions, topic.questionsPerAttempt, randomSource),
+      selectQuizQuestions(
+        topic.questions,
+        topic.questionsPerAttempt,
+        randomSource,
+      ),
     );
     setCurrentIndex(0);
     setAnswers({});
@@ -127,7 +131,10 @@ export function TopicQuiz({
       return;
     }
 
-    setAnswers((current) => ({ ...current, [currentQuestion.id]: optionIndex }));
+    setAnswers((current) => ({
+      ...current,
+      [currentQuestion.id]: optionIndex,
+    }));
   }
 
   function handleAdvance() {
@@ -160,43 +167,78 @@ export function TopicQuiz({
             <p className={styles.meta}>
               {t("quizDuration", { minutes: topic.durationMinutes })}
             </p>
-            <button type="button" className={`${styles.button} ${styles.buttonPrimary}`} onClick={startAttempt}>
+            <button
+              type="button"
+              className={`${styles.button} ${styles.buttonPrimary}`}
+              onClick={startAttempt}
+            >
               {t("startQuiz")}
             </button>
           </div>
         ) : null}
         {phase === "active" && currentQuestion ? (
           <>
-            <p className={styles.timer}>{t("timeRemaining", { time: formatTime(remainingSeconds) })}</p>
-            <p className={styles.progress}>
-              {t("questionProgress", { current: currentIndex + 1, total: attemptQuestions.length })}
+            <p className={styles.timer}>
+              {t("timeRemaining", { time: formatTime(remainingSeconds) })}
             </p>
-            <p className={styles.question}>{localize(currentQuestion.question)}</p>
+            <p className={styles.progress}>
+              {t("questionProgress", {
+                current: currentIndex + 1,
+                total: attemptQuestions.length,
+              })}
+            </p>
+            <p className={styles.question}>
+              {localize(currentQuestion.question)}
+            </p>
             <fieldset className={styles.options}>
               <legend className={styles.legend}>{t("chooseAnswer")}</legend>
               {currentQuestion.options.map((option, optionIndex) => (
-                <label key={`${currentQuestion.id}-${optionIndex}`} className={styles.option}>
-                  <input type="radio" name={currentQuestion.id} checked={answers[currentQuestion.id] === optionIndex} onChange={() => handleSelectOption(optionIndex)} />
+                <label
+                  key={`${currentQuestion.id}-${optionIndex}`}
+                  className={styles.option}
+                >
+                  <input
+                    type="radio"
+                    name={currentQuestion.id}
+                    checked={answers[currentQuestion.id] === optionIndex}
+                    onChange={() => handleSelectOption(optionIndex)}
+                  />
                   {localize(option)}
                 </label>
               ))}
             </fieldset>
-            <button type="button" className={`${styles.button} ${styles.buttonPrimary}`} onClick={handleAdvance} disabled={!hasCurrentAnswer}>
+            <button
+              type="button"
+              className={`${styles.button} ${styles.buttonPrimary}`}
+              onClick={handleAdvance}
+              disabled={!hasCurrentAnswer}
+            >
               {isLastQuestion ? t("finishQuiz") : t("next")}
             </button>
           </>
         ) : null}
         {phase === "result" && result ? (
           <div className={styles.summary}>
-            <p className={styles.score}>{result.correct} / {result.total}</p>
+            <p className={styles.score}>
+              {result.correct} / {result.total}
+            </p>
             <p className={styles.percentage}>{result.percentage}%</p>
             <ul className={styles.summaryCounts}>
               {topic.categories.map((category) => {
                 const score = result.byCategory[category.id];
-                return score ? <li key={category.id}>{localize(category.displayName)}: {score.correct} / {score.total}</li> : null;
+                return score ? (
+                  <li key={category.id}>
+                    {localize(category.displayName)}: {score.correct} /{" "}
+                    {score.total}
+                  </li>
+                ) : null;
               })}
             </ul>
-            <button type="button" className={`${styles.button} ${styles.buttonPrimary}`} onClick={startAttempt}>
+            <button
+              type="button"
+              className={`${styles.button} ${styles.buttonPrimary}`}
+              onClick={startAttempt}
+            >
               {t("tryAgain")}
             </button>
           </div>

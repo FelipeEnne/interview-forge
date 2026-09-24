@@ -12,7 +12,10 @@ import {
 
 import type { RecallRating } from "@/domain/recall-rating";
 import { DEFAULT_LOCALE, type Locale } from "@/i18n/locale";
-import { getLocalizedText, type LocalizedTextSource } from "@/i18n/localized-text";
+import {
+  getLocalizedText,
+  type LocalizedTextSource,
+} from "@/i18n/localized-text";
 import { readLocale, saveLocale } from "@/i18n/local-storage-locale";
 import {
   formatQuestionsReviewed,
@@ -53,10 +56,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     applyDocumentLang(nextLocale);
   }, []);
 
-  const value = useMemo(
-    () => ({ locale, setLocale }),
-    [locale, setLocale],
-  );
+  const value = useMemo(() => ({ locale, setLocale }), [locale, setLocale]);
 
   return (
     <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>

@@ -1,4 +1,9 @@
-import { DEFAULT_LOCALE, LOCALE_STORAGE_KEY, parseLocale, type Locale } from "./locale";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_STORAGE_KEY,
+  parseLocale,
+  type Locale,
+} from "./locale";
 
 function getStorage(): Storage | null {
   if (typeof window === "undefined") {

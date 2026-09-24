@@ -102,9 +102,9 @@ describe("NODEJS_QUIZ_QUESTIONS", () => {
       for (const locale of ["en", "pt"] as const) {
         const optionTexts = item.options.map((option) => option[locale]);
 
-        expect(isCorrectOptionLengthOutlier(optionTexts, item.correctOption)).toBe(
-          false,
-        );
+        expect(
+          isCorrectOptionLengthOutlier(optionTexts, item.correctOption),
+        ).toBe(false);
       }
     }
   });

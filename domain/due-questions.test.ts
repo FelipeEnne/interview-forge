@@ -29,11 +29,7 @@ describe("getDueQuestions", () => {
   });
 
   it("includes past and exactly due reviews but excludes future reviews", () => {
-    const questions = [
-      { id: "past" },
-      { id: "exact" },
-      { id: "future" },
-    ];
+    const questions = [{ id: "past" }, { id: "exact" }, { id: "future" }];
     const progress: QuestionProgressState = {
       past: {
         lastRating: "again",

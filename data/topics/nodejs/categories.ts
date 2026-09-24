@@ -45,9 +45,7 @@ export const NODEJS_CATEGORIES: readonly CategoryDefinition<QuestionCategory>[] 
     },
   ];
 
-export function isQuestionCategory(
-  value: string,
-): value is QuestionCategory {
+export function isQuestionCategory(value: string): value is QuestionCategory {
   return (QUESTION_CATEGORIES as readonly string[]).includes(value);
 }
 

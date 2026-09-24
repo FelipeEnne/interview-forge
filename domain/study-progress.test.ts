@@ -24,9 +24,13 @@ const zeroRatings = {
 
 function expectStudyProgressInvariants(result: StudyProgress): void {
   const { ratings, total, memorized, remaining } = result;
-  expect(ratings.again + ratings.hard + ratings.good + ratings.easy + ratings.unreviewed).toBe(
-    total,
-  );
+  expect(
+    ratings.again +
+      ratings.hard +
+      ratings.good +
+      ratings.easy +
+      ratings.unreviewed,
+  ).toBe(total);
   expect(memorized).toBe(ratings.good + ratings.easy);
   expect(remaining).toBe(ratings.again + ratings.hard + ratings.unreviewed);
   expect(remaining).toBe(total - memorized);

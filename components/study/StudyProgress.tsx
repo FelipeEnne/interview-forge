@@ -49,8 +49,7 @@ export function StudyProgress({ questions }: StudyProgressProps) {
     getStoredProgressSnapshot,
     getServerProgressSnapshot,
   );
-  const progress =
-    storedProgressRaw === null ? {} : readQuestionProgress();
+  const progress = storedProgressRaw === null ? {} : readQuestionProgress();
   const { total, memorized, remaining, percentage, ratings } = getStudyProgress(
     questions,
     progress,

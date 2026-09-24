@@ -55,7 +55,8 @@ type Messages = Record<MessageKey, string>;
 const portugueseMessages: Messages = {
   appName: "InterviewForge",
   languageSelector: "Idioma",
-  homeTagline: "Pratique perguntas de entrevista técnica um tópico de cada vez.",
+  homeTagline:
+    "Pratique perguntas de entrevista técnica um tópico de cada vez.",
   studyNodejsQuestions: "Estudar perguntas de Node.js",
   technicalInterviewPreparation: "Preparação para Entrevistas Técnicas",
   comingSoon: "Em breve",

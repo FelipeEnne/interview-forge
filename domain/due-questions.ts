@@ -11,8 +11,7 @@ export function getDueQuestions<Question extends { id: string }>(
     const nextReviewAt = progress[question.id]?.nextReviewAt;
 
     return (
-      nextReviewAt === undefined ||
-      Date.parse(nextReviewAt) <= currentTimestamp
+      nextReviewAt === undefined || Date.parse(nextReviewAt) <= currentTimestamp
     );
   });
 }

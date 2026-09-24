@@ -38,21 +38,22 @@ export function getLowestCategoryPerformance<CategoryId extends string>(
   performance: QuizPerformance<CategoryId>,
   categoryOrder: readonly CategoryId[],
 ): CategoryPerformanceEntry<CategoryId>[] {
-  return categoryOrder.flatMap((category) => {
-    const score = performance[category];
+  return categoryOrder
+    .flatMap((category) => {
+      const score = performance[category];
 
-    if (!score || score.total < MIN_CATEGORY_QUESTIONS) {
-      return [];
-    }
+      if (!score || score.total < MIN_CATEGORY_QUESTIONS) {
+        return [];
+      }
 
-    return [
-      {
-        category,
-        ...score,
-        percentage: Math.round((score.correct / score.total) * 100),
-      },
-    ];
-  })
+      return [
+        {
+          category,
+          ...score,
+          percentage: Math.round((score.correct / score.total) * 100),
+        },
+      ];
+    })
     .sort((first, second) => {
       const accuracyComparison =
         first.correct * second.total - second.correct * first.total;

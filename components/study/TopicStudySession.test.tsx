@@ -134,7 +134,9 @@ describe("TopicStudySession", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "Node.js" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Node.js" }),
+    ).toBeInTheDocument();
   });
 
   it("runs and schedules active recall for a non-Node.js question bank", async () => {
@@ -239,7 +241,9 @@ describe("TopicStudySession", () => {
       />,
     );
 
-    expect(await screen.findByText("Second question text?")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Second question text?"),
+    ).toBeInTheDocument();
   });
 
   it("starts with only due questions ordered by recall priority", async () => {
@@ -277,7 +281,9 @@ describe("TopicStudySession", () => {
       />,
     );
 
-    expect(await screen.findByText("Second question text?")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Second question text?"),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Show answer" }));
     await user.click(screen.getByRole("button", { name: "Good" }));
@@ -327,7 +333,9 @@ describe("TopicStudySession", () => {
       />,
     );
 
-    expect(await screen.findByText("Second question text?")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Second question text?"),
+    ).toBeInTheDocument();
     await completeSession(user, ["good", "good", "good"]);
 
     expect(screen.getByText("3 questions reviewed")).toBeInTheDocument();
@@ -835,9 +843,7 @@ describe("TopicStudySession", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Fundamentos")).toBeInTheDocument();
     expect(screen.getByText("Texto da primeira pergunta?")).toBeInTheDocument();
-    expect(
-      screen.queryByText("First question text?"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("First question text?")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Mostrar resposta" }));
     expect(screen.getByText("Texto da primeira resposta.")).toBeInTheDocument();
@@ -846,7 +852,9 @@ describe("TopicStudySession", () => {
     expect(readQuestionProgress().q1?.lastRating).toBe("good");
     expect(screen.getByText("1 pergunta revisada")).toBeInTheDocument();
     expect(screen.getByText("Bom: 1")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Estudar novamente" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Estudar novamente" }),
+    ).toBeInTheDocument();
   });
 
   it("keeps the current question and revealed answer when switching language", async () => {
@@ -857,7 +865,7 @@ describe("TopicStudySession", () => {
         <LanguageSelector />
         <TopicStudySession
           topicName="Node.js"
-        categories={sampleCategories}
+          categories={sampleCategories}
           questions={sampleQuestions}
           now={clock.now}
         />
@@ -876,7 +884,9 @@ describe("TopicStudySession", () => {
     expect(screen.getByText("Texto da segunda pergunta?")).toBeInTheDocument();
     expect(screen.getByText("Texto da segunda resposta.")).toBeInTheDocument();
     expect(screen.queryByText("First question text?")).not.toBeInTheDocument();
-    expect(screen.queryByText("Texto da primeira pergunta?")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Texto da primeira pergunta?"),
+    ).not.toBeInTheDocument();
     expect(readQuestionProgress().q1?.lastRating).toBe("good");
     expect(
       screen.getByRole("button", { name: "Mostrar resposta" }),

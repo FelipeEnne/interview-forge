@@ -43,15 +43,21 @@ function TopicQuizPerformance({
     getSnapshot,
     () => null,
   );
-  const performance = storedPerformance === null
-    ? {}
-    : readQuizPerformance(topic.id, topic.categories.map(({ id }) => id));
+  const performance =
+    storedPerformance === null
+      ? {}
+      : readQuizPerformance(
+          topic.id,
+          topic.categories.map(({ id }) => id),
+        );
 
   return (
     <CategoryPerformance
       performance={performance}
       categories={topic.categories}
-      studyCategoryBasePath={hasStudy ? `/topics/${topic.id}/categories` : undefined}
+      studyCategoryBasePath={
+        hasStudy ? `/topics/${topic.id}/categories` : undefined
+      }
     />
   );
 }
@@ -70,15 +76,26 @@ export function TopicOverview({
       {studyTopic ? <StudyProgress questions={studyTopic.questions} /> : null}
       {studyTopic ? (
         <>
-          <Link className={`${styles.link} ${styles.primaryLink}`} href={`/topics/${topic.id}/study`}>
+          <Link
+            className={`${styles.link} ${styles.primaryLink}`}
+            href={`/topics/${topic.id}/study`}
+          >
             {t("studyDueQuestions")}
           </Link>
-          <section className={styles.categories} aria-labelledby="categories-title">
-            <h2 id="categories-title" className={styles.subtitle}>{t("categories")}</h2>
+          <section
+            className={styles.categories}
+            aria-labelledby="categories-title"
+          >
+            <h2 id="categories-title" className={styles.subtitle}>
+              {t("categories")}
+            </h2>
             <ul className={styles.categoryList}>
               {studyTopic.categories.map((category) => (
                 <li key={category.id}>
-                  <Link className={styles.link} href={`/topics/${topic.id}/categories/${category.id}`}>
+                  <Link
+                    className={styles.link}
+                    href={`/topics/${topic.id}/categories/${category.id}`}
+                  >
                     {localize(category.displayName)}
                   </Link>
                 </li>
@@ -97,7 +114,12 @@ export function TopicOverview({
           {t("practiceCodingChallenges")}
         </Link>
       ) : null}
-      {quizTopic ? <TopicQuizPerformance topic={quizTopic} hasStudy={studyTopic !== undefined} /> : null}
+      {quizTopic ? (
+        <TopicQuizPerformance
+          topic={quizTopic}
+          hasStudy={studyTopic !== undefined}
+        />
+      ) : null}
     </main>
   );
 }

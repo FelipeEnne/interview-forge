@@ -77,8 +77,9 @@ describe("LanguageSelector", () => {
     unmount();
     renderSelector();
 
-    expect(
-      await screen.findByRole("button", { name: "PT" }),
-    ).toHaveAttribute("aria-pressed", "true");
+    expect(await screen.findByRole("button", { name: "PT" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 });

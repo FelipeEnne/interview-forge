@@ -16,8 +16,14 @@ describe("TopicOverview", () => {
     );
 
     expect(screen.getByRole("heading", { name: "React" })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Study due questions" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Take proficiency quiz" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Practice coding challenges" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Study due questions" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Take proficiency quiz" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Practice coding challenges" }),
+    ).not.toBeInTheDocument();
   });
 });

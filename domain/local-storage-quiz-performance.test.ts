@@ -51,9 +51,9 @@ describe("local-storage-quiz-performance", () => {
 
     saveQuizPerformance("react", { hooks: { correct: 1, total: 2 } });
 
-    expect(
-      localStorage.getItem("interview-forge:quiz-attempts:react"),
-    ).toBe(JSON.stringify({ hooks: { correct: 1, total: 2 } }));
+    expect(localStorage.getItem("interview-forge:quiz-attempts:react")).toBe(
+      JSON.stringify({ hooks: { correct: 1, total: 2 } }),
+    );
   });
 
   it("uses Angular's topic-specific key for its performance", () => {
@@ -63,9 +63,9 @@ describe("local-storage-quiz-performance", () => {
 
     saveQuizPerformance("angular", { observables: { correct: 1, total: 2 } });
 
-    expect(
-      localStorage.getItem("interview-forge:quiz-attempts:angular"),
-    ).toBe(JSON.stringify({ observables: { correct: 1, total: 2 } }));
+    expect(localStorage.getItem("interview-forge:quiz-attempts:angular")).toBe(
+      JSON.stringify({ observables: { correct: 1, total: 2 } }),
+    );
   });
 
   it("keeps matching category ids isolated between topics", () => {
@@ -87,10 +87,7 @@ describe("local-storage-quiz-performance", () => {
       "an unknown category",
       JSON.stringify({ databases: { correct: 1, total: 2 } }),
     ],
-    [
-      "incoherent counts",
-      JSON.stringify({ async: { correct: 3, total: 2 } }),
-    ],
+    ["incoherent counts", JSON.stringify({ async: { correct: 3, total: 2 } })],
     [
       "non-integer counts",
       JSON.stringify({ async: { correct: 0.5, total: 2 } }),

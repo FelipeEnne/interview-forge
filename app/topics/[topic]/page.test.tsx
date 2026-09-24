@@ -1,7 +1,10 @@
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { NODEJS_CATEGORIES, QUESTION_CATEGORIES } from "@/data/topics/nodejs/categories";
+import {
+  NODEJS_CATEGORIES,
+  QUESTION_CATEGORIES,
+} from "@/data/topics/nodejs/categories";
 import { NODEJS_QUESTIONS } from "@/data/topics/nodejs/questions";
 import {
   REACT_CATEGORIES,
@@ -63,7 +66,9 @@ describe("TopicPage", () => {
       }),
     );
 
-    expect(screen.getByRole("heading", { name: "Node.js" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Node.js" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Study due questions" }),
     ).toHaveAttribute("href", "/topics/nodejs/study");
@@ -77,7 +82,10 @@ describe("TopicPage", () => {
     for (const category of QUESTION_CATEGORIES) {
       expect(
         screen.getByRole("link", {
-          name: getLocalizedText(NODEJS_CATEGORIES.find(({ id }) => id === category)!.displayName, "en"),
+          name: getLocalizedText(
+            NODEJS_CATEGORIES.find(({ id }) => id === category)!.displayName,
+            "en",
+          ),
         }),
       ).toHaveAttribute("href", `/topics/nodejs/categories/${category}`);
     }
@@ -197,9 +205,10 @@ describe("TopicPage", () => {
     expect(
       screen.getByRole("heading", { name: "Hooks & Effects", level: 3 }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /Study Hooks/ }),
-    ).toHaveAttribute("href", "/topics/react/categories/hooks");
+    expect(screen.getByRole("link", { name: /Study Hooks/ })).toHaveAttribute(
+      "href",
+      "/topics/react/categories/hooks",
+    );
   });
 
   it("derives React study progress only from React question ids", async () => {
@@ -270,9 +279,10 @@ describe("TopicPage", () => {
     expect(
       screen.getByRole("heading", { name: "Categorias" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "Fundamentos" }),
-    ).toHaveAttribute("href", "/topics/nodejs/categories/fundamentals");
+    expect(screen.getByRole("link", { name: "Fundamentos" })).toHaveAttribute(
+      "href",
+      "/topics/nodejs/categories/fundamentals",
+    );
     expect(
       screen.getByRole("link", { name: "Produção e Arquitetura" }),
     ).toHaveAttribute("href", "/topics/nodejs/categories/production");
@@ -289,7 +299,9 @@ describe("TopicPage", () => {
       }),
     );
 
-    expect(screen.getByRole("heading", { name: "Angular" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Angular" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Study due questions" }),
     ).toHaveAttribute("href", "/topics/angular/study");

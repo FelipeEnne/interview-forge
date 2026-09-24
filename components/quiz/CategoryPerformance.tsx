@@ -32,11 +32,15 @@ export function CategoryPerformance({
 
   return (
     <section className={styles.performance} aria-labelledby="performance-title">
-      <h2 id="performance-title" className={styles.title}>{t("performance")}</h2>
+      <h2 id="performance-title" className={styles.title}>
+        {t("performance")}
+      </h2>
       <ul className={styles.list}>
         {entries.map(({ category, correct, total, percentage }) => {
           const definition = categories.find(({ id }) => id === category);
-          const label = definition ? localize(definition.displayName) : category;
+          const label = definition
+            ? localize(definition.displayName)
+            : category;
 
           return (
             <li key={category} className={styles.item}>
@@ -48,7 +52,10 @@ export function CategoryPerformance({
                 </p>
               </div>
               {studyCategoryBasePath ? (
-                <Link className={styles.link} href={`${studyCategoryBasePath}/${category}`}>
+                <Link
+                  className={styles.link}
+                  href={`${studyCategoryBasePath}/${category}`}
+                >
                   {t("studyCategory", { label })}
                 </Link>
               ) : null}
