@@ -61,6 +61,13 @@ Do not write large batches of tests followed by large batches of implementation 
 
 ### 3. Simple Design
 
+A design is simple, in Kent Beck's priority order, when it:
+
+1. passes all the tests;
+2. contains no duplication;
+3. expresses the programmer's intent;
+4. minimizes the number of classes and methods.
+
 Prefer:
 
 * small modules;
