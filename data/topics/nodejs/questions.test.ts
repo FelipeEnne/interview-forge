@@ -2,6 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
+import { expectNonEmptyLocalizedText } from "@/data/topic-content-test-helpers";
 import { QUESTION_CATEGORIES } from "./categories";
 import { NODEJS_QUESTIONS } from "./questions";
 
@@ -67,11 +68,6 @@ const ORIGINAL_QUESTION_IDS = [
   "clustering-and-scaling",
   "monolith-vs-microservices",
 ] as const;
-
-function expectNonEmptyLocalizedText(value: { en: string; pt: string }) {
-  expect(value.en.trim()).not.toBe("");
-  expect(value.pt.trim()).not.toBe("");
-}
 
 describe("NODEJS_QUESTIONS", () => {
   it("has exactly 60 questions", () => {

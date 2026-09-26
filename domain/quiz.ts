@@ -1,4 +1,5 @@
 import type { QuizQuestion } from "@/data/quiz-types";
+import { calculatePercentage } from "./percentage";
 
 export type QuizAnswers = Readonly<Record<string, number>>;
 
@@ -57,7 +58,7 @@ export function calculateQuizResult<CategoryId extends string>(
   return {
     correct,
     total,
-    percentage: total === 0 ? 0 : Math.round((correct / total) * 100),
+    percentage: calculatePercentage(correct, total),
     byCategory,
   };
 }

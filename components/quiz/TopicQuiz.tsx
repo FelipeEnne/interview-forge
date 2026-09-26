@@ -15,6 +15,13 @@ import {
   type QuizResult,
 } from "@/domain/quiz";
 import { recordQuizPerformance } from "@/domain/quiz-performance";
+import {
+  formatQuizTime,
+  getRemainingQuizSeconds,
+  minutesToMilliseconds,
+  minutesToSeconds,
+  QUIZ_TIMER_TICK_MILLISECONDS,
+} from "@/domain/quiz-timer";
 import { useTranslations } from "../LocaleProvider";
 
 import styles from "./TopicQuiz.module.css";
@@ -27,24 +34,14 @@ type TopicQuizProps = {
   now?: () => number;
 };
 
-function formatTime(totalSeconds: number) {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-function remainingSecondsFrom(deadline: number, now: number) {
-  return Math.max(0, Math.ceil((deadline - now) / 1000));
-}
-
 export function TopicQuiz({
   topic,
   randomSource,
   now = Date.now,
 }: TopicQuizProps) {
   const { t, localize } = useTranslations();
-  const durationMs = topic.durationMinutes * 60 * 1000;
+  const durationMs = minutesToMilliseconds(topic.durationMinutes);
+  const durationSeconds = minutesToSeconds(topic.durationMinutes);
   const categoryIds = useMemo(
     () => topic.categories.map(({ id }) => id),
     [topic.categories],
@@ -56,7 +53,7 @@ export function TopicQuiz({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>({});
   const [deadline, setDeadline] = useState<number | null>(null);
-  const [remainingSeconds, setRemainingSeconds] = useState(durationMs / 1000);
+  const [remainingSeconds, setRemainingSeconds] = useState(durationSeconds);
   const [result, setResult] = useState<QuizResult | null>(null);
   const isAttemptRecorded = useRef(false);
 
@@ -83,7 +80,7 @@ export function TopicQuiz({
     }
 
     const updateRemaining = () => {
-      const remaining = remainingSecondsFrom(deadline, now());
+      const remaining = getRemainingQuizSeconds(deadline, now());
       setRemainingSeconds(remaining);
 
       if (remaining === 0) {
@@ -99,7 +96,7 @@ export function TopicQuiz({
       if (updateRemaining() === 0) {
         window.clearInterval(intervalId);
       }
-    }, 1000);
+    }, QUIZ_TIMER_TICK_MILLISECONDS);
 
     return () => window.clearInterval(intervalId);
   }, [phase, deadline, finishAttempt, now]);
@@ -121,7 +118,7 @@ export function TopicQuiz({
     setCurrentIndex(0);
     setAnswers({});
     setDeadline(now() + durationMs);
-    setRemainingSeconds(durationMs / 1000);
+    setRemainingSeconds(durationSeconds);
     setResult(null);
     setPhase("active");
   }
@@ -179,7 +176,7 @@ export function TopicQuiz({
         {phase === "active" && currentQuestion ? (
           <>
             <p className={styles.timer}>
-              {t("timeRemaining", { time: formatTime(remainingSeconds) })}
+              {t("timeRemaining", { time: formatQuizTime(remainingSeconds) })}
             </p>
             <p className={styles.progress}>
               {t("questionProgress", {

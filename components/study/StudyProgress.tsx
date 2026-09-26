@@ -7,6 +7,7 @@ import {
   readQuestionProgress,
 } from "@/domain/local-storage-progress";
 import { getStudyProgress } from "@/domain/study-progress";
+import { PERCENTAGE_MAX } from "@/domain/percentage";
 import { formatStudyQuestionsRemaining } from "@/i18n/translations";
 import { useTranslations } from "../LocaleProvider";
 
@@ -68,7 +69,7 @@ export function StudyProgress({ questions }: StudyProgressProps) {
       </p>
       <progress
         className={styles.bar}
-        max={100}
+        max={PERCENTAGE_MAX}
         value={percentage}
         aria-label={t("progress")}
       />

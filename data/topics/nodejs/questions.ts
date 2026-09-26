@@ -1,14 +1,6 @@
 import type { QuestionCategory } from "./categories";
 import type { InterviewQuestion } from "@/data/study-types";
 
-export {
-  isQuestionCategory,
-  NODEJS_CATEGORIES,
-  QUESTION_CATEGORIES,
-  type QuestionCategory,
-} from "./categories";
-export type { InterviewQuestion } from "@/data/study-types";
-
 export const NODEJS_QUESTIONS: readonly InterviewQuestion<QuestionCategory>[] =
   [
     {

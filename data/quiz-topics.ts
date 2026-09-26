@@ -7,6 +7,9 @@ import { REACT_QUIZ_QUESTIONS } from "./topics/react/quiz-questions";
 import type { QuizTopicData } from "./quiz-types";
 import { getTopicById } from "./topic-registry";
 
+const QUESTIONS_PER_ATTEMPT = 10;
+const DURATION_MINUTES = 8;
+
 const nodejsDefinition = getTopicById("nodejs")!;
 
 const NODEJS_QUIZ_TOPIC: QuizTopicData = {
@@ -14,8 +17,8 @@ const NODEJS_QUIZ_TOPIC: QuizTopicData = {
   displayName: nodejsDefinition.displayName,
   categories: NODEJS_CATEGORIES,
   questions: NODEJS_QUIZ_QUESTIONS,
-  questionsPerAttempt: 10,
-  durationMinutes: 8,
+  questionsPerAttempt: QUESTIONS_PER_ATTEMPT,
+  durationMinutes: DURATION_MINUTES,
 };
 
 const reactDefinition = getTopicById("react")!;
@@ -25,8 +28,8 @@ const REACT_QUIZ_TOPIC: QuizTopicData = {
   displayName: reactDefinition.displayName,
   categories: REACT_CATEGORIES,
   questions: REACT_QUIZ_QUESTIONS,
-  questionsPerAttempt: 10,
-  durationMinutes: 8,
+  questionsPerAttempt: QUESTIONS_PER_ATTEMPT,
+  durationMinutes: DURATION_MINUTES,
 };
 
 const angularDefinition = getTopicById("angular")!;
@@ -36,8 +39,8 @@ const ANGULAR_QUIZ_TOPIC: QuizTopicData = {
   displayName: angularDefinition.displayName,
   categories: ANGULAR_CATEGORIES,
   questions: ANGULAR_QUIZ_QUESTIONS,
-  questionsPerAttempt: 10,
-  durationMinutes: 8,
+  questionsPerAttempt: QUESTIONS_PER_ATTEMPT,
+  durationMinutes: DURATION_MINUTES,
 };
 
 const QUIZ_TOPICS: readonly QuizTopicData[] = [

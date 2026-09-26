@@ -10,7 +10,6 @@ describe("TopicOverview", () => {
         topic={{
           id: "react",
           displayName: { en: "React", pt: "React" },
-          status: "available",
         }}
       />,
     );

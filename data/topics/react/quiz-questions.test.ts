@@ -2,33 +2,13 @@
 
 import { describe, expect, it } from "vitest";
 
+import {
+  expectNonEmptyLocalizedText,
+  isCorrectOptionLengthOutlier,
+} from "@/data/topic-content-test-helpers";
 import { NODEJS_QUIZ_QUESTIONS } from "../nodejs/quiz-questions";
 import { REACT_CATEGORIES, REACT_QUESTION_CATEGORIES } from "./categories";
 import { REACT_QUIZ_QUESTIONS } from "./quiz-questions";
-
-function expectNonEmptyLocalizedText(value: { en: string; pt: string }) {
-  expect(value.en.trim()).not.toBe("");
-  expect(value.pt.trim()).not.toBe("");
-}
-
-function isCorrectOptionLengthOutlier(
-  optionTexts: readonly string[],
-  correctIndex: number,
-): boolean {
-  const correctLength = optionTexts[correctIndex]?.trim().length ?? 0;
-  const longestDistractor = optionTexts.reduce((longest, text, index) => {
-    if (index === correctIndex) {
-      return longest;
-    }
-
-    return Math.max(longest, text.trim().length);
-  }, 0);
-
-  return (
-    correctLength > longestDistractor * 1.6 &&
-    correctLength - longestDistractor >= 25
-  );
-}
 
 describe("REACT_QUIZ_QUESTIONS", () => {
   it("has the approved eight categories and 20 questions", () => {

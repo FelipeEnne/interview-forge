@@ -16,18 +16,9 @@ export function HomePage() {
       <ul className={styles.topicList}>
         {TOPICS.map((topic) => (
           <li className={styles.topic} key={topic.id}>
-            {topic.status === "available" ? (
-              <Link className={styles.link} href={`/topics/${topic.id}`}>
-                {localize(topic.displayName)}
-              </Link>
-            ) : (
-              <>
-                <span className={styles.topicName}>
-                  {localize(topic.displayName)}
-                </span>
-                <span className={styles.status}>{t("comingSoon")}</span>
-              </>
-            )}
+            <Link className={styles.link} href={`/topics/${topic.id}`}>
+              {localize(topic.displayName)}
+            </Link>
           </li>
         ))}
       </ul>

@@ -4,17 +4,10 @@ import {
   parseLocale,
   type Locale,
 } from "./locale";
-
-function getStorage(): Storage | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  return window.localStorage;
-}
+import { getLocalStorage } from "@/browser/local-storage";
 
 export function readLocale(): Locale {
-  const storage = getStorage();
+  const storage = getLocalStorage();
   if (!storage) {
     return DEFAULT_LOCALE;
   }
@@ -23,7 +16,7 @@ export function readLocale(): Locale {
 }
 
 export function saveLocale(locale: Locale): void {
-  const storage = getStorage();
+  const storage = getLocalStorage();
   if (!storage) {
     return;
   }

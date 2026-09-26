@@ -5,12 +5,8 @@ import { describe, expect, it } from "vitest";
 import { TOPICS, getTopicById } from "@/data/topic-registry";
 
 describe("topic registry", () => {
-  it.each([
-    ["nodejs", "available"],
-    ["react", "available"],
-    ["angular", "available"],
-  ] as const)("resolves %s with its status", (id, status) => {
-    expect(getTopicById(id)).toMatchObject({ id, status });
+  it.each(["nodejs", "react", "angular"] as const)("resolves %s", (id) => {
+    expect(getTopicById(id)).toMatchObject({ id });
   });
 
   it("does not resolve an unknown slug", () => {

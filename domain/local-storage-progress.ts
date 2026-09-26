@@ -3,6 +3,7 @@ import type {
   QuestionProgressState,
 } from "./question-progress";
 import { RECALL_RATING_OPTIONS, type RecallRating } from "./recall-rating";
+import { getLocalStorage } from "@/browser/local-storage";
 
 export const QUESTION_PROGRESS_STORAGE_KEY =
   "interview-forge:question-progress";
@@ -79,16 +80,8 @@ function parseQuestionProgressState(raw: string): QuestionProgressState {
   return state;
 }
 
-function getStorage(): Storage | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  return window.localStorage;
-}
-
 export function readQuestionProgress(): QuestionProgressState {
-  const storage = getStorage();
+  const storage = getLocalStorage();
   if (!storage) {
     return {};
   }
@@ -102,7 +95,7 @@ export function readQuestionProgress(): QuestionProgressState {
 }
 
 export function saveQuestionProgress(state: QuestionProgressState): void {
-  const storage = getStorage();
+  const storage = getLocalStorage();
   if (!storage) {
     return;
   }

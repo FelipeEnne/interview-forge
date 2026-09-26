@@ -2,6 +2,10 @@
 
 import { describe, expect, it } from "vitest";
 
+import {
+  expectNonEmptyLocalizedText,
+  isCorrectOptionLengthOutlier,
+} from "@/data/topic-content-test-helpers";
 import { QUESTION_CATEGORIES } from "./categories";
 import { NODEJS_QUIZ_QUESTIONS } from "./quiz-questions";
 
@@ -27,30 +31,6 @@ const ORIGINAL_QUIZ_QUESTION_IDS = [
   "quiz-authn-authz",
   "quiz-api-security-baseline",
 ] as const;
-
-function expectNonEmptyLocalizedText(value: { en: string; pt: string }) {
-  expect(value.en.trim()).not.toBe("");
-  expect(value.pt.trim()).not.toBe("");
-}
-
-function isCorrectOptionLengthOutlier(
-  optionTexts: readonly string[],
-  correctIndex: number,
-): boolean {
-  const correctLength = optionTexts[correctIndex]?.trim().length ?? 0;
-  const longestDistractor = optionTexts.reduce((longest, text, index) => {
-    if (index === correctIndex) {
-      return longest;
-    }
-
-    return Math.max(longest, text.trim().length);
-  }, 0);
-
-  return (
-    correctLength > longestDistractor * 1.6 &&
-    correctLength - longestDistractor >= 25
-  );
-}
 
 describe("NODEJS_QUIZ_QUESTIONS", () => {
   it("has exactly 20 questions", () => {
@@ -107,41 +87,5 @@ describe("NODEJS_QUIZ_QUESTIONS", () => {
         ).toBe(false);
       }
     }
-  });
-});
-
-describe("isCorrectOptionLengthOutlier", () => {
-  it("flags a correct option that is dramatically longer than every distractor", () => {
-    expect(
-      isCorrectOptionLengthOutlier(
-        [
-          "short wrong A",
-          "Waits for every promise to settle and returns detailed information about whether each individual promise fulfilled or rejected",
-          "short wrong C",
-          "short wrong D",
-        ],
-        1,
-      ),
-    ).toBe(true);
-  });
-
-  it("does not flag a large absolute gap when the ratio stays moderate", () => {
-    expect(
-      isCorrectOptionLengthOutlier(
-        [
-          "Stops when the first promise rejects and returns that rejection right away",
-          "Executes each promise sequentially and stops after the first failure occurs",
-          "Waits for every promise to settle and reports each individual outcome",
-          "Waits only for fulfilled promises and discards rejected outcomes after that",
-        ],
-        2,
-      ),
-    ).toBe(false);
-  });
-
-  it("does not flag short options with a high ratio but a tiny character gap", () => {
-    expect(isCorrectOptionLengthOutlier(["2xx", "3xx", "4xx", "5xx"], 3)).toBe(
-      false,
-    );
   });
 });

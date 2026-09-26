@@ -2,6 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
+import { expectNonEmptyLocalizedText } from "@/data/topic-content-test-helpers";
 import { REACT_QUESTION_CATEGORIES } from "./categories";
 import { REACT_QUESTIONS } from "./questions";
 
@@ -58,11 +59,6 @@ const APPROVED_QUESTION_IDS = [
   "react-user-interactions",
   "react-async-ui-and-mocking",
 ] as const;
-
-function expectNonEmptyLocalizedText(value: { en: string; pt: string }) {
-  expect(value.en.trim()).not.toBe("");
-  expect(value.pt.trim()).not.toBe("");
-}
 
 describe("REACT_QUESTIONS", () => {
   it("has exactly 40 questions", () => {

@@ -1,6 +1,6 @@
 # Architecture
 
-Architecture after the multi-topic capability refactor: the topic registry recognizes Node.js, React, and Angular, while content is resolved independently for Study, Quiz, and Challenges. Node.js is the only topic with content today. React and Angular remain localized coming-soon topics until a capability receives a real bank.
+The topic registry recognizes Node.js, React, and Angular, while content is resolved independently for Study, Quiz, and Challenges. All three topics provide study and quiz content; Node.js also provides coding challenges.
 
 ## Current stack
 
@@ -26,7 +26,7 @@ Each capability has a separate resolver:
 
 A missing resolver result means that capability is unavailable. No capability flags, factories, repositories, or aggregate topic object are needed.
 
-Node.js content is organized under `data/topics/nodejs/`:
+Topic-owned content is organized under `data/topics/<topic>/`:
 
 ```text
 data/
@@ -38,11 +38,10 @@ data/
 ├── challenge-types.ts
 ├── challenge-topics.ts
 ├── topic-registry.ts
-└── topics/nodejs/
-    ├── categories.ts
-    ├── questions.ts
-    ├── quiz-questions.ts
-    └── coding-challenges.ts
+└── topics/
+    ├── angular/
+    ├── nodejs/
+    └── react/
 ```
 
 `CategoryDefinition<CategoryId>` contains an id and localized display name. `InterviewQuestion`, `QuizQuestion`, and `CodingChallenge` are separate generic content models. A topic-specific category union stays inside its own data module; the application does not define a global union of every technology's category ids.
@@ -109,6 +108,6 @@ Quiz attempt configuration is content data, not a domain constant. Node.js curre
 
 ## Testing strategy
 
-Data tests protect the complete Node.js banks: 60 active-recall questions, nine categories, 20 quiz questions with balanced correct-option positions, and six challenges. Existing behavioral tests cover study scheduling, quiz flow, timeout, retry, LocalStorage, EN/PT, routes, and reveal behavior.
+Data tests protect every study and quiz bank, including bilingual content, category distributions, globally unique ids, and balanced correct-option positions. Node.js challenge tests additionally protect its six coding challenges. Existing behavioral tests cover study scheduling, quiz flow, timeout, retry, LocalStorage, EN/PT, routes, and reveal behavior.
 
 Shared-engine tests use small non-Node fixtures: Quiz uses `hooks` and `state`, Category Performance receives supplied generic category definitions, and Coding Challenge renders a fictitious React-shaped challenge. Persistence tests prove the Node.js legacy key, topic-specific keys, and isolation for matching category slugs.

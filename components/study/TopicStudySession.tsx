@@ -9,7 +9,6 @@ import {
   readQuestionProgress,
   saveQuestionProgress,
 } from "@/domain/local-storage-progress";
-import { getDueQuestions } from "@/domain/due-questions";
 import { orderQuestionsForStudy } from "@/domain/question-order";
 import { recordQuestionProgress } from "@/domain/question-progress";
 import {
@@ -19,17 +18,19 @@ import {
   type RecallRating,
   type SessionRatings,
 } from "@/domain/recall-rating";
+import {
+  createStudyQueue,
+  type StudySessionMode,
+} from "@/domain/study-session";
 import { useTranslations } from "../LocaleProvider";
 
 import styles from "./TopicStudySession.module.css";
-
-type SessionMode = "due-review" | "practice";
 
 type TopicStudySessionProps = {
   topicName: string;
   questions: readonly InterviewQuestion[];
   categories: readonly CategoryDefinition[];
-  sessionMode?: SessionMode;
+  sessionMode?: StudySessionMode;
   category?: string;
   now?: () => Date;
   backLink?: {
@@ -62,13 +63,10 @@ export function TopicStudySession({
   useEffect(() => {
     // LocalStorage is client-only, so the session queue is initialized after hydration.
     const progress = readQuestionProgress();
-    const selectedQuestions =
-      sessionMode === "due-review"
-        ? getDueQuestions(questions, progress, now())
-        : questions;
-
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSessionQuestions(orderQuestionsForStudy(selectedQuestions, progress));
+    setSessionQuestions(
+      createStudyQueue(questions, progress, sessionMode, now()),
+    );
   }, [now, questions, sessionMode]);
 
   const currentQuestion = sessionQuestions?.[currentIndex];
@@ -129,12 +127,7 @@ export function TopicStudySession({
 
   function handleStudyAgain() {
     const progress = readQuestionProgress();
-    const selectedQuestions =
-      sessionMode === "due-review"
-        ? getDueQuestions(questions, progress, now())
-        : questions;
-
-    startSession(orderQuestionsForStudy(selectedQuestions, progress));
+    startSession(createStudyQueue(questions, progress, sessionMode, now()));
   }
 
   function handleStudyAllQuestions() {

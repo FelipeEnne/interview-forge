@@ -1,13 +1,6 @@
 import type { ReactQuestionCategory } from "./categories";
 import type { InterviewQuestion } from "@/data/study-types";
 
-export {
-  REACT_CATEGORIES,
-  REACT_QUESTION_CATEGORIES,
-  type ReactQuestionCategory,
-} from "./categories";
-export type { InterviewQuestion } from "@/data/study-types";
-
 export const REACT_QUESTIONS: readonly InterviewQuestion<ReactQuestionCategory>[] =
   [
     {

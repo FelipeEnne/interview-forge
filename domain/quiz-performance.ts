@@ -1,13 +1,14 @@
 import type { CategoryScore } from "./quiz";
+import { calculatePercentage } from "./percentage";
 
-export const MIN_CATEGORY_QUESTIONS = 2;
-export const LOWEST_CATEGORY_LIMIT = 3;
+const MIN_CATEGORY_QUESTIONS = 2;
+const LOWEST_CATEGORY_LIMIT = 3;
 
 export type QuizPerformance<CategoryId extends string = string> = Partial<
   Record<CategoryId, CategoryScore>
 >;
 
-export type CategoryPerformanceEntry<CategoryId extends string = string> =
+type CategoryPerformanceEntry<CategoryId extends string = string> =
   CategoryScore & {
     category: CategoryId;
     percentage: number;
@@ -50,7 +51,7 @@ export function getLowestCategoryPerformance<CategoryId extends string>(
         {
           category,
           ...score,
-          percentage: Math.round((score.correct / score.total) * 100),
+          percentage: calculatePercentage(score.correct, score.total),
         },
       ];
     })

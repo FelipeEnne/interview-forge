@@ -1,5 +1,6 @@
 import type { CategoryScore } from "./quiz";
 import type { QuizPerformance } from "./quiz-performance";
+import { getLocalStorage } from "@/browser/local-storage";
 
 export const QUIZ_PERFORMANCE_STORAGE_KEY = "interview-forge:quiz-attempts";
 
@@ -62,19 +63,11 @@ function parseQuizPerformance<CategoryId extends string>(
   return performance;
 }
 
-function getStorage(): Storage | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  return window.localStorage;
-}
-
 export function readQuizPerformance<CategoryId extends string>(
   topicId: string,
   categoryIds: readonly CategoryId[],
 ): QuizPerformance<CategoryId> {
-  const storage = getStorage();
+  const storage = getLocalStorage();
   if (!storage) {
     return {};
   }
@@ -91,7 +84,7 @@ export function saveQuizPerformance<CategoryId extends string>(
   topicId: string,
   performance: QuizPerformance<CategoryId>,
 ): void {
-  const storage = getStorage();
+  const storage = getLocalStorage();
   if (!storage) {
     return;
   }

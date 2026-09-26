@@ -1,13 +1,6 @@
 import type { AngularQuestionCategory } from "./categories";
 import type { InterviewQuestion } from "@/data/study-types";
 
-export {
-  ANGULAR_CATEGORIES,
-  ANGULAR_QUESTION_CATEGORIES,
-  type AngularQuestionCategory,
-} from "./categories";
-export type { InterviewQuestion } from "@/data/study-types";
-
 export const ANGULAR_QUESTIONS: readonly InterviewQuestion<AngularQuestionCategory>[] =
   [
     {
