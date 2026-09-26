@@ -118,7 +118,7 @@ Server Components by default. Client Components only where interactivity or Loca
 
 ## Requirements
 
-- Node.js 20 or later
+- Node.js 20 or later (see `.nvmrc`)
 - npm (lockfile is `package-lock.json`)
 - [Make](https://www.gnu.org/software/make/) optional; `package.json` scripts work without it
 
@@ -164,6 +164,8 @@ make clean
 ```
 
 `make quick-check` runs format-check, lint, typecheck, and tests. `make check` also builds. `make clean` removes `.next` and `coverage`.
+
+Pull requests and pushes to `development` run the same `make check` pipeline in GitHub Actions.
 
 Equivalent npm / npx commands:
 
