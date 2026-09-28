@@ -118,7 +118,7 @@ Server Components by default. Client Components only where interactivity or Loca
 
 ## Requirements
 
-- Node.js 20 or later (see `.nvmrc`)
+- Node.js 22 or later (see `.nvmrc`; required for the current jsdom test stack)
 - npm (lockfile is `package-lock.json`)
 - [Make](https://www.gnu.org/software/make/) optional; `package.json` scripts work without it
 
