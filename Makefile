@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help install dev test lint format format-check typecheck build quick-check check clean
+.PHONY: help install dev test lint format format-check typecheck build quick-check check security-check clean
 
 help:
 	@echo "InterviewForge"
@@ -16,6 +16,7 @@ help:
 	@echo "  make build         Build production application"
 	@echo "  make quick-check   format-check, lint, typecheck, test"
 	@echo "  make check         Full validation (quick-check + build)"
+	@echo "  make security-check  npm audit (high severity and above)"
 	@echo "  make clean         Remove generated files"
 
 install:
@@ -49,6 +50,9 @@ quick-check: format-check lint typecheck test
 check: format-check lint typecheck test build
 	@echo ""
 	@echo "All checks passed."
+
+security-check:
+	npm audit --audit-level=high
 
 clean:
 	rm -rf .next coverage

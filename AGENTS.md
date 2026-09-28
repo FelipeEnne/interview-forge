@@ -245,6 +245,8 @@ git diff --check
 
 GitHub Actions CI must stay aligned with `make check` (do not duplicate individual validation steps in workflow YAML).
 
+For dependency security, use `make security-check` (`npm audit --audit-level=high`). Do not weaken security checks only to keep CI green. Never run `npm audit fix --force` automatically.
+
 A task is not complete while required validation is failing. If a validation failure is known to be environment-specific, reproduce and document it separately rather than modifying application code to hide it.
 
 Individual commands remain valid during TDD (for example `npm test -- --run`).
