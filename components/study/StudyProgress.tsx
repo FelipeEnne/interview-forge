@@ -9,13 +9,10 @@ import {
 import { getStudyProgress } from "@/domain/study-progress";
 import { PERCENTAGE_MAX } from "@/domain/percentage";
 import { formatStudyQuestionsRemaining } from "@/i18n/translations";
+import { noopSubscribe } from "@/browser/noop-subscribe";
 import { useTranslations } from "../LocaleProvider";
 
 import styles from "./StudyProgress.module.css";
-
-function subscribeToProgress() {
-  return () => {};
-}
 
 function getStoredProgressSnapshot(): string | null {
   return window.localStorage.getItem(QUESTION_PROGRESS_STORAGE_KEY);
@@ -46,7 +43,7 @@ type StudyProgressProps = {
 export function StudyProgress({ questions }: StudyProgressProps) {
   const { locale, t, ratingLabel } = useTranslations();
   const storedProgressRaw = useSyncExternalStore(
-    subscribeToProgress,
+    noopSubscribe,
     getStoredProgressSnapshot,
     getServerProgressSnapshot,
   );

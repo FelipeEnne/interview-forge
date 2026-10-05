@@ -13,6 +13,7 @@ import {
   getQuizPerformanceStorageKey,
   readQuizPerformance,
 } from "@/domain/local-storage-quiz-performance";
+import { noopSubscribe } from "@/browser/noop-subscribe";
 import { useTranslations } from "@/components/LocaleProvider";
 import styles from "./page.module.css";
 
@@ -22,10 +23,6 @@ type TopicOverviewProps = {
   quizTopic?: QuizTopicData;
   challengeTopic?: ChallengeTopicData;
 };
-
-function subscribeToPerformance() {
-  return () => {};
-}
 
 function TopicQuizPerformance({
   topic,
@@ -39,7 +36,7 @@ function TopicQuizPerformance({
     [topic.id],
   );
   const storedPerformance = useSyncExternalStore(
-    subscribeToPerformance,
+    noopSubscribe,
     getSnapshot,
     () => null,
   );

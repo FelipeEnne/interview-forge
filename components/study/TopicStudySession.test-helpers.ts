@@ -1,10 +1,8 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import type {
-  InterviewQuestion,
-  StudyCategoryDefinition,
-} from "@/data/study-types";
+import type { CategoryDefinition } from "@/data/category-types";
+import type { InterviewQuestion } from "@/data/study-types";
 import type { RecallRating } from "@/domain/recall-rating";
 
 export const sampleQuestions: InterviewQuestion[] = [
@@ -46,7 +44,7 @@ export const sampleQuestions: InterviewQuestion[] = [
   },
 ];
 
-export const sampleCategories: readonly StudyCategoryDefinition[] = [
+export const sampleCategories: readonly CategoryDefinition[] = [
   {
     id: "fundamentals",
     displayName: { en: "Fundamentals", pt: "Fundamentos" },

@@ -1,9 +1,6 @@
 import type { CategoryDefinition } from "./category-types";
 import type { LocalizedText } from "@/i18n/localized-text";
 
-export type StudyCategoryDefinition<CategoryId extends string = string> =
-  CategoryDefinition<CategoryId>;
-
 export type InterviewQuestion<CategoryId extends string = string> = {
   id: string;
   category: CategoryId;

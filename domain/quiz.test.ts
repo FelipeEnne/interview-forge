@@ -62,6 +62,19 @@ describe("selectQuizQuestions", () => {
 
     expect(bank.map(({ id }) => id)).toEqual(originalIds);
   });
+
+  it("returns the entire bank when count exceeds the bank length", () => {
+    const selected = selectQuizQuestions(bank, bank.length + 5, () => 0);
+
+    expect(selected).toHaveLength(bank.length);
+    expect(new Set(selected.map(({ id }) => id))).toEqual(
+      new Set(bank.map(({ id }) => id)),
+    );
+  });
+
+  it("returns an empty list when count is zero", () => {
+    expect(selectQuizQuestions(bank, 0, () => 0)).toEqual([]);
+  });
 });
 
 describe("calculateQuizResult", () => {

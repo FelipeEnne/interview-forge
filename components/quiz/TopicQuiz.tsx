@@ -16,13 +16,15 @@ import {
 } from "@/domain/quiz";
 import { recordQuizPerformance } from "@/domain/quiz-performance";
 import {
-  formatQuizTime,
   getRemainingQuizSeconds,
   minutesToMilliseconds,
   minutesToSeconds,
   QUIZ_TIMER_TICK_MILLISECONDS,
 } from "@/domain/quiz-timer";
 import { useTranslations } from "../LocaleProvider";
+import { QuizActiveQuestion } from "./QuizActiveQuestion";
+import { QuizIntro } from "./QuizIntro";
+import { QuizResultSummary } from "./QuizResultSummary";
 
 import styles from "./TopicQuiz.module.css";
 
@@ -157,88 +159,30 @@ export function TopicQuiz({
       </h1>
       <article className={styles.card} aria-live="polite">
         {phase === "intro" ? (
-          <div className={styles.summary}>
-            <p className={styles.meta}>
-              {t("quizQuestionCount", { count: topic.questionsPerAttempt })}
-            </p>
-            <p className={styles.meta}>
-              {t("quizDuration", { minutes: topic.durationMinutes })}
-            </p>
-            <button
-              type="button"
-              className={`${styles.button} ${styles.buttonPrimary}`}
-              onClick={startAttempt}
-            >
-              {t("startQuiz")}
-            </button>
-          </div>
+          <QuizIntro
+            questionsPerAttempt={topic.questionsPerAttempt}
+            durationMinutes={topic.durationMinutes}
+            onStart={startAttempt}
+          />
         ) : null}
         {phase === "active" && currentQuestion ? (
-          <>
-            <p className={styles.timer}>
-              {t("timeRemaining", { time: formatQuizTime(remainingSeconds) })}
-            </p>
-            <p className={styles.progress}>
-              {t("questionProgress", {
-                current: currentIndex + 1,
-                total: attemptQuestions.length,
-              })}
-            </p>
-            <p className={styles.question}>
-              {localize(currentQuestion.question)}
-            </p>
-            <fieldset className={styles.options}>
-              <legend className={styles.legend}>{t("chooseAnswer")}</legend>
-              {currentQuestion.options.map((option, optionIndex) => (
-                <label
-                  key={`${currentQuestion.id}-${optionIndex}`}
-                  className={styles.option}
-                >
-                  <input
-                    type="radio"
-                    name={currentQuestion.id}
-                    checked={answers[currentQuestion.id] === optionIndex}
-                    onChange={() => handleSelectOption(optionIndex)}
-                  />
-                  {localize(option)}
-                </label>
-              ))}
-            </fieldset>
-            <button
-              type="button"
-              className={`${styles.button} ${styles.buttonPrimary}`}
-              onClick={handleAdvance}
-              disabled={!hasCurrentAnswer}
-            >
-              {isLastQuestion ? t("finishQuiz") : t("next")}
-            </button>
-          </>
+          <QuizActiveQuestion
+            question={currentQuestion}
+            currentIndex={currentIndex}
+            totalQuestions={attemptQuestions.length}
+            remainingSeconds={remainingSeconds}
+            selectedOption={answers[currentQuestion.id]}
+            isLastQuestion={isLastQuestion}
+            onSelectOption={handleSelectOption}
+            onAdvance={handleAdvance}
+          />
         ) : null}
         {phase === "result" && result ? (
-          <div className={styles.summary}>
-            <p className={styles.score}>
-              {result.correct} / {result.total}
-            </p>
-            <p className={styles.percentage}>{result.percentage}%</p>
-            <ul className={styles.summaryCounts}>
-              {topic.categories.map((category) => {
-                const score = result.byCategory[category.id];
-                return score ? (
-                  <li key={category.id}>
-                    {localize(category.displayName)}: {score.correct} /{" "}
-                    {score.total}
-                  </li>
-                ) : null;
-              })}
-            </ul>
-            <button
-              type="button"
-              className={`${styles.button} ${styles.buttonPrimary}`}
-              onClick={startAttempt}
-            >
-              {t("tryAgain")}
-            </button>
-          </div>
+          <QuizResultSummary
+            result={result}
+            categories={topic.categories}
+            onTryAgain={startAttempt}
+          />
         ) : null}
       </article>
     </div>

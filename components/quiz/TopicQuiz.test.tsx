@@ -46,7 +46,10 @@ async function startQuiz(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe("TopicQuiz", () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    vi.restoreAllMocks();
+  });
 
   it("shows topic configuration and starts a generic category fixture", async () => {
     const user = userEvent.setup({ delay: null });
@@ -127,6 +130,64 @@ describe("TopicQuiz", () => {
     await user.click(screen.getByRole("button", { name: "Finish quiz" }));
     await user.click(screen.getByRole("button", { name: "Try again" }));
     expect(screen.getByText("Question 1 of 10")).toBeInTheDocument();
+  });
+
+  it("accumulates persisted performance across Try again attempts", async () => {
+    const user = userEvent.setup({ delay: null });
+    await startQuiz(user);
+    for (let index = 1; index <= 9; index += 1) {
+      await user.click(screen.getByRole("radio", { name: `q${index} A` }));
+      await user.click(screen.getByRole("button", { name: "Next" }));
+    }
+    await user.click(screen.getByRole("radio", { name: "q10 A" }));
+    await user.click(screen.getByRole("button", { name: "Finish quiz" }));
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+    for (let index = 1; index <= 9; index += 1) {
+      await user.click(screen.getByRole("radio", { name: `q${index} A` }));
+      await user.click(screen.getByRole("button", { name: "Next" }));
+    }
+    await user.click(screen.getByRole("radio", { name: "q10 A" }));
+    await user.click(screen.getByRole("button", { name: "Finish quiz" }));
+
+    expect(readQuizPerformance(topic.id, ["hooks", "state"])).toEqual({
+      hooks: { correct: 10, total: 10 },
+      state: { correct: 10, total: 10 },
+    });
+  });
+
+  it("persists performance only once when Finish and the deadline overlap", () => {
+    const startedAt = new Date("2026-09-18T00:00:00.000Z").getTime();
+    let currentTime = startedAt;
+    const spy = vi.spyOn(Storage.prototype, "setItem");
+    const { rerender } = render(
+      <TopicQuiz
+        topic={topic}
+        randomSource={stableRandom}
+        now={() => currentTime}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Start quiz" }));
+    for (let index = 1; index <= 9; index += 1) {
+      fireEvent.click(screen.getByRole("radio", { name: `q${index} A` }));
+      fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    }
+    fireEvent.click(screen.getByRole("radio", { name: "q10 A" }));
+    currentTime += 8 * 60 * 1000;
+    fireEvent.click(screen.getByRole("button", { name: "Finish quiz" }));
+    rerender(
+      <TopicQuiz
+        topic={topic}
+        randomSource={stableRandom}
+        now={() => currentTime}
+      />,
+    );
+
+    expect(screen.getByText("10 / 10")).toBeInTheDocument();
+    const quizWrites = spy.mock.calls.filter(([key]) =>
+      String(key).includes("quiz-attempts"),
+    );
+    expect(quizWrites).toHaveLength(1);
   });
 
   it("localizes a generic topic without resetting the current attempt", async () => {

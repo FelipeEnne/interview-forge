@@ -1,10 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type {
-  InterviewQuestion,
-  StudyCategoryDefinition,
-} from "@/data/study-types";
+import type { CategoryDefinition } from "@/data/category-types";
+import type { InterviewQuestion } from "@/data/study-types";
 import {
   QUESTION_PROGRESS_STORAGE_KEY,
   readQuestionProgress,
@@ -58,7 +56,7 @@ describe("TopicStudySession", () => {
         },
       },
     ];
-    const reactCategories: StudyCategoryDefinition[] = [
+    const reactCategories: CategoryDefinition[] = [
       {
         id: "hooks",
         displayName: { en: "Hooks", pt: "Hooks" },

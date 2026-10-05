@@ -2,7 +2,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { expectNonEmptyLocalizedText } from "@/data/topic-content-test-helpers";
+import {
+  expectStudyQuestionBankShape,
+  expectUniqueIds,
+} from "@/data/topic-content-test-helpers";
 import { QUESTION_CATEGORIES } from "./categories";
 import { NODEJS_QUESTIONS } from "./questions";
 
@@ -75,20 +78,11 @@ describe("NODEJS_QUESTIONS", () => {
   });
 
   it("each question has a valid category and bilingual content", () => {
-    const validCategories = QUESTION_CATEGORIES;
-
-    for (const item of NODEJS_QUESTIONS) {
-      expect(item.id.trim()).not.toBe("");
-      expect(validCategories).toContain(item.category);
-      expectNonEmptyLocalizedText(item.question);
-      expectNonEmptyLocalizedText(item.answer);
-    }
+    expectStudyQuestionBankShape(NODEJS_QUESTIONS, QUESTION_CATEGORIES);
   });
 
   it("has unique question ids", () => {
-    const ids = NODEJS_QUESTIONS.map(({ id }) => id);
-
-    expect(new Set(ids).size).toBe(ids.length);
+    expectUniqueIds(NODEJS_QUESTIONS.map(({ id }) => id));
   });
 
   it("preserves the original question ids", () => {

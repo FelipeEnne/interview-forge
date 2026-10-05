@@ -21,10 +21,14 @@ export function CategoryPerformance({
   studyCategoryBasePath,
 }: CategoryPerformanceProps) {
   const { t, localize } = useTranslations();
-  const entries = getLowestCategoryPerformance(
-    performance,
-    categories.map(({ id }) => id),
+  const definedIds = categories.map(({ id }) => id);
+  const performanceOnlyIds = Object.keys(performance).filter(
+    (categoryId) => !definedIds.includes(categoryId),
   );
+  const entries = getLowestCategoryPerformance(performance, [
+    ...definedIds,
+    ...performanceOnlyIds,
+  ]);
 
   if (entries.length === 0) {
     return null;

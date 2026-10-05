@@ -4,8 +4,10 @@ import { getLocalStorage } from "@/browser/local-storage";
 
 export const QUIZ_PERFORMANCE_STORAGE_KEY = "interview-forge:quiz-attempts";
 
+const LEGACY_QUIZ_PERFORMANCE_TOPIC_ID = "nodejs";
+
 export function getQuizPerformanceStorageKey(topicId: string): string {
-  return topicId === "nodejs"
+  return topicId === LEGACY_QUIZ_PERFORMANCE_TOPIC_ID
     ? QUIZ_PERFORMANCE_STORAGE_KEY
     : `${QUIZ_PERFORMANCE_STORAGE_KEY}:${topicId}`;
 }

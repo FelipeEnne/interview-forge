@@ -44,6 +44,35 @@ describe("local-storage-progress", () => {
       expect(readQuestionProgress()).toEqual({});
     });
 
+    it("returns an empty state when the root value is null", () => {
+      localStorage.setItem(QUESTION_PROGRESS_STORAGE_KEY, "null");
+
+      expect(readQuestionProgress()).toEqual({});
+    });
+
+    it("returns an empty state when a question id is empty", () => {
+      localStorage.setItem(
+        QUESTION_PROGRESS_STORAGE_KEY,
+        JSON.stringify({
+          "": { lastRating: "good", reviewCount: 1 },
+        }),
+      );
+
+      expect(readQuestionProgress()).toEqual({});
+    });
+
+    it.each([
+      ["a null entry", null],
+      ["a non-object entry", "good"],
+    ])("returns an empty state for %s", (_description, entry) => {
+      localStorage.setItem(
+        QUESTION_PROGRESS_STORAGE_KEY,
+        JSON.stringify({ q1: entry }),
+      );
+
+      expect(readQuestionProgress()).toEqual({});
+    });
+
     it("returns an empty state when any entry fails validation", () => {
       localStorage.setItem(
         QUESTION_PROGRESS_STORAGE_KEY,

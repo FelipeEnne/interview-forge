@@ -3,8 +3,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  expectNonEmptyLocalizedText,
-  isCorrectOptionLengthOutlier,
+  expectEvenCorrectOptionSpread,
+  expectNoCorrectOptionLengthOutliers,
+  expectQuizQuestionBankShape,
+  expectUniqueIds,
 } from "@/data/topic-content-test-helpers";
 import { QUESTION_CATEGORIES } from "./categories";
 import { NODEJS_QUIZ_QUESTIONS } from "./quiz-questions";
@@ -38,9 +40,7 @@ describe("NODEJS_QUIZ_QUESTIONS", () => {
   });
 
   it("has unique question ids", () => {
-    const ids = NODEJS_QUIZ_QUESTIONS.map(({ id }) => id);
-
-    expect(new Set(ids).size).toBe(ids.length);
+    expectUniqueIds(NODEJS_QUIZ_QUESTIONS.map(({ id }) => id));
   });
 
   it("preserves the original question ids", () => {
@@ -50,42 +50,14 @@ describe("NODEJS_QUIZ_QUESTIONS", () => {
   });
 
   it("each question has bilingual content, four bilingual options, and a valid correct option", () => {
-    const validCategories = QUESTION_CATEGORIES;
-
-    for (const item of NODEJS_QUIZ_QUESTIONS) {
-      expect(item.id.trim()).not.toBe("");
-      expect(validCategories).toContain(item.category);
-      expectNonEmptyLocalizedText(item.question);
-      expect(item.options).toHaveLength(4);
-
-      for (const option of item.options) {
-        expectNonEmptyLocalizedText(option);
-      }
-
-      expect(item.correctOption).toBeGreaterThanOrEqual(0);
-      expect(item.correctOption).toBeLessThan(item.options.length);
-    }
+    expectQuizQuestionBankShape(NODEJS_QUIZ_QUESTIONS, QUESTION_CATEGORIES);
   });
 
   it("spreads correctOption evenly across the four indices", () => {
-    const counts = [0, 0, 0, 0];
-
-    for (const item of NODEJS_QUIZ_QUESTIONS) {
-      counts[item.correctOption] += 1;
-    }
-
-    expect(counts).toEqual([5, 5, 5, 5]);
+    expectEvenCorrectOptionSpread(NODEJS_QUIZ_QUESTIONS);
   });
 
   it("does not make the correct option a clear length outlier in English or Portuguese", () => {
-    for (const item of NODEJS_QUIZ_QUESTIONS) {
-      for (const locale of ["en", "pt"] as const) {
-        const optionTexts = item.options.map((option) => option[locale]);
-
-        expect(
-          isCorrectOptionLengthOutlier(optionTexts, item.correctOption),
-        ).toBe(false);
-      }
-    }
+    expectNoCorrectOptionLengthOutliers(NODEJS_QUIZ_QUESTIONS);
   });
 });

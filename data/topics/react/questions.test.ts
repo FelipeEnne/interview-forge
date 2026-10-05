@@ -2,7 +2,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { expectNonEmptyLocalizedText } from "@/data/topic-content-test-helpers";
+import {
+  expectStudyQuestionBankShape,
+  expectUniqueIds,
+} from "@/data/topic-content-test-helpers";
 import { REACT_QUESTION_CATEGORIES } from "./categories";
 import { REACT_QUESTIONS } from "./questions";
 
@@ -75,8 +78,7 @@ describe("REACT_QUESTIONS", () => {
   });
 
   it("has unique question ids locally", () => {
-    const ids = REACT_QUESTIONS.map(({ id }) => id);
-    expect(new Set(ids).size).toBe(ids.length);
+    expectUniqueIds(REACT_QUESTIONS.map(({ id }) => id));
   });
 
   it("matches the approved category distribution", () => {
@@ -89,13 +91,6 @@ describe("REACT_QUESTIONS", () => {
   });
 
   it("each question has a valid category and bilingual content", () => {
-    const validCategories = REACT_QUESTION_CATEGORIES;
-
-    for (const item of REACT_QUESTIONS) {
-      expect(item.id.trim()).not.toBe("");
-      expect(validCategories).toContain(item.category);
-      expectNonEmptyLocalizedText(item.question);
-      expectNonEmptyLocalizedText(item.answer);
-    }
+    expectStudyQuestionBankShape(REACT_QUESTIONS, REACT_QUESTION_CATEGORIES);
   });
 });

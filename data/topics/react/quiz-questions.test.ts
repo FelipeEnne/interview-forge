@@ -3,8 +3,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  expectNonEmptyLocalizedText,
-  isCorrectOptionLengthOutlier,
+  expectCategoryDefinitionsMatchIds,
+  expectEvenCorrectOptionSpread,
+  expectNoCorrectOptionLengthOutliers,
+  expectQuizQuestionBankShape,
+  expectUniqueIds,
 } from "@/data/topic-content-test-helpers";
 import { NODEJS_QUIZ_QUESTIONS } from "../nodejs/quiz-questions";
 import { REACT_CATEGORIES, REACT_QUESTION_CATEGORIES } from "./categories";
@@ -23,12 +26,10 @@ describe("REACT_QUIZ_QUESTIONS", () => {
       "testing",
     ]);
     expect(REACT_CATEGORIES).toHaveLength(8);
-    expect(REACT_CATEGORIES.map(({ id }) => id)).toEqual(
+    expectCategoryDefinitionsMatchIds(
+      REACT_CATEGORIES,
       REACT_QUESTION_CATEGORIES,
     );
-    for (const category of REACT_CATEGORIES) {
-      expectNonEmptyLocalizedText(category.displayName);
-    }
     expect(REACT_QUIZ_QUESTIONS).toHaveLength(20);
   });
 
@@ -53,53 +54,28 @@ describe("REACT_QUIZ_QUESTIONS", () => {
     const ids = REACT_QUIZ_QUESTIONS.map(({ id }) => id);
 
     expect(ids.every((id) => id.startsWith("react-quiz-"))).toBe(true);
-    expect(new Set(ids).size).toBe(ids.length);
+    expectUniqueIds(ids);
   });
 
   it("keeps quiz ids globally unique across current topic banks", () => {
-    const ids = [
+    expectUniqueIds([
       ...NODEJS_QUIZ_QUESTIONS.map(({ id }) => id),
       ...REACT_QUIZ_QUESTIONS.map(({ id }) => id),
-    ];
-
-    expect(new Set(ids).size).toBe(ids.length);
+    ]);
   });
 
   it("has bilingual content, four bilingual options, valid categories, and valid correct options", () => {
-    for (const question of REACT_QUIZ_QUESTIONS) {
-      expect(REACT_QUESTION_CATEGORIES).toContain(question.category);
-      expectNonEmptyLocalizedText(question.question);
-      expect(question.options).toHaveLength(4);
-
-      for (const option of question.options) {
-        expectNonEmptyLocalizedText(option);
-      }
-
-      expect(question.correctOption).toBeGreaterThanOrEqual(0);
-      expect(question.correctOption).toBeLessThan(question.options.length);
-    }
+    expectQuizQuestionBankShape(
+      REACT_QUIZ_QUESTIONS,
+      REACT_QUESTION_CATEGORIES,
+    );
   });
 
   it("spreads correct options evenly across the four indices", () => {
-    const counts = [0, 0, 0, 0];
-
-    for (const question of REACT_QUIZ_QUESTIONS) {
-      counts[question.correctOption] += 1;
-    }
-
-    expect(counts).toEqual([5, 5, 5, 5]);
+    expectEvenCorrectOptionSpread(REACT_QUIZ_QUESTIONS);
   });
 
   it("does not make a correct option a clear length outlier in either language", () => {
-    for (const question of REACT_QUIZ_QUESTIONS) {
-      for (const locale of ["en", "pt"] as const) {
-        expect(
-          isCorrectOptionLengthOutlier(
-            question.options.map((option) => option[locale]),
-            question.correctOption,
-          ),
-        ).toBe(false);
-      }
-    }
+    expectNoCorrectOptionLengthOutliers(REACT_QUIZ_QUESTIONS);
   });
 });

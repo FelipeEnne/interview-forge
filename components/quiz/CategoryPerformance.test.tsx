@@ -55,4 +55,39 @@ describe("CategoryPerformance", () => {
       screen.queryByRole("heading", { name: "Performance" }),
     ).not.toBeInTheDocument();
   });
+
+  it("omits study links when studyCategoryBasePath is not provided", () => {
+    render(
+      <CategoryPerformance
+        categories={categories}
+        performance={{
+          hooks: { correct: 1, total: 2 },
+          state: { correct: 1, total: 2 },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Hooks", level: 3 }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /Study/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("falls back to the raw category id when a definition is missing", () => {
+    render(
+      <CategoryPerformance
+        categories={categories}
+        performance={{
+          hooks: { correct: 2, total: 5 },
+          "raw-category": { correct: 0, total: 2 },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "raw-category", level: 3 }),
+    ).toBeInTheDocument();
+  });
 });

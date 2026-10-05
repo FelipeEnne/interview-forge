@@ -4,49 +4,34 @@ import { ANGULAR_CATEGORIES } from "./topics/angular/categories";
 import { ANGULAR_QUIZ_QUESTIONS } from "./topics/angular/quiz-questions";
 import { REACT_CATEGORIES } from "./topics/react/categories";
 import { REACT_QUIZ_QUESTIONS } from "./topics/react/quiz-questions";
-import type { QuizTopicData } from "./quiz-types";
+import type { CategoryDefinition } from "./category-types";
+import type { QuizQuestion, QuizTopicData } from "./quiz-types";
 import { getTopicById } from "./topic-registry";
 
 const QUESTIONS_PER_ATTEMPT = 10;
 const DURATION_MINUTES = 8;
 
-const nodejsDefinition = getTopicById("nodejs")!;
+function buildQuizTopic(
+  topicId: string,
+  categories: readonly CategoryDefinition[],
+  questions: readonly QuizQuestion[],
+): QuizTopicData {
+  const definition = getTopicById(topicId)!;
 
-const NODEJS_QUIZ_TOPIC: QuizTopicData = {
-  id: nodejsDefinition.id,
-  displayName: nodejsDefinition.displayName,
-  categories: NODEJS_CATEGORIES,
-  questions: NODEJS_QUIZ_QUESTIONS,
-  questionsPerAttempt: QUESTIONS_PER_ATTEMPT,
-  durationMinutes: DURATION_MINUTES,
-};
-
-const reactDefinition = getTopicById("react")!;
-
-const REACT_QUIZ_TOPIC: QuizTopicData = {
-  id: reactDefinition.id,
-  displayName: reactDefinition.displayName,
-  categories: REACT_CATEGORIES,
-  questions: REACT_QUIZ_QUESTIONS,
-  questionsPerAttempt: QUESTIONS_PER_ATTEMPT,
-  durationMinutes: DURATION_MINUTES,
-};
-
-const angularDefinition = getTopicById("angular")!;
-
-const ANGULAR_QUIZ_TOPIC: QuizTopicData = {
-  id: angularDefinition.id,
-  displayName: angularDefinition.displayName,
-  categories: ANGULAR_CATEGORIES,
-  questions: ANGULAR_QUIZ_QUESTIONS,
-  questionsPerAttempt: QUESTIONS_PER_ATTEMPT,
-  durationMinutes: DURATION_MINUTES,
-};
+  return {
+    id: definition.id,
+    displayName: definition.displayName,
+    categories,
+    questions,
+    questionsPerAttempt: QUESTIONS_PER_ATTEMPT,
+    durationMinutes: DURATION_MINUTES,
+  };
+}
 
 const QUIZ_TOPICS: readonly QuizTopicData[] = [
-  NODEJS_QUIZ_TOPIC,
-  REACT_QUIZ_TOPIC,
-  ANGULAR_QUIZ_TOPIC,
+  buildQuizTopic("nodejs", NODEJS_CATEGORIES, NODEJS_QUIZ_QUESTIONS),
+  buildQuizTopic("react", REACT_CATEGORIES, REACT_QUIZ_QUESTIONS),
+  buildQuizTopic("angular", ANGULAR_CATEGORIES, ANGULAR_QUIZ_QUESTIONS),
 ];
 
 export function getQuizTopicById(id: string): QuizTopicData | undefined {

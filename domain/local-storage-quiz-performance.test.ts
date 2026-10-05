@@ -83,6 +83,7 @@ describe("local-storage-quiz-performance", () => {
   it.each([
     ["invalid JSON", "not-json{"],
     ["a non-object root", "[]"],
+    ["a null root", "null"],
     [
       "an unknown category",
       JSON.stringify({ databases: { correct: 1, total: 2 } }),
@@ -92,6 +93,9 @@ describe("local-storage-quiz-performance", () => {
       "non-integer counts",
       JSON.stringify({ async: { correct: 0.5, total: 2 } }),
     ],
+    ["total below one", JSON.stringify({ async: { correct: 0, total: 0 } })],
+    ["missing score fields", JSON.stringify({ async: { correct: 1 } })],
+    ["a non-object score", JSON.stringify({ async: 2 })],
   ])("returns empty performance for %s", (_description, raw) => {
     localStorage.setItem(QUIZ_PERFORMANCE_STORAGE_KEY, raw);
 

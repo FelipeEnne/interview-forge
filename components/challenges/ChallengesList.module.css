@@ -1,21 +1,13 @@
 .container {
-  width: 100%;
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 2rem 1.25rem 3rem;
+  composes: container from "../session-shell.module.css";
 }
 
 .backLink {
-  display: inline-block;
-  margin-bottom: 1rem;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+  composes: backLink from "../session-shell.module.css";
 }
 
 .title {
-  font-size: 1.75rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+  composes: title from "../session-shell.module.css";
 }
 
 .list {
