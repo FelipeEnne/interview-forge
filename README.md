@@ -165,7 +165,7 @@ make clean
 
 `make quick-check` runs format-check, lint, typecheck, and tests. `make check` also builds. `make clean` removes `.next` and `coverage`.
 
-Pull requests and pushes to `development` run the same `make check` pipeline in GitHub Actions (CI workflow). The Security workflow runs dependency audit (`make security-check`) and CodeQL for JavaScript/TypeScript on the same triggers plus a weekly schedule. Dependabot opens weekly update PRs for npm and GitHub Actions.
+Pull requests and pushes to `development` run the same `make check` pipeline in GitHub Actions (CI workflow). The Security workflow runs dependency audit (`make security-check`) and CodeQL for JavaScript/TypeScript on pushes to `development`, on a weekly schedule, and via manual `workflow_dispatch`—not on every pull request. Dependabot opens weekly update PRs for npm and GitHub Actions, grouping minor/patch bumps (majors stay separate).
 
 Equivalent npm / npx commands:
 

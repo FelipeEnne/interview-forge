@@ -1,12 +1,19 @@
 name: Security
 
 on:
-  pull_request:
   push:
     branches:
       - development
   schedule:
     - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   dependency-audit:
