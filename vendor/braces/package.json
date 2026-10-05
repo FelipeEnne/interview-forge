@@ -1,0 +1,14 @@
+{
+  "name": "braces",
+  "description": "Local braces 3.0.3 fork with nesting-depth guards for CVE-2026-93687 (GHSA-vfj7-8cjw-p6xm). Upstream has no patched release yet.",
+  "version": "3.0.4",
+  "license": "MIT",
+  "files": ["index.js", "lib"],
+  "main": "index.js",
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "fill-range": "^7.1.1"
+  }
+}

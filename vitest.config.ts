@@ -1,6 +1,6 @@
 import path from "node:path";
 import react from "@vitejs/plugin-react";
-import { configDefaults, defineConfig, type Plugin } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 const monotonicNow = path.join(import.meta.dirname, "vitest.monotonic-now.cjs");
 
@@ -11,24 +11,13 @@ const localStorageDomTests = [
   "**/local-storage-*.test.ts",
 ];
 
-// plugin-react 6 is typed for Vite 8; Vitest 3.2 still types plugins against Vite 7.
-const reactPlugins = react() as unknown as Plugin[];
-
 export default defineConfig({
-  plugins: reactPlugins,
+  plugins: react(),
   test: {
     sequence: {
       hooks: "stack",
     },
     pool: "forks",
-    poolOptions: {
-      forks: {
-        execArgv: ["--require", monotonicNow],
-      },
-      threads: {
-        isolate: false,
-      },
-    },
     // Node tests skip jsdom and Testing Library; DOM tests keep isolated forks
     // so Date.now stays aligned with performance.now for React 19.
     projects: [
@@ -58,6 +47,7 @@ export default defineConfig({
           setupFiles: ["./vitest.setup.ts"],
           isolate: true,
           pool: "forks",
+          execArgv: ["--require", monotonicNow],
         },
       },
     ],
