@@ -17,7 +17,7 @@ export default async function TopicStudyPage({ params }: TopicStudyPageProps) {
 
   return (
     <TopicStudySession
-      topicName={studyTopic.displayName.en}
+      topicDisplayName={studyTopic.displayName}
       categories={studyTopic.categories}
       questions={studyTopic.questions}
       backLink={{

@@ -1,6 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import {
+  QUIZ_DURATION_MINUTES,
+  QUIZ_QUESTIONS_PER_ATTEMPT,
+} from "@/data/quiz-topics";
 import TopicQuizPage from "./page";
 
 describe("TopicQuizPage", () => {
@@ -40,8 +44,12 @@ describe("TopicQuizPage", () => {
     expect(
       screen.getByRole("heading", { name: "React Proficiency Quiz" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("10 questions")).toBeInTheDocument();
-    expect(screen.getByText("8 minutes")).toBeInTheDocument();
+    expect(
+      screen.getByText(`${QUIZ_QUESTIONS_PER_ATTEMPT} questions`),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(`${QUIZ_DURATION_MINUTES} minutes`),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Back to React" })).toHaveAttribute(
       "href",
       "/topics/react",
@@ -58,8 +66,12 @@ describe("TopicQuizPage", () => {
     expect(
       screen.getByRole("heading", { name: "Angular Proficiency Quiz" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("10 questions")).toBeInTheDocument();
-    expect(screen.getByText("8 minutes")).toBeInTheDocument();
+    expect(
+      screen.getByText(`${QUIZ_QUESTIONS_PER_ATTEMPT} questions`),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(`${QUIZ_DURATION_MINUTES} minutes`),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Back to Angular" }),
     ).toHaveAttribute("href", "/topics/angular");

@@ -1,6 +1,7 @@
 import type { CategoryScore } from "./quiz";
 import type { QuizPerformance } from "./quiz-performance";
 import { getLocalStorage } from "@/browser/local-storage";
+import { parseJsonObject } from "@/browser/parse-json-object";
 
 export const QUIZ_PERFORMANCE_STORAGE_KEY = "interview-forge:quiz-attempts";
 
@@ -34,24 +35,15 @@ function parseQuizPerformance<CategoryId extends string>(
   raw: string,
   categoryIds: readonly CategoryId[],
 ): QuizPerformance<CategoryId> {
-  let parsed: unknown;
-
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    return {};
-  }
-
-  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+  const parsed = parseJsonObject(raw);
+  if (parsed === null) {
     return {};
   }
 
   const validCategories = new Set<string>(categoryIds);
   const performance: QuizPerformance<CategoryId> = {};
 
-  for (const [category, score] of Object.entries(
-    parsed as Record<string, unknown>,
-  )) {
+  for (const [category, score] of Object.entries(parsed)) {
     if (!validCategories.has(category) || !isValidCategoryScore(score)) {
       return {};
     }

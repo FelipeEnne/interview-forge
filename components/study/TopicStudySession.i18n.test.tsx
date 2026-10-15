@@ -25,16 +25,23 @@ describe("TopicStudySession localization", () => {
 
     renderWithLocale(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js (PT)" }}
         categories={sampleCategories}
         questions={[sampleQuestions[0]!]}
         now={clock.now}
+        backLink={{ href: "/topics/nodejs" }}
       />,
       "pt",
     );
 
     expect(
-      await screen.findByRole("button", { name: "Mostrar resposta" }),
+      await screen.findByRole("heading", { name: "Node.js (PT)" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Voltar para Node.js (PT)" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Mostrar resposta" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Fundamentos")).toBeInTheDocument();
     expect(screen.getByText("Texto da primeira pergunta?")).toBeInTheDocument();
@@ -59,7 +66,7 @@ describe("TopicStudySession localization", () => {
       <LocaleProvider>
         <LanguageSelector />
         <TopicStudySession
-          topicName="Node.js"
+          topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
           categories={sampleCategories}
           questions={sampleQuestions}
           now={clock.now}

@@ -1,19 +1,26 @@
 import { NODEJS_CATEGORIES } from "./topics/nodejs/categories";
 import { NODEJS_CODING_CHALLENGES } from "./topics/nodejs/coding-challenges";
-import type { ChallengeTopicData } from "./challenge-types";
+import type { CategoryDefinition } from "./category-types";
+import type { CodingChallenge, ChallengeTopicData } from "./challenge-types";
 import { getTopicById } from "./topic-registry";
 
-const nodejsDefinition = getTopicById("nodejs")!;
+function buildChallengeTopic(
+  topicId: string,
+  categories: readonly CategoryDefinition[],
+  challenges: readonly CodingChallenge[],
+): ChallengeTopicData {
+  const definition = getTopicById(topicId)!;
 
-const NODEJS_CHALLENGE_TOPIC: ChallengeTopicData = {
-  id: nodejsDefinition.id,
-  displayName: nodejsDefinition.displayName,
-  categories: NODEJS_CATEGORIES,
-  challenges: NODEJS_CODING_CHALLENGES,
-};
+  return {
+    id: definition.id,
+    displayName: definition.displayName,
+    categories,
+    challenges,
+  };
+}
 
 const CHALLENGE_TOPICS: readonly ChallengeTopicData[] = [
-  NODEJS_CHALLENGE_TOPIC,
+  buildChallengeTopic("nodejs", NODEJS_CATEGORIES, NODEJS_CODING_CHALLENGES),
 ];
 
 export function getChallengeTopicById(

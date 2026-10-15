@@ -26,7 +26,7 @@ export default async function CategoryStudyPage({
 
   return (
     <TopicStudySession
-      topicName={studyTopic.displayName.en}
+      topicDisplayName={studyTopic.displayName}
       category={category}
       categories={studyTopic.categories}
       questions={questions}

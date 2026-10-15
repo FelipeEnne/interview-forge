@@ -4,6 +4,7 @@ import type {
 } from "./question-progress";
 import { RECALL_RATING_OPTIONS, type RecallRating } from "./recall-rating";
 import { getLocalStorage } from "@/browser/local-storage";
+import { parseJsonObject } from "@/browser/parse-json-object";
 
 export const QUESTION_PROGRESS_STORAGE_KEY =
   "interview-forge:question-progress";
@@ -50,22 +51,14 @@ function isValidQuestionProgress(value: unknown): value is QuestionProgress {
 }
 
 function parseQuestionProgressState(raw: string): QuestionProgressState {
-  let parsed: unknown;
-
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
+  const parsed = parseJsonObject(raw);
+  if (parsed === null) {
     return {};
   }
 
-  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-    return {};
-  }
-
-  const entries = Object.entries(parsed as Record<string, unknown>);
   const state: QuestionProgressState = {};
 
-  for (const [questionId, progress] of entries) {
+  for (const [questionId, progress] of Object.entries(parsed)) {
     if (questionId.length === 0 || !isValidQuestionProgress(progress)) {
       return {};
     }

@@ -75,6 +75,10 @@ describe("selectQuizQuestions", () => {
   it("returns an empty list when count is zero", () => {
     expect(selectQuizQuestions(bank, 0, () => 0)).toEqual([]);
   });
+
+  it("returns an empty list when the question bank is empty", () => {
+    expect(selectQuizQuestions([], 10, () => 0)).toEqual([]);
+  });
 });
 
 describe("calculateQuizResult", () => {

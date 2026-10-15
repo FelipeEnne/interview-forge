@@ -8,7 +8,6 @@ import type { LocalizedText } from "@/i18n/localized-text";
 const CORRECT_OPTION_LENGTH_RATIO_LIMIT = 1.6;
 const CORRECT_OPTION_LENGTH_GAP_LIMIT = 25;
 const QUIZ_OPTION_COUNT = 4;
-const EXPECTED_CORRECT_OPTION_SPREAD = [5, 5, 5, 5] as const;
 
 export function expectNonEmptyLocalizedText(value: LocalizedText): void {
   expect(value.en.trim()).not.toBe("");
@@ -72,13 +71,30 @@ export function expectQuizQuestionBankShape(
 export function expectEvenCorrectOptionSpread(
   questions: readonly QuizQuestion[],
 ): void {
-  const counts = [0, 0, 0, 0];
+  expect(questions.length % QUIZ_OPTION_COUNT).toBe(0);
+
+  const expectedPerOption = questions.length / QUIZ_OPTION_COUNT;
+  const counts = Array.from({ length: QUIZ_OPTION_COUNT }, () => 0);
 
   for (const question of questions) {
     counts[question.correctOption] += 1;
   }
 
-  expect(counts).toEqual([...EXPECTED_CORRECT_OPTION_SPREAD]);
+  expect(counts).toEqual(
+    Array.from({ length: QUIZ_OPTION_COUNT }, () => expectedPerOption),
+  );
+}
+
+export function expectCategoryDistribution(
+  questions: readonly { category: string }[],
+  distribution: Readonly<Record<string, number>>,
+): void {
+  for (const [category, expectedCount] of Object.entries(distribution)) {
+    const count = questions.filter(
+      (question) => question.category === category,
+    ).length;
+    expect(count).toBe(expectedCount);
+  }
 }
 
 export function expectNoCorrectOptionLengthOutliers(

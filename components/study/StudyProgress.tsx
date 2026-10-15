@@ -1,7 +1,5 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
-
 import {
   QUESTION_PROGRESS_STORAGE_KEY,
   readQuestionProgress,
@@ -9,18 +7,10 @@ import {
 import { getStudyProgress } from "@/domain/study-progress";
 import { PERCENTAGE_MAX } from "@/domain/percentage";
 import { formatStudyQuestionsRemaining } from "@/i18n/translations";
-import { noopSubscribe } from "@/browser/noop-subscribe";
+import { useLocalStorageSnapshot } from "@/browser/use-local-storage-snapshot";
 import { useTranslations } from "../LocaleProvider";
 
 import styles from "./StudyProgress.module.css";
-
-function getStoredProgressSnapshot(): string | null {
-  return window.localStorage.getItem(QUESTION_PROGRESS_STORAGE_KEY);
-}
-
-function getServerProgressSnapshot(): null {
-  return null;
-}
 
 type RatingRowProps = {
   label: string;
@@ -42,10 +32,8 @@ type StudyProgressProps = {
 
 export function StudyProgress({ questions }: StudyProgressProps) {
   const { locale, t, ratingLabel } = useTranslations();
-  const storedProgressRaw = useSyncExternalStore(
-    noopSubscribe,
-    getStoredProgressSnapshot,
-    getServerProgressSnapshot,
+  const storedProgressRaw = useLocalStorageSnapshot(
+    QUESTION_PROGRESS_STORAGE_KEY,
   );
   const progress = storedProgressRaw === null ? {} : readQuestionProgress();
   const { total, memorized, remaining, percentage, ratings } = getStudyProgress(

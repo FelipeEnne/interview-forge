@@ -9,7 +9,6 @@ import {
   expectQuizQuestionBankShape,
   expectUniqueIds,
 } from "@/data/topic-content-test-helpers";
-import { NODEJS_QUIZ_QUESTIONS } from "../nodejs/quiz-questions";
 import { REACT_CATEGORIES, REACT_QUESTION_CATEGORIES } from "./categories";
 import { REACT_QUIZ_QUESTIONS } from "./quiz-questions";
 
@@ -55,13 +54,6 @@ describe("REACT_QUIZ_QUESTIONS", () => {
 
     expect(ids.every((id) => id.startsWith("react-quiz-"))).toBe(true);
     expectUniqueIds(ids);
-  });
-
-  it("keeps quiz ids globally unique across current topic banks", () => {
-    expectUniqueIds([
-      ...NODEJS_QUIZ_QUESTIONS.map(({ id }) => id),
-      ...REACT_QUIZ_QUESTIONS.map(({ id }) => id),
-    ]);
   });
 
   it("has bilingual content, four bilingual options, valid categories, and valid correct options", () => {

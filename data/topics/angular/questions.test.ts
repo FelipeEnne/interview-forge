@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  expectCategoryDistribution,
   expectStudyQuestionBankShape,
   expectUniqueIds,
 } from "@/data/topic-content-test-helpers";
@@ -82,12 +83,10 @@ describe("ANGULAR_QUESTIONS", () => {
   });
 
   it("matches the approved category distribution", () => {
-    for (const category of ANGULAR_QUESTION_CATEGORIES) {
-      const count = ANGULAR_QUESTIONS.filter(
-        (question) => question.category === category,
-      ).length;
-      expect(count).toBe(EXPECTED_DISTRIBUTION[category]);
-    }
+    expect(Object.keys(EXPECTED_DISTRIBUTION)).toEqual([
+      ...ANGULAR_QUESTION_CATEGORIES,
+    ]);
+    expectCategoryDistribution(ANGULAR_QUESTIONS, EXPECTED_DISTRIBUTION);
   });
 
   it("each question has a valid category and bilingual content", () => {

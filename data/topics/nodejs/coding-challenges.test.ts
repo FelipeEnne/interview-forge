@@ -2,13 +2,9 @@
 
 import { describe, expect, it } from "vitest";
 
+import { expectNonEmptyLocalizedText } from "@/data/topic-content-test-helpers";
 import { QUESTION_CATEGORIES } from "./categories";
 import { NODEJS_CODING_CHALLENGES } from "./coding-challenges";
-
-function expectNonEmptyLocalizedText(value: { en: string; pt: string }) {
-  expect(value.en.trim()).not.toBe("");
-  expect(value.pt.trim()).not.toBe("");
-}
 
 function englishList(items: readonly { en: string }[]) {
   return items.map((item) => item.en).join(" ");

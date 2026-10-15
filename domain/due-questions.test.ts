@@ -56,6 +56,20 @@ describe("getDueQuestions", () => {
     ).toEqual(["past", "exact"]);
   });
 
+  it("excludes questions whose nextReviewAt is not a parseable date", () => {
+    const questions = [{ id: "q1" }];
+    const progress: QuestionProgressState = {
+      q1: {
+        lastRating: "good",
+        reviewCount: 1,
+        lastReviewedAt: "2026-09-18T03:00:00.000Z",
+        nextReviewAt: "not-a-date",
+      },
+    };
+
+    expect(getDueQuestions(questions, progress, CURRENT_TIME)).toEqual([]);
+  });
+
   it("preserves input order, ignores unknown progress, and does not modify inputs", () => {
     const questions = [{ id: "q3" }, { id: "q1" }, { id: "q2" }];
     const progress: QuestionProgressState = {

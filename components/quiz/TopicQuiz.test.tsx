@@ -2,8 +2,13 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  QUIZ_DURATION_MINUTES,
+  QUIZ_QUESTIONS_PER_ATTEMPT,
+} from "@/data/quiz-topics";
 import type { QuizQuestion, QuizTopicData } from "@/data/quiz-types";
 import { readQuizPerformance } from "@/domain/local-storage-quiz-performance";
+import { minutesToMilliseconds } from "@/domain/quiz-timer";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import { renderWithLocale } from "@/i18n/render-with-locale";
@@ -31,11 +36,14 @@ const topic: QuizTopicData = {
     { id: "hooks", displayName: { en: "Hooks", pt: "Hooks" } },
     { id: "state", displayName: { en: "State", pt: "Estado" } },
   ],
-  questions: Array.from({ length: 10 }, (_, index) =>
-    question(`q${index + 1}`, index < 5 ? "hooks" : "state"),
+  questions: Array.from({ length: QUIZ_QUESTIONS_PER_ATTEMPT }, (_, index) =>
+    question(
+      `q${index + 1}`,
+      index < QUIZ_QUESTIONS_PER_ATTEMPT / 2 ? "hooks" : "state",
+    ),
   ),
-  questionsPerAttempt: 10,
-  durationMinutes: 8,
+  questionsPerAttempt: QUIZ_QUESTIONS_PER_ATTEMPT,
+  durationMinutes: QUIZ_DURATION_MINUTES,
 };
 
 const stableRandom = () => 0.999;
@@ -58,11 +66,18 @@ describe("TopicQuiz", () => {
     expect(
       screen.getByRole("heading", { name: "React fixture Proficiency Quiz" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("10 questions")).toBeInTheDocument();
-    expect(screen.getByText("8 minutes")).toBeInTheDocument();
+    expect(
+      screen.getByText(`${QUIZ_QUESTIONS_PER_ATTEMPT} questions`),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(`${QUIZ_DURATION_MINUTES} minutes`),
+    ).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Start quiz" }));
-    expect(screen.getByText("Question 1 of 10")).toBeInTheDocument();
+    expect(
+      screen.getByText(`Question 1 of ${QUIZ_QUESTIONS_PER_ATTEMPT}`),
+    ).toBeInTheDocument();
     expect(screen.getByText("q1 prompt")).toBeInTheDocument();
+    expect(screen.getByText("Time remaining: 08:00")).toBeInTheDocument();
   });
 
   it("scores, persists once, and displays category results", async () => {
@@ -108,7 +123,7 @@ describe("TopicQuiz", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Start quiz" }));
     fireEvent.click(screen.getByRole("radio", { name: "q1 A" }));
-    currentTime += 8 * 60 * 1000;
+    currentTime += minutesToMilliseconds(QUIZ_DURATION_MINUTES);
     rerender(
       <TopicQuiz
         topic={topic}
@@ -116,7 +131,9 @@ describe("TopicQuiz", () => {
         now={() => currentTime}
       />,
     );
-    expect(screen.getByText("1 / 10")).toBeInTheDocument();
+    expect(
+      screen.getByText(`1 / ${QUIZ_QUESTIONS_PER_ATTEMPT}`),
+    ).toBeInTheDocument();
   });
 
   it("starts a fresh attempt from Try again", async () => {
@@ -173,7 +190,7 @@ describe("TopicQuiz", () => {
       fireEvent.click(screen.getByRole("button", { name: "Next" }));
     }
     fireEvent.click(screen.getByRole("radio", { name: "q10 A" }));
-    currentTime += 8 * 60 * 1000;
+    currentTime += minutesToMilliseconds(QUIZ_DURATION_MINUTES);
     fireEvent.click(screen.getByRole("button", { name: "Finish quiz" }));
     rerender(
       <TopicQuiz

@@ -17,7 +17,7 @@ export function recordSessionRating(
   return { ...ratings, [questionId]: rating };
 }
 
-type SessionRatingCounts = {
+export type SessionRatingCounts = {
   total: number;
   again: number;
   hard: number;

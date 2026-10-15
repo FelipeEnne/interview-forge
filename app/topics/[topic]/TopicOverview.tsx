@@ -1,19 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useSyncExternalStore } from "react";
 
-import { CategoryPerformance } from "@/components/quiz/CategoryPerformance";
+import { TopicQuizPerformance } from "@/components/quiz/TopicQuizPerformance";
 import { StudyProgress } from "@/components/study/StudyProgress";
 import type { ChallengeTopicData } from "@/data/challenge-types";
 import type { QuizTopicData } from "@/data/quiz-types";
 import type { StudyTopicData } from "@/data/study-types";
 import type { TopicDefinition } from "@/data/topic-registry";
-import {
-  getQuizPerformanceStorageKey,
-  readQuizPerformance,
-} from "@/domain/local-storage-quiz-performance";
-import { noopSubscribe } from "@/browser/noop-subscribe";
 import { useTranslations } from "@/components/LocaleProvider";
 import styles from "./page.module.css";
 
@@ -23,41 +17,6 @@ type TopicOverviewProps = {
   quizTopic?: QuizTopicData;
   challengeTopic?: ChallengeTopicData;
 };
-
-function TopicQuizPerformance({
-  topic,
-  hasStudy,
-}: {
-  topic: QuizTopicData;
-  hasStudy: boolean;
-}) {
-  const getSnapshot = useCallback(
-    () => window.localStorage.getItem(getQuizPerformanceStorageKey(topic.id)),
-    [topic.id],
-  );
-  const storedPerformance = useSyncExternalStore(
-    noopSubscribe,
-    getSnapshot,
-    () => null,
-  );
-  const performance =
-    storedPerformance === null
-      ? {}
-      : readQuizPerformance(
-          topic.id,
-          topic.categories.map(({ id }) => id),
-        );
-
-  return (
-    <CategoryPerformance
-      performance={performance}
-      categories={topic.categories}
-      studyCategoryBasePath={
-        hasStudy ? `/topics/${topic.id}/categories` : undefined
-      }
-    />
-  );
-}
 
 export function TopicOverview({
   topic,

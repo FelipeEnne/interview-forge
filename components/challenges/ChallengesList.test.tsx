@@ -23,6 +23,18 @@ const baseTopic: ChallengeTopicData = {
 };
 
 describe("ChallengesList", () => {
+  it("renders challenge links with known category labels", () => {
+    render(<ChallengesList topic={baseTopic} />);
+
+    expect(
+      screen.getByRole("heading", { name: "Node.js Coding Challenges" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Known category challenge" }),
+    ).toHaveAttribute("href", "/topics/nodejs/challenges/challenge-1");
+    expect(screen.getByText("Async")).toBeInTheDocument();
+  });
+
   it("falls back to the raw category id when the category is unknown", () => {
     const topic: ChallengeTopicData = {
       ...baseTopic,

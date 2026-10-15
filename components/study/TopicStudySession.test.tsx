@@ -28,7 +28,7 @@ describe("TopicStudySession", () => {
   it("shows the topic name Node.js", () => {
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -65,7 +65,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="React"
+        topicDisplayName={{ en: "React", pt: "React" }}
         categories={reactCategories}
         questions={reactQuestions}
         now={clock.now}
@@ -92,7 +92,7 @@ describe("TopicStudySession", () => {
   it("shows the first question and hides its answer initially", () => {
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -108,7 +108,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -126,7 +126,7 @@ describe("TopicStudySession", () => {
   it("does not show recall rating buttons before the answer is revealed", () => {
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -145,7 +145,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -161,7 +161,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -183,7 +183,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -202,7 +202,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={[sampleQuestions[0]!]}
         now={clock.now}
@@ -222,7 +222,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -248,7 +248,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -268,7 +268,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -291,7 +291,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -312,7 +312,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -332,7 +332,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -355,7 +355,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}
@@ -381,7 +381,7 @@ describe("TopicStudySession", () => {
 
     render(
       <TopicStudySession
-        topicName="Node.js"
+        topicDisplayName={{ en: "Node.js", pt: "Node.js" }}
         categories={sampleCategories}
         questions={sampleQuestions}
         now={clock.now}

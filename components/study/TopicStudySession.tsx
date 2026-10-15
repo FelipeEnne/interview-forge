@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import type { InterviewQuestion } from "@/data/study-types";
+import { getCategoryLabel } from "@/data/category-label";
 import type { CategoryDefinition } from "@/data/category-types";
+import type { InterviewQuestion } from "@/data/study-types";
 import {
   readQuestionProgress,
   saveQuestionProgress,
@@ -13,7 +14,6 @@ import { orderQuestionsForStudy } from "@/domain/question-order";
 import { recordQuestionProgress } from "@/domain/question-progress";
 import {
   countSessionRatings,
-  RECALL_RATING_OPTIONS,
   recordSessionRating,
   type RecallRating,
   type SessionRatings,
@@ -22,12 +22,16 @@ import {
   createStudyQueue,
   type StudySessionMode,
 } from "@/domain/study-session";
+import type { LocalizedText } from "@/i18n/localized-text";
 import { useTranslations } from "../LocaleProvider";
+import { StudyCaughtUpSummary } from "./StudyCaughtUpSummary";
+import { StudyQuestionCard } from "./StudyQuestionCard";
+import { StudySessionCompleteSummary } from "./StudySessionCompleteSummary";
 
 import styles from "./TopicStudySession.module.css";
 
 type TopicStudySessionProps = {
-  topicName: string;
+  topicDisplayName: LocalizedText;
   questions: readonly InterviewQuestion[];
   categories: readonly CategoryDefinition[];
   sessionMode?: StudySessionMode;
@@ -43,7 +47,7 @@ function currentTime() {
 }
 
 export function TopicStudySession({
-  topicName,
+  topicDisplayName,
   questions,
   categories,
   sessionMode = "due-review",
@@ -51,7 +55,7 @@ export function TopicStudySession({
   now = currentTime,
   backLink,
 }: TopicStudySessionProps) {
-  const { t, localize, ratingLabel, questionsReviewed } = useTranslations();
+  const { t, localize } = useTranslations();
   const [sessionQuestions, setSessionQuestions] = useState<
     InterviewQuestion[] | null
   >(null);
@@ -69,21 +73,19 @@ export function TopicStudySession({
     );
   }, [now, questions, sessionMode]);
 
+  const topicName = localize(topicDisplayName);
   const currentQuestion = sessionQuestions?.[currentIndex];
   const isLastQuestion =
     sessionQuestions !== null && currentIndex >= sessionQuestions.length - 1;
   const showRatings = isAnswerVisible && !isSessionComplete;
   const ratingCounts = countSessionRatings(sessionRatings);
-  function categoryLabel(categoryId: string): string {
-    const definition = categories.find(({ id }) => id === categoryId);
-
-    return definition ? localize(definition.displayName) : categoryId;
-  }
+  const categoryLabelFor = (categoryId: string) =>
+    getCategoryLabel(categories, categoryId, localize);
 
   const title = category
     ? t("topicCategoryTitle", {
         topic: topicName,
-        category: categoryLabel(category),
+        category: categoryLabelFor(category),
       })
     : topicName;
 
@@ -148,76 +150,21 @@ export function TopicStudySession({
         {sessionQuestions === null ? (
           <p className={styles.question}>{t("preparingStudySession")}</p>
         ) : isSessionComplete ? (
-          <div className={styles.summary}>
-            <p className={styles.sessionComplete}>{t("sessionComplete")}</p>
-            <p className={styles.summaryTotal}>
-              {questionsReviewed(ratingCounts.total)}
-            </p>
-            <ul className={styles.summaryCounts}>
-              {RECALL_RATING_OPTIONS.map((rating) => (
-                <li key={rating}>
-                  {ratingLabel(rating)}: {ratingCounts[rating]}
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              className={`${styles.button} ${styles.buttonPrimary}`}
-              onClick={handleStudyAgain}
-            >
-              {t("studyAgain")}
-            </button>
-          </div>
+          <StudySessionCompleteSummary
+            ratingCounts={ratingCounts}
+            onStudyAgain={handleStudyAgain}
+          />
         ) : sessionMode === "due-review" && sessionQuestions.length === 0 ? (
-          <div className={styles.summary}>
-            <p className={styles.sessionComplete}>{t("allCaughtUp")}</p>
-            <p className={styles.summaryTotal}>{t("noQuestionsDue")}</p>
-            <button
-              type="button"
-              className={`${styles.button} ${styles.buttonPrimary}`}
-              onClick={handleStudyAllQuestions}
-            >
-              {t("studyAllQuestions")}
-            </button>
-          </div>
+          <StudyCaughtUpSummary onStudyAllQuestions={handleStudyAllQuestions} />
         ) : currentQuestion ? (
-          <>
-            <p className={styles.category}>
-              {categoryLabel(currentQuestion.category)}
-            </p>
-            <p className={styles.question}>
-              {localize(currentQuestion.question)}
-            </p>
-            {isAnswerVisible ? (
-              <p className={styles.answer}>
-                {localize(currentQuestion.answer)}
-              </p>
-            ) : null}
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={`${styles.button} ${styles.buttonPrimary}`}
-                onClick={handleShowAnswer}
-                disabled={isAnswerVisible}
-              >
-                {t("showAnswer")}
-              </button>
-              {showRatings ? (
-                <div className={styles.ratings}>
-                  {RECALL_RATING_OPTIONS.map((rating) => (
-                    <button
-                      key={rating}
-                      type="button"
-                      className={styles.button}
-                      onClick={() => handleRating(rating)}
-                    >
-                      {ratingLabel(rating)}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </>
+          <StudyQuestionCard
+            question={currentQuestion}
+            categoryLabel={categoryLabelFor(currentQuestion.category)}
+            isAnswerVisible={isAnswerVisible}
+            showRatings={showRatings}
+            onShowAnswer={handleShowAnswer}
+            onRate={handleRating}
+          />
         ) : null}
       </article>
     </div>

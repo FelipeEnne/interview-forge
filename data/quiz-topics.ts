@@ -8,8 +8,8 @@ import type { CategoryDefinition } from "./category-types";
 import type { QuizQuestion, QuizTopicData } from "./quiz-types";
 import { getTopicById } from "./topic-registry";
 
-const QUESTIONS_PER_ATTEMPT = 10;
-const DURATION_MINUTES = 8;
+export const QUIZ_QUESTIONS_PER_ATTEMPT = 10;
+export const QUIZ_DURATION_MINUTES = 8;
 
 function buildQuizTopic(
   topicId: string,
@@ -23,8 +23,8 @@ function buildQuizTopic(
     displayName: definition.displayName,
     categories,
     questions,
-    questionsPerAttempt: QUESTIONS_PER_ATTEMPT,
-    durationMinutes: DURATION_MINUTES,
+    questionsPerAttempt: QUIZ_QUESTIONS_PER_ATTEMPT,
+    durationMinutes: QUIZ_DURATION_MINUTES,
   };
 }
 

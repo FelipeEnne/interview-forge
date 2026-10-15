@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { getCategoryLabel } from "@/data/category-label";
 import type { CategoryDefinition } from "@/data/category-types";
 import type { QuizPerformance } from "@/domain/quiz-performance";
 import { getLowestCategoryPerformance } from "@/domain/quiz-performance";
@@ -41,10 +42,7 @@ export function CategoryPerformance({
       </h2>
       <ul className={styles.list}>
         {entries.map(({ category, correct, total, percentage }) => {
-          const definition = categories.find(({ id }) => id === category);
-          const label = definition
-            ? localize(definition.displayName)
-            : category;
+          const label = getCategoryLabel(categories, category, localize);
 
           return (
             <li key={category} className={styles.item}>

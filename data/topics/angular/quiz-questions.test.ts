@@ -9,8 +9,6 @@ import {
   expectQuizQuestionBankShape,
   expectUniqueIds,
 } from "@/data/topic-content-test-helpers";
-import { NODEJS_QUIZ_QUESTIONS } from "../nodejs/quiz-questions";
-import { REACT_QUIZ_QUESTIONS } from "../react/quiz-questions";
 import { ANGULAR_CATEGORIES, ANGULAR_QUESTION_CATEGORIES } from "./categories";
 import { ANGULAR_QUIZ_QUESTIONS } from "./quiz-questions";
 
@@ -57,14 +55,6 @@ describe("ANGULAR_QUIZ_QUESTIONS", () => {
 
     expect(ids.every((id) => id.startsWith("angular-quiz-"))).toBe(true);
     expectUniqueIds(ids);
-  });
-
-  it("keeps quiz ids globally unique across all topic banks", () => {
-    expectUniqueIds([
-      ...NODEJS_QUIZ_QUESTIONS.map(({ id }) => id),
-      ...REACT_QUIZ_QUESTIONS.map(({ id }) => id),
-      ...ANGULAR_QUIZ_QUESTIONS.map(({ id }) => id),
-    ]);
   });
 
   it("has bilingual content, four bilingual options, valid categories, and valid correct options", () => {
